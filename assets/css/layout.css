@@ -665,3 +665,9 @@
 .page-nav .nav-next {
   margin-left: auto;
 }
+
+.page-nav .disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: default;
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f0f1a"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f7cff"/>
+      <stop offset="100%" stop-color="#6f9bff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1200" height="4" fill="url(#accentGrad)"/>
+  <circle cx="200" cy="315" r="120" fill="#00758f" opacity="0.15"/>
+  <circle cx="200" cy="315" r="80" fill="#00758f" opacity="0.25"/>
+  <text x="200" y="340" font-family="system-ui" font-size="100" text-anchor="middle" fill="#4db3c9">MySQL</text>
+  <text x="600" y="280" font-family="system-ui" font-weight="700" font-size="48" fill="#eaeaf5" text-anchor="middle">Guía de MySQL</text>
+  <text x="600" y="340" font-family="system-ui" font-weight="400" font-size="24" fill="#b0b0c8" text-anchor="middle">Aprende MySQL desde cero a experto</text>
+  <text x="600" y="390" font-family="system-ui" font-weight="400" font-size="18" fill="#7a7a94" text-anchor="middle">Guía completa y gratuita · Ejemplos prácticos · 11 módulos</text>
+  <rect x="440" y="440" width="320" height="40" rx="20" fill="#4f7cff"/>
+  <text x="600" y="467" font-family="system-ui" font-weight="600" font-size="16" fill="#fff" text-anchor="middle">apaza-victor.github.io/Guia-de-MySQL</text>
+</svg>

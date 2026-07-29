@@ -1,0 +1,20 @@
+{
+  "name": "Guía de MySQL",
+  "short_name": "Guía MySQL",
+  "description": "Guía completa y gratuita para aprender MySQL paso a paso. Desde fundamentos hasta nivel experto.",
+  "start_url": "/Guia-de-MySQL/",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#00758f",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/Guia-de-MySQL/assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "technology"],
+  "lang": "es-ES"
+}

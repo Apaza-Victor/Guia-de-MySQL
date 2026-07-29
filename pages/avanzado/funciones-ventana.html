@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#00758f">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funciones ventana (Window Functions) - Guía MySQL</title>
+  <meta name="description" content="Aprende a usar funciones ventana en MySQL: ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD, SUM OVER y más.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="avanzado" data-page="funciones-ventana">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Avanzado</a></li>
+      <li class="active">Funciones ventana</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area" id="main-content">
+        <h1>Funciones ventana (Window Functions)</h1>
+        <p>Las <strong>funciones ventana</strong> (window functions) realizan cálculos sobre un conjunto de filas relacionadas con la fila actual, sin colapsar los resultados como hacen <code>GROUP BY</code> y las funciones agregadas. Fueron introducidas en <strong>MySQL 8.0</strong> y son esenciales para análisis de datos, reporting y rankings.</p>
+
+        <h2>¿Qué son las funciones ventana?</h2>
+        <p>Una función ventana opera sobre una "ventana" (window) definida por la cláusula <code>OVER()</code>. A diferencia de <code>GROUP BY</code>, las funciones ventana no agrupan filas en una sola salida — cada fila conserva su identidad y la función agrega un valor calculado.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Sintaxis general
+SELECT columna1, columna2,
+       funcion_ventana() OVER (
+           PARTITION BY columna   -- opcional: divide en particiones
+           ORDER BY columna       -- opcional: orden dentro de cada partición
+       ) AS resultado
+FROM tabla;</code></pre>
+        </div>
+
+        <h2>Datos de ejemplo</h2>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE empleados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50),
+    departamento VARCHAR(50),
+    salario DECIMAL(10,2),
+    fecha_ingreso DATE
+);
+
+INSERT INTO empleados (nombre, departamento, salario, fecha_ingreso) VALUES
+('Ana López', 'Ventas', 3500, '2021-03-15'),
+('Carlos Ruiz', 'Ventas', 4200, '2020-06-01'),
+('María Díaz', 'IT', 5000, '2022-01-10'),
+('Pedro Gómez', 'IT', 4800, '2019-11-20'),
+('Laura Torres', 'Ventas', 3100, '2023-02-28'),
+('Roberto Vega', 'IT', 5200, '2018-05-12'),
+('Sofía Rivas', 'IT', 4600, '2021-09-01'),
+('Diego Muñoz', 'Ventas', 3900, '2020-08-14');</code></pre>
+        </div>
+
+        <h2>ROW_NUMBER() — Numeración de filas</h2>
+        <p>Asigna un número único incremental a cada fila dentro de una partición:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, departamento, salario,
+    ROW_NUMBER() OVER (ORDER BY salario DESC) AS ranking_global,
+    ROW_NUMBER() OVER (PARTITION BY departamento ORDER BY salario DESC) AS ranking_depto
+FROM empleados;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>departamento</th><th>salario</th><th>ranking_global</th><th>ranking_depto</th></tr></thead>
+            <tbody>
+              <tr><td>Roberto Vega</td><td>IT</td><td>5200</td><td>1</td><td>1</td></tr>
+              <tr><td>María Díaz</td><td>IT</td><td>5000</td><td>2</td><td>2</td></tr>
+              <tr><td>Pedro Gómez</td><td>IT</td><td>4800</td><td>3</td><td>3</td></tr>
+              <tr><td>Carlos Ruiz</td><td>Ventas</td><td>4200</td><td>4</td><td>1</td></tr>
+              <tr><td>Diego Muñoz</td><td>Ventas</td><td>3900</td><td>5</td><td>2</td></tr>
+              <tr><td>Ana López</td><td>Ventas</td><td>3500</td><td>6</td><td>3</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>RANK() y DENSE_RANK() — Ranking con empates</h2>
+        <p><code>RANK()</code> asigna el mismo rango a valores iguales, pero salta números después de un empate. <code>DENSE_RANK()</code> no salta números:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, departamento, salario,
+    RANK() OVER (ORDER BY salario DESC) AS ranking,
+    DENSE_RANK() OVER (ORDER BY salario DESC) AS dense_ranking
+FROM empleados;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>salario</th><th>RANK()</th><th>DENSE_RANK()</th></tr></thead>
+            <tbody>
+              <tr><td>Roberto Vega</td><td>5200</td><td>1</td><td>1</td></tr>
+              <tr><td>María Díaz</td><td>5000</td><td>2</td><td>2</td></tr>
+              <tr><td>Pedro Gómez</td><td>4800</td><td>3</td><td>3</td></tr>
+              <tr><td>Sofía Rivas</td><td>4600</td><td>4</td><td>4</td></tr>
+              <tr><td>Carlos Ruiz</td><td>4200</td><td>5</td><td>5</td></tr>
+              <tr><td>Diego Muñoz</td><td>3900</td><td>6</td><td>6</td></tr>
+              <tr><td>Ana López</td><td>3500</td><td>7</td><td>7</td></tr>
+              <tr><td>Laura Torres</td><td>3100</td><td>8</td><td>8</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>LAG() y LEAD() — Acceso a filas adyacentes</h2>
+        <p><code>LAG()</code> accede al valor de una fila anterior y <code>LEAD()</code> al de una fila posterior dentro de la ventana:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, salario,
+    LAG(salario, 1, 0) OVER (ORDER BY salario) AS salario_anterior,
+    salario - LAG(salario, 1, 0) OVER (ORDER BY salario) AS diferencia,
+    LEAD(salario, 1, 0) OVER (ORDER BY salario) AS salario_siguiente
+FROM empleados;</code></pre>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p><code>LAG(columna, offset, default)</code> — el segundo parámetro es cuántas filas retroceder (1 por defecto), y el tercero es el valor por defecto si no hay fila anterior.</p></div></div>
+
+        <h2>SUM() OVER — Totales acumulados</h2>
+        <p>Las funciones agregadas como <code>SUM</code>, <code>AVG</code>, <code>COUNT</code>, <code>MIN</code> y <code>MAX</code> también pueden usarse como funciones ventana:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, departamento, salario,
+    SUM(salario) OVER (PARTITION BY departamento) AS total_depto,
+    ROUND(AVG(salario) OVER (PARTITION BY departamento), 2) AS promedio_depto,
+    SUM(salario) OVER (ORDER BY salario) AS acumulado_global
+FROM empleados;</code></pre>
+        </div>
+
+        <h2>Frame: ventanas móviles</h2>
+        <p>Puedes definir un <strong>frame</strong> (marco) dentro de la ventana para limitar las filas consideradas. Esto es útil para medias móviles y totales parciales:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Media móvil de 3 salarios (fila actual + 2 anteriores)
+SELECT nombre, salario,
+    AVG(salario) OVER (
+        ORDER BY salario
+        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+    ) AS media_movil_3
+FROM empleados;
+
+-- Total acumulado por departamento
+SELECT nombre, departamento, salario,
+    SUM(salario) OVER (
+        PARTITION BY departamento
+        ORDER BY salario
+        ROWS UNBOUNDED PRECEDING
+    ) AS acumulado_depto
+FROM empleados;</code></pre>
+        </div>
+
+        <div class="callout callout-warning"><div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div><div class="callout-content"><p>Las funciones ventana solo están disponibles en <strong>MySQL 8.0+</strong>. Si usas MySQL 5.7 o inferior, no podrás utilizar esta funcionalidad. Considera actualizar o simular con variables de usuario.</p></div></div>
+
+        <h2>Resumen de funciones ventana</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Función</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr><td><code>ROW_NUMBER()</code></td><td>Número único de fila dentro de la partición</td></tr>
+              <tr><td><code>RANK()</code></td><td>Ranking con saltos en empates</td></tr>
+              <tr><td><code>DENSE_RANK()</code></td><td>Ranking sin saltos en empates</td></tr>
+              <tr><td><code>NTILE(n)</code></td><td>Divide las filas en n grupos (percentiles)</td></tr>
+              <tr><td><code>LAG(col, offset, default)</code></td><td>Valor de fila anterior</td></tr>
+              <tr><td><code>LEAD(col, offset, default)</code></td><td>Valor de fila siguiente</td></tr>
+              <tr><td><code>FIRST_VALUE(col)</code></td><td>Primer valor de la ventana</td></tr>
+              <tr><td><code>LAST_VALUE(col)</code></td><td>Último valor de la ventana</td></tr>
+              <tr><td><code>SUM/AVG/COUNT/MIN/MAX OVER</code></td><td>Agregaciones como función ventana</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <nav class="page-nav">
+          <a href="cte.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior: CTEs</a>
+          <a href="set-operators.html" class="nav-next">Siguiente: Operadores de conjunto <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script defer src="../../assets/js/theme-switcher.js"></script>
+  <script defer src="../../assets/js/include-partials.js"></script>
+  <script defer src="../../assets/js/navbar.js"></script>
+  <script defer src="../../assets/js/copy-code.js"></script>
+  <script defer src="../../assets/js/search.js"></script>
+  <script defer src="../../assets/js/main.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/Guia-de-MySQL/sw.js');
+  });
+}
+</script>
+</body>
+</html>

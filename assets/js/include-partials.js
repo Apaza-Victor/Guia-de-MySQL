@@ -55,6 +55,7 @@
         links.forEach(function (a) {
           if (a.getAttribute('data-page') === currentPage) {
             a.classList.add('active');
+            a.setAttribute('aria-current', 'page');
           }
         });
       }

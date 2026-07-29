@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#00758f">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operadores de conjunto (UNION, INTERSECT, EXCEPT) - Guía MySQL</title>
+  <meta name="description" content="Aprende a combinar resultados de múltiples consultas con UNION, UNION ALL, INTERSECT y EXCEPT en MySQL.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="avanzado" data-page="set-operators">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Avanzado</a></li>
+      <li class="active">Operadores de conjunto</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area" id="main-content">
+        <h1>Operadores de conjunto (UNION, INTERSECT, EXCEPT)</h1>
+        <p>Los <strong>operadores de conjunto</strong> permiten combinar los resultados de dos o más consultas <code>SELECT</code> en un solo resultado. A diferencia de los <code>JOINs</code> que combinan columnas horizontalmente, los operadores de conjunto apilan filas verticalmente o encuentran coincidencias entre conjuntos.</p>
+
+        <h2>Reglas fundamentales</h2>
+        <p>Para usar cualquier operador de conjunto, ambas consultas deben cumplir:</p>
+        <ul>
+          <li>Mismo número de columnas en el <code>SELECT</code>.</li>
+          <li>Tipos de datos compatibles columna por columna.</li>
+          <li>El orden de las columnas determina la correspondencia (no los nombres).</li>
+        </ul>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Sintaxis general
+SELECT columna1, columna2 FROM tabla1
+OPERADOR
+SELECT columna1, columna2 FROM tabla2
+ORDER BY columna1;</code></pre>
+        </div>
+
+        <h2>UNION vs UNION ALL</h2>
+        <p><code>UNION</code> combina resultados de dos consultas eliminando duplicados. <code>UNION ALL</code> los combina sin eliminar duplicados (más rápido).</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Datos de ejemplo
+CREATE TABLE clientes_2023 (
+    id INT, nombre VARCHAR(50), email VARCHAR(100)
+);
+CREATE TABLE clientes_2024 (
+    id INT, nombre VARCHAR(50), email VARCHAR(100)
+);
+
+INSERT INTO clientes_2023 VALUES
+(1, 'Ana López', 'ana@email.com'),
+(2, 'Carlos Ruiz', 'carlos@email.com'),
+(3, 'María Díaz', 'maria@email.com');
+
+INSERT INTO clientes_2024 VALUES
+(2, 'Carlos Ruiz', 'carlos@email.com'),
+(3, 'María Díaz', 'maria@email.com'),
+(4, 'Pedro Gómez', 'pedro@email.com');
+
+-- UNION ALL: todos los registros (incluye duplicados)
+SELECT nombre, email FROM clientes_2023
+UNION ALL
+SELECT nombre, email FROM clientes_2024;
+
+-- UNION: sin duplicados
+SELECT nombre, email FROM clientes_2023
+UNION
+SELECT nombre, email FROM clientes_2024;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Consulta</th><th>Filas</th><th>Incluye duplicados?</th></tr></thead>
+            <tbody>
+              <tr><td>UNION ALL</td><td>6</td><td>Sí (Carlos y María aparecen 2 veces)</td></tr>
+              <tr><td>UNION</td><td>4</td><td>No</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Usa <code>UNION ALL</code> cuando sepas que no hay duplicados o cuando no te importen. Es significativamente más rápido que <code>UNION</code> porque evita la operación de eliminación de duplicados.</p></div></div>
+
+        <h2>UNION con ORDER BY y LIMIT</h2>
+        <p>Puedes ordenar el resultado final con <code>ORDER BY</code> al final. Si necesitas orden o límite por cada consulta individual, usa subconsultas o paréntesis:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- ORDER BY global (al final)
+SELECT id, nombre FROM clientes_2023
+UNION
+SELECT id, nombre FROM clientes_2024
+ORDER BY nombre ASC;
+
+-- LIMIT por consulta individual (con paréntesis)
+(SELECT * FROM clientes_2023 ORDER BY id DESC LIMIT 2)
+UNION
+(SELECT * FROM clientes_2024 ORDER BY id DESC LIMIT 2);</code></pre>
+        </div>
+
+        <h2>INTERSECT</h2>
+        <p><code>INTERSECT</code> devuelve solo las filas que existen en <strong>ambas</strong> consultas. Está disponible desde <strong>MySQL 8.0.31</strong>:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Clientes que están en ambos años
+SELECT nombre, email FROM clientes_2023
+INTERSECT
+SELECT nombre, email FROM clientes_2024;
+
+-- Resultado: Carlos Ruiz y María Díaz (2 filas)</code></pre>
+        </div>
+
+        <div class="callout callout-warning"><div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div><div class="callout-content"><p><code>INTERSECT</code> y <code>EXCEPT</code> están disponibles desde <strong>MySQL 8.0.31</strong> (MariaDB los soporta desde versiones anteriores). Si usas MySQL 8.0.30 o inferior, puedes simularlos con <code>IN</code>, <code>EXISTS</code> o <code>JOIN</code>.</p></div></div>
+
+        <h2>EXCEPT (o MINUS)</h2>
+        <p><code>EXCEPT</code> devuelve las filas de la primera consulta que <strong>no</strong> existen en la segunda. En Oracle se llama <code>MINUS</code>:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Clientes de 2023 que NO están en 2024
+SELECT nombre, email FROM clientes_2023
+EXCEPT
+SELECT nombre, email FROM clientes_2024;
+
+-- Resultado: Ana López (1 fila)
+
+-- Simular EXCEPT en MySQL < 8.0.31
+SELECT c2023.* FROM clientes_2023 c2023
+WHERE NOT EXISTS (
+    SELECT 1 FROM clientes_2024 c2024
+    WHERE c2024.email = c2023.email
+);</code></pre>
+        </div>
+
+        <h2>Ejemplo práctico: reporte de ventas</h2>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Productos más vendidos en 2023 y 2024
+(SELECT '2023' AS año, p.nombre, SUM(v.cantidad) AS total
+ FROM ventas_2023 v JOIN productos p ON v.producto_id = p.id
+ GROUP BY p.nombre
+ ORDER BY total DESC LIMIT 5)
+
+UNION ALL
+
+(SELECT '2024' AS año, p.nombre, SUM(v.cantidad) AS total
+ FROM ventas_2024 v JOIN productos p ON v.producto_id = p.id
+ GROUP BY p.nombre
+ ORDER BY total DESC LIMIT 5)
+ORDER BY año, total DESC;</code></pre>
+        </div>
+
+        <h2>Comparativa rápida</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Operador</th><th>Qué devuelve</th><th>Elimina duplicados?</th><th>MySQL</th></tr></thead>
+            <tbody>
+              <tr><td><code>UNION</code></td><td>Filas de A + B</td><td>Sí</td><td>Todas las versiones</td></tr>
+              <tr><td><code>UNION ALL</code></td><td>Filas de A + B</td><td>No</td><td>Todas las versiones</td></tr>
+              <tr><td><code>INTERSECT</code></td><td>Filas comunes A ∩ B</td><td>Sí</td><td>8.0.31+</td></tr>
+              <tr><td><code>EXCEPT</code></td><td>Filas en A pero no en B</td><td>Sí</td><td>8.0.31+</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <nav class="page-nav">
+          <a href="funciones-ventana.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior: Funciones ventana</a>
+          <a href="#" class="nav-next disabled">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script defer src="../../assets/js/theme-switcher.js"></script>
+  <script defer src="../../assets/js/include-partials.js"></script>
+  <script defer src="../../assets/js/navbar.js"></script>
+  <script defer src="../../assets/js/copy-code.js"></script>
+  <script defer src="../../assets/js/search.js"></script>
+  <script defer src="../../assets/js/main.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/Guia-de-MySQL/sw.js');
+  });
+}
+</script>
+</body>
+</html>

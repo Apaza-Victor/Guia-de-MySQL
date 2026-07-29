@@ -3,7 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://apaza-victor.github.io/Guia-de-MySQL/404.html">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="Guía de MySQL">
+  <meta property="og:url" content="https://apaza-victor.github.io/Guia-de-MySQL/404.html">
+  <meta property="og:image" content="https://apaza-victor.github.io/Guia-de-MySQL/assets/og-image.svg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="ssets/favicon.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Página no encontrada - Guía MySQL">
+  <meta name="twitter:description" content="La página que buscas no existe.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Página no encontrada - Guía MySQL",
+    "description": "La página que buscas no existe.",
+    "url": "https://apaza-victor.github.io/Guia-de-MySQL/404.html",
+    "author": { "@type": "Person", "name": "Apaza Victor" },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Guía de MySQL",
+      "logo": { "@type": "ImageObject", "url": "https://apaza-victor.github.io/Guia-de-MySQL/assets/favicon.svg" }
+    },
+    "image": "https://apaza-victor.github.io/Guia-de-MySQL/assets/og-image.svg",
+    "inLanguage": "es-ES",
+    "isAccessibleForFree": true
+  }
+  </script>
   <meta name="theme-color" content="#00758f">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Página no encontrada - Guía MySQL</title>
   <meta name="description" content="La página que buscas no existe.">
@@ -23,23 +58,109 @@
   </script>
 </head>
 <body data-base=".">
+  <a href="#main-content" class="skip-link">Saltar al contenido</a>
   <div id="header-placeholder"></div>
   <aside class="sidebar" id="sidebar-placeholder" style="display:none" aria-hidden="true"></aside>
-  <main class="container" style="min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:3rem 1rem;">
-    <div>
-      <h1 style="font-size:clamp(4rem,10vw,6rem);color:var(--accent);margin-bottom:0;">404</h1>
-      <h2 style="margin-bottom:1rem;">Página no encontrada</h2>
-      <p style="max-width:450px;margin:0 auto 1.5rem;">La página que estás buscando no existe o ha sido movida. Revisa la navegación o vuelve al inicio.</p>
-      <a href="index.html" class="btn btn-primary"><i class="bi bi-house"></i> Volver al inicio</a>
+  <main class="container" id="main-content">
+    <div style="min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:3rem 1rem;">
+      <div>
+        <h1 style="font-size:clamp(4rem,10vw,6rem);color:var(--accent);margin-bottom:0;">404</h1>
+        <h2 style="margin-bottom:1rem;">Página no encontrada</h2>
+        <p style="max-width:450px;margin:0 auto 1.5rem;">La página que estás buscando no existe o ha sido movida. Revisa la navegación o vuelve al inicio.</p>
+        <a href="index.html" class="btn btn-primary" style="margin-bottom:2rem;"><i class="bi bi-house"></i> Volver al inicio</a>
+
+        <div style="max-width:400px;margin:0 auto;">
+          <p style="font-size:0.9rem;margin-bottom:0.75rem;">Buscar en la guía:</p>
+          <div class="search-box" style="max-width:300px;margin:0 auto;">
+            <input type="text" id="searchInput404" placeholder="Buscar temas..." aria-label="Buscar">
+            <i class="bi bi-search search-icon"></i>
+          </div>
+        </div>
+
+        <div style="margin-top:2rem;">
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.5rem;">O explora algunos módulos populares:</p>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;">
+            <a href="pages/fundamentos/que-es-mysql.html" class="btn btn-outline" style="font-size:0.8rem;padding:0.4rem 0.8rem;">Fundamentos</a>
+            <a href="pages/consultas-basicas/select.html" class="btn btn-outline" style="font-size:0.8rem;padding:0.4rem 0.8rem;">SQL Básico</a>
+            <a href="pages/consultas-intermedias/joins.html" class="btn btn-outline" style="font-size:0.8rem;padding:0.4rem 0.8rem;">JOINs</a>
+            <a href="pages/avanzado/indices.html" class="btn btn-outline" style="font-size:0.8rem;padding:0.4rem 0.8rem;">Índices</a>
+            <a href="pages/practica/ejercicios-basicos.html" class="btn btn-outline" style="font-size:0.8rem;padding:0.4rem 0.8rem;">Ejercicios</a>
+            <a href="pages/glosario/glosario.html" class="btn btn-outline" style="font-size:0.8rem;padding:0.4rem 0.8rem;">Glosario</a>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var input = document.getElementById('searchInput404');
+      if (input) {
+        var container = document.createElement('div');
+        container.className = 'search-results-header';
+        input.parentNode.style.position = 'relative';
+        input.parentNode.appendChild(container);
+
+        input.addEventListener('input', function() {
+          if (typeof searchIndex === 'undefined') {
+            loadSearchIndex(function() { input.dispatchEvent(new Event('input')); });
+            return;
+          }
+          var query = this.value.trim();
+          if (query.length < 2) { container.style.display = 'none'; return; }
+          var results = searchInIndex(query);
+          if (results.length === 0) {
+            container.innerHTML = '<div class="no-results">Sin resultados</div>';
+            container.style.display = 'block';
+            return;
+          }
+          container.innerHTML = results.map(function(r) {
+            return '<a href="' + r.url + '"><div style="font-weight:600;">' + highlightText(r.title, query) + '</div>' +
+              (r.description ? '<div style="font-size:0.75rem;color:var(--text-muted);">' + highlightText(r.description, query) + '</div>' : '') + '</a>';
+          }).join('');
+          container.style.display = 'block';
+        });
+
+        function loadSearchIndex(cb) {
+          fetch('assets/search-index.json').then(function(r) { return r.json(); }).then(function(data) {
+            window.searchIndex = data;
+            if (cb) cb();
+          });
+        }
+
+        function searchInIndex(q) {
+          q = q.toLowerCase();
+          return (window.searchIndex || []).filter(function(p) {
+            return (p.title + ' ' + p.h1 + ' ' + p.description + ' ' + (p.headings||[]).join(' ') + ' ' + (p.text||'')).toLowerCase().indexOf(q) !== -1;
+          }).slice(0, 8).map(function(p) { return { url: p.url, title: p.title, description: p.description }; });
+        }
+
+        function highlightText(text, query) {
+          var r = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          return text.replace(new RegExp('(' + r + ')', 'gi'), '<span style="background:var(--accent-light);color:var(--accent);font-weight:700;">$1</span>');
+        }
+
+        document.addEventListener('click', function(e) {
+          if (!e.target.closest('.search-box')) container.style.display = 'none';
+        });
+      }
+    });
+  </script>
   <div id="footer-placeholder"></div>
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-  <script src="assets/js/theme-switcher.js"></script>
-  <script src="assets/js/include-partials.js"></script>
-  <script src="assets/js/navbar.js"></script>
-  <script src="assets/js/copy-code.js"></script>
-  <script src="assets/js/search.js"></script>
-  <script src="assets/js/main.js"></script>
+  <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script defer src="assets/js/theme-switcher.js"></script>
+  <script defer src="assets/js/include-partials.js"></script>
+  <script defer src="assets/js/navbar.js"></script>
+  <script defer src="assets/js/copy-code.js"></script>
+  <script defer src="assets/js/search.js"></script>
+  <script defer src="assets/js/main.js"></script>
+
+  <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/Guia-de-MySQL/sw.js');
+  });
+}
+</script>
 </body>
 </html>

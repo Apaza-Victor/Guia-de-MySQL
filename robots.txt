@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://apaza-victor.github.io/Guia-de-MySQL/sitemap.xml

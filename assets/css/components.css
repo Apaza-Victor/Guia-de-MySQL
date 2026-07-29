@@ -96,6 +96,11 @@
   margin-bottom: 0;
 }
 
+.card-link {
+  margin-top: 0.75rem;
+  display: inline-block;
+}
+
 /* Module cards grid */
 .module-grid {
   display: grid;

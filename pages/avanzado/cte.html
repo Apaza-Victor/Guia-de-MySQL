@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#00758f">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CTEs y consultas recursivas (WITH) - Guía MySQL</title>
+  <meta name="description" content="Aprende a usar Common Table Expressions (WITH) en MySQL para consultas más legibles y recursivas.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="avanzado" data-page="cte">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Avanzado</a></li>
+      <li class="active">CTEs y consultas recursivas</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area" id="main-content">
+        <h1>CTEs y consultas recursivas (WITH)</h1>
+        <p>Una <strong>Common Table Expression (CTE)</strong> es una consulta temporal con nombre que puedes referenciar dentro de una sentencia <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code> o <code>DELETE</code>. Se definen con la cláusula <code>WITH</code> y hacen que el SQL sea más legible, modular y fácil de mantener.</p>
+
+        <h2>¿Qué es una CTE?</h2>
+        <p>Una CTE actúa como una vista temporal que existe solo durante la ejecución de la consulta. A diferencia de una subconsulta, puedes referenciar una CTE múltiples veces dentro de la misma sentencia, lo que evita duplicación y mejora la claridad del código.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Sintaxis básica de CTE
+WITH nombre_cte AS (
+    SELECT columna1, columna2
+    FROM tabla
+    WHERE condicion
+)
+SELECT * FROM nombre_cte;</code></pre>
+        </div>
+
+        <h2>CTE simple</h2>
+        <p>Supongamos una tabla <code>empleados</code> y queremos obtener los empleados con salario superior al promedio de su departamento:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Datos de ejemplo
+CREATE TABLE empleados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50),
+    departamento VARCHAR(50),
+    salario DECIMAL(10,2)
+);
+
+INSERT INTO empleados (nombre, departamento, salario) VALUES
+('Ana López', 'Ventas', 3500),
+('Carlos Ruiz', 'Ventas', 4200),
+('María Díaz', 'IT', 5000),
+('Pedro Gómez', 'IT', 4800),
+('Laura Torres', 'Ventas', 3100),
+('Roberto Vega', 'IT', 5200);
+
+-- CTE: promedio por departamento
+WITH promedio_depto AS (
+    SELECT departamento, AVG(salario) AS salario_promedio
+    FROM empleados
+    GROUP BY departamento
+)
+SELECT e.nombre, e.departamento, e.salario, p.salario_promedio
+FROM empleados e
+JOIN promedio_depto p ON e.departamento = p.departamento
+WHERE e.salario > p.salario_promedio;</code></pre>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Las CTE hacen que las consultas complejas sean más legibles que las subconsultas anidadas, especialmente cuando necesitas referenciar el mismo resultado varias veces.</p></div></div>
+
+        <h2>Múltiples CTEs</h2>
+        <p>Puedes definir varias CTEs separadas por comas. Cada una puede referenciar a las anteriores:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">WITH
+ventas_2023 AS (
+    SELECT cliente_id, SUM(total) AS total_2023
+    FROM pedidos WHERE YEAR(fecha) = 2023
+    GROUP BY cliente_id
+),
+ventas_2024 AS (
+    SELECT cliente_id, SUM(total) AS total_2024
+    FROM pedidos WHERE YEAR(fecha) = 2024
+    GROUP BY cliente_id
+)
+SELECT 
+    c.nombre,
+    v2023.total_2023,
+    v2024.total_2024,
+    (v2024.total_2024 - v2023.total_2023) AS crecimiento
+FROM clientes c
+LEFT JOIN ventas_2023 v2023 ON c.id = v2023.cliente_id
+LEFT JOIN ventas_2024 v2024 ON c.id = v2024.cliente_id
+ORDER BY crecimiento DESC;</code></pre>
+        </div>
+
+        <h2>CTE recursiva</h2>
+        <p>Las CTEs recursivas se utilizan para trabajar con datos jerárquicos como árboles de categorías, organigramas o rutas. Una CTE recursiva tiene dos partes: un <strong>ancla</strong> (consulta base) y una <strong>parte recursiva</strong> que se une al resultado anterior con <code>UNION ALL</code>.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Estructura jerárquica: categorías
+CREATE TABLE categorias (
+    id INT PRIMARY KEY,
+    nombre VARCHAR(100),
+    padre_id INT NULL,
+    FOREIGN KEY (padre_id) REFERENCES categorias(id)
+);
+
+INSERT INTO categorias VALUES
+(1, 'Electrónica', NULL),
+(2, 'Computadoras', 1),
+(3, 'Celulares', 1),
+(4, 'Laptops', 2),
+(5, 'Accesorios PC', 2),
+(6, 'Tablets', 3),
+(7, 'Auriculares', 5);
+
+-- CTE recursiva: árbol completo con nivel
+WITH RECURSIVE arbol AS (
+    -- Ancla: nodos raíz (sin padre)
+    SELECT id, nombre, padre_id, 0 AS nivel, CAST(nombre AS CHAR(200)) AS ruta
+    FROM categorias WHERE padre_id IS NULL
+    
+    UNION ALL
+    
+    -- Parte recursiva: hijos
+    SELECT c.id, c.nombre, c.padre_id, a.nivel + 1,
+           CONCAT(a.ruta, ' > ', c.nombre)
+    FROM categorias c
+    JOIN arbol a ON c.padre_id = a.id
+)
+SELECT * FROM arbol ORDER BY ruta;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id</th><th>nombre</th><th>nivel</th><th>ruta</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Electrónica</td><td>0</td><td>Electrónica</td></tr>
+              <tr><td>2</td><td>Computadoras</td><td>1</td><td>Electrónica > Computadoras</td></tr>
+              <tr><td>4</td><td>Laptops</td><td>2</td><td>Electrónica > Computadoras > Laptops</td></tr>
+              <tr><td>5</td><td>Accesorios PC</td><td>2</td><td>Electrónica > Computadoras > Accesorios PC</td></tr>
+              <tr><td>3</td><td>Celulares</td><td>1</td><td>Electrónica > Celulares</td></tr>
+              <tr><td>6</td><td>Tablets</td><td>2</td><td>Electrónica > Celulares > Tablets</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-warning"><div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div><div class="callout-content"><p>Las CTEs recursivas deben incluir la palabra clave <code>RECURSIVE</code> justo después de <code>WITH</code> (MySQL 8.0+). Sin ella, obtendrás un error de sintaxis. Siempre asegúrate de que la parte recursiva tenga una condición de terminación para evitar bucles infinitos.</p></div></div>
+
+        <h2>Limitaciones de las CTEs</h2>
+        <ul>
+          <li>Las CTEs existen solo durante la ejecución de la consulta — no se almacenan en disco.</li>
+          <li>No se pueden referenciar desde otras consultas ni desde procedimientos almacenados como objetos persistentes.</li>
+          <li>El rendimiento de una CTE recursiva puede degradarse con conjuntos de datos muy grandes (millones de filas).</li>
+          <li>MySQL limita la recursión a 1000 iteraciones por defecto (<code>cte_max_recursion_depth</code>).</li>
+        </ul>
+
+        <h2>CTE vs Subconsulta vs Vista</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Característica</th><th>CTE (WITH)</th><th>Subconsulta</th><th>Vista (VIEW)</th></tr></thead>
+            <tbody>
+              <tr><td>Persistente</td><td>No</td><td>No</td><td>Sí</td></tr>
+              <tr><td>Referenciable múltiples veces</td><td>Sí</td><td>No (duplicas)</td><td>Sí</td></tr>
+              <tr><td>Soporta recursividad</td><td>Sí</td><td>No</td><td>No</td></tr>
+              <tr><td>Legibilidad</td><td>Excelente</td><td>Regular</td><td>Buena</td></tr>
+              <tr><td>Ámbito</td><td>Una consulta</td><td>Una consulta</td><td>Global</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <nav class="page-nav">
+          <a href="#" class="nav-prev disabled"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="funciones-ventana.html" class="nav-next">Siguiente: Funciones ventana <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script defer src="../../assets/js/theme-switcher.js"></script>
+  <script defer src="../../assets/js/include-partials.js"></script>
+  <script defer src="../../assets/js/navbar.js"></script>
+  <script defer src="../../assets/js/copy-code.js"></script>
+  <script defer src="../../assets/js/search.js"></script>
+  <script defer src="../../assets/js/main.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/Guia-de-MySQL/sw.js');
+  });
+}
+</script>
+</body>
+</html>
