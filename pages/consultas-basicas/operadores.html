@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operadores en SQL - Guía MySQL</title>
+  <meta name="description" content="Guía de referencia de todos los operadores en SQL: aritméticos, comparación, lógicos y de cadena.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="consultas-basicas" data-page="operadores">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Básico</a></li>
+      <li class="active">Operadores</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Operadores en SQL</h1>
+        <p>Los operadores en SQL son símbolos o palabras clave que permiten realizar operaciones sobre los datos, ya sean cálculos matemáticos, comparaciones entre valores, evaluaciones lógicas o manipulación de cadenas. Conocer los operadores disponibles y su precedencia es esencial para escribir consultas correctas y eficientes. Esta página sirve como guía de referencia rápida para todos los operadores que ofrece MySQL.</p>
+
+        <h2>Operadores aritméticos</h2>
+        <p>Los operadores aritméticos se usan para realizar cálculos matemáticos dentro de las consultas, principalmente en la cláusula <code>SELECT</code> o en condiciones <code>WHERE</code>. MySQL sigue la precedencia matemática estándar: multiplicación y división antes que suma y resta. Se pueden usar paréntesis para alterar el orden de evaluación.</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead>
+              <tr><th>Operador</th><th>Descripción</th><th>Ejemplo</th><th>Resultado</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>+</code></td><td>Suma</td><td><code>SELECT 10 + 5;</code></td><td>15</td></tr>
+              <tr><td><code>-</code></td><td>Resta</td><td><code>SELECT 10 - 5;</code></td><td>5</td></tr>
+              <tr><td><code>*</code></td><td>Multiplicación</td><td><code>SELECT 10 * 5;</code></td><td>50</td></tr>
+              <tr><td><code>/</code></td><td>División</td><td><code>SELECT 10 / 3;</code></td><td>3.3333</td></tr>
+              <tr><td><code>%</code></td><td>Módulo (residuo)</td><td><code>SELECT 10 % 3;</code></td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Operadores de comparación</h2>
+        <p>Los operadores de comparación se utilizan principalmente en la cláusula <code>WHERE</code> para filtrar filas. Comparan dos valores y devuelven verdadero (<code>TRUE</code>), falso (<code>FALSE</code>) o NULL. Es importante recordar que cualquier comparación con NULL produce NULL, no <code>TRUE</code> ni <code>FALSE</code>.</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead>
+              <tr><th>Operador</th><th>Descripción</th><th>Ejemplo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>=</code></td><td>Igual a</td><td><code>WHERE nombre = 'Ana'</code></td></tr>
+              <tr><td><code>!=</code> o <code>&lt;&gt;</code></td><td>Distinto de</td><td><code>WHERE salario &lt;&gt; 50000</code></td></tr>
+              <tr><td><code>&gt;</code></td><td>Mayor que</td><td><code>WHERE precio &gt; 1000</code></td></tr>
+              <tr><td><code>&lt;</code></td><td>Menor que</td><td><code>WHERE stock &lt; 20</code></td></tr>
+              <tr><td><code>&gt;=</code></td><td>Mayor o igual que</td><td><code>WHERE salario &gt;= 45000</code></td></tr>
+              <tr><td><code>&lt;=</code></td><td>Menor o igual que</td><td><code>WHERE promedio &lt;= 8.0</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Operadores lógicos</h2>
+        <p>Los operadores lógicos permiten combinar múltiples condiciones en una misma cláusula <code>WHERE</code>. <code>AND</code> exige que todas las condiciones sean verdaderas, <code>OR</code> requiere que al menos una lo sea, y <code>NOT</code> invierte el valor de verdad de una condición. La precedencia natural es <code>NOT</code> &gt; <code>AND</code> &gt; <code>OR</code>, por lo que se recomienda usar paréntesis para evitar ambigüedades.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, salario, departamento FROM empleados
+WHERE (departamento = 'TI' OR departamento = 'Ventas') AND salario > 45000;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>salario</th><th>departamento</th></tr></thead>
+            <tbody>
+              <tr><td>Carlos Ruiz</td><td>52000.00</td><td>TI</td></tr>
+              <tr><td>María García</td><td>48000.00</td><td>Ventas</td></tr>
+              <tr><td>José Pérez</td><td>55000.00</td><td>TI</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Operadores especiales</h2>
+        <p>MySQL proporciona operadores adicionales para casos de uso específicos. <code>LIKE</code> permite búsqueda por patrones en cadenas. <code>IN</code> verifica si un valor pertenece a una lista. <code>BETWEEN</code> evalúa si un valor está dentro de un rango. <code>IS NULL</code> comprueba la ausencia de valor. Estos operadores hacen que las consultas sean más expresivas y concisas que sus equivalentes con operadores básicos.</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead>
+              <tr><th>Operador</th><th>Descripción</th><th>Ejemplo</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>LIKE</code></td><td>Coincide con un patrón (% cualquier secuencia, _ un carácter)</td><td><code>WHERE nombre LIKE 'A%'</code></td></tr>
+              <tr><td><code>IN</code></td><td>Pertenece a una lista de valores</td><td><code>WHERE depto IN ('TI', 'RH')</code></td></tr>
+              <tr><td><code>BETWEEN</code></td><td>Dentro de un rango (inclusive)</td><td><code>WHERE salario BETWEEN 40000 AND 50000</code></td></tr>
+              <tr><td><code>IS NULL</code></td><td>Es nulo</td><td><code>WHERE comision IS NULL</code></td></tr>
+              <tr><td><code>IS NOT NULL</code></td><td>No es nulo</td><td><code>WHERE comision IS NOT NULL</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Operador de concatenación: CONCAT()</h2>
+        <p>A diferencia de otros lenguajes SQL que usan <code>||</code> para concatenar, MySQL utiliza la función <code>CONCAT()</code>. Esta función recibe dos o más argumentos y los une en una sola cadena. Si algún argumento es NULL, el resultado completo es NULL, a menos que se use <code>CONCAT_WS()</code> (concat with separator) que omite valores nulos.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT CONCAT(nombre, ' - ', departamento) AS descripcion FROM empleados;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>descripcion</th></tr></thead>
+            <tbody>
+              <tr><td>Ana López - Ventas</td></tr>
+              <tr><td>Carlos Ruiz - TI</td></tr>
+              <tr><td>María García - Ventas</td></tr>
+              <tr><td>José Pérez - TI</td></tr>
+              <tr><td>Laura Díaz - RH</td></tr>
+              <tr><td>Pedro Sánchez - Ventas</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>Para concatenar con un separador que ignora valores NULL, usa <code>CONCAT_WS(separador, cadena1, cadena2, ...)</code>. Por ejemplo: <code>CONCAT_WS(' - ', nombre, departamento)</code>.</p></div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="callout-content"><p>En MySQL, el operador <code>||</code> no realiza concatenación por defecto. Equivale a <code>OR</code> lógico. Si deseas usar <code>||</code> como concatenación, debes habilitar el modo <code>PIPES_AS_CONCAT</code> en la configuración de SQL. La forma portable y recomendada es usar <code>CONCAT()</code>.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="insert-update-delete.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="../../index.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seguridad en MySQL - Guía MySQL</title>
+  <meta name="description" content="Protege tu base de datos contra inyección SQL, accesos no autorizados y más.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="administracion" data-page="seguridad">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Administración</a></li>
+      <li class="active">Seguridad en MySQL</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Seguridad en MySQL</h1>
+        <p>La seguridad de las bases de datos es un aspecto crítico en cualquier aplicación. MySQL ofrece múltiples mecanismos para proteger los datos contra accesos no autorizados, ataques de inyección SQL y fugas de información sensible.</p>
+
+        <h2>Inyección SQL</h2>
+        <p>La inyección SQL es una técnica de ataque en la que el intruso inserta código SQL malicioso a través de campos de entrada del usuario. Si la aplicación no sanitiza correctamente las entradas, el atacante puede leer, modificar o eliminar datos arbitrarios.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Ejemplo VULNERABLE: concatenación directa de variables
+SELECT * FROM usuarios WHERE email = '$email' AND password = '$password';
+
+-- Si el atacante ingresa: ' OR '1'='1
+-- La consulta se convierte en:
+SELECT * FROM usuarios WHERE email = '' OR '1'='1' AND password = '' OR '1'='1';
+-- Esto devuelve todos los usuarios, evadiendo la autenticación.</code></pre>
+        </div>
+
+        <h3>Prevención con prepared statements</h3>
+        <p>La forma más efectiva de prevenir la inyección SQL es usar <strong>prepared statements</strong> (consultas parametrizadas). Estas separan el código SQL de los datos, impidiendo que los valores ingresados sean interpretados como parte de la sentencia.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Ejemplo SEGURO con prepared statements en SQL nativo
+PREPARE stmt FROM 'SELECT * FROM usuarios WHERE email = ? AND password = ?';
+SET @email = 'usuario@ejemplo.com';
+SET @password = 'clave_segura';
+EXECUTE stmt USING @email, @password;
+DEALLOCATE PREPARE stmt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label">PHP (PDO)</div>
+          <pre><code class="language-php">$stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ? AND password = ?");
+$stmt->execute([$email, $password]);</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label">Python (mysql-connector)</div>
+          <pre><code class="language-python">cursor.execute("SELECT * FROM usuarios WHERE email = %s AND password = %s", (email, password))</code></pre>
+        </div>
+
+        <h2>Cifrado de datos</h2>
+        <p>MySQL proporciona funciones de cifrado para proteger datos sensibles tanto en tránsito como en reposo. Para conexiones se utiliza SSL/TLS, y para datos almacenados se dispone de <code>AES_ENCRYPT</code> y <code>AES_DECRYPT</code>.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Cifrar un dato con AES-256
+INSERT INTO tarjetas (numero_cifrado) VALUES (AES_ENCRYPT('4111111111111111', 'clave_secreta'));
+
+-- Descifrar el dato
+SELECT AES_DECRYPT(numero_cifrado, 'clave_secreta') FROM tarjetas;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Mecanismo</th><th>Propósito</th><th>Implementación</th></tr></thead>
+            <tbody>
+              <tr><td>SSL/TLS</td><td>Cifrar conexión cliente-servidor</td><td>Configurar certificados en my.cnf</td></tr>
+              <tr><td>AES_ENCRYPT / AES_DECRYPT</td><td>Cifrar datos en reposo</td><td>Función SQL con clave simétrica</td></tr>
+              <tr><td>SHA2 / MD5</td><td>Hash de contraseñas</td><td>Función SQL unidireccional</td></tr>
+              <tr><td>mysql_native_password / caching_sha2_password</td><td>Autenticación segura</td><td>Plugin de autenticación por defecto en MySQL 8</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Buenas prácticas de configuración</h2>
+        <p>Ajustar correctamente la configuración del servidor MySQL reduce significativamente la superficie de ataque. Las siguientes recomendaciones deberían aplicarse en todo entorno de producción:</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><code class="language-bash"># Vincular solo a la interfaz local
+bind-address = 127.0.0.1
+
+# Cambiar el puerto por defecto (opcional)
+port = 3307
+
+# Deshabilitar el acceso remoto del usuario root
+# (renombrar o eliminar root@'%')
+
+# Activar logs de consultas lentas y errores
+log_error = /var/log/mysql/error.log
+slow_query_log = 1
+long_query_time = 2</code></pre>
+        </div>
+
+        <h2>mysql_secure_installation</h2>
+        <p>MySQL incluye un script interactivo llamado <code>mysql_secure_installation</code> que aplica una serie de medidas de seguridad básicas. Se recomienda ejecutarlo inmediatamente después de instalar MySQL.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><code class="language-bash">sudo mysql_secure_installation</code></pre>
+        </div>
+        <p>El script guía al administrador a través de los siguientes pasos:</p>
+        <ul>
+          <li>Establecer una contraseña para el usuario root.</li>
+          <li>Eliminar usuarios anónimos.</li>
+          <li>Deshabilitar el inicio de sesión remoto para root.</li>
+          <li>Eliminar la base de datos de prueba <code>test</code>.</li>
+          <li>Recargar las tablas de privilegios.</li>
+        </ul>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>Las <strong>prepared statements</strong> son la defensa más eficaz contra la inyección SQL. Nunca concatenes valores directamente en las consultas SQL. Combínalas con la validación de entrada y el principio de mínimo privilegio para una defensa en profundidad.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="replicacion.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="../../index.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

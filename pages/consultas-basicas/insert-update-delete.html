@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INSERT, UPDATE y DELETE - Guía MySQL</title>
+  <meta name="description" content="Aprende a insertar, actualizar y eliminar datos en MySQL con INSERT INTO, UPDATE y DELETE.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="consultas-basicas" data-page="insert-update-delete">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Básico</a></li>
+      <li class="active">INSERT, UPDATE y DELETE</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>INSERT, UPDATE y DELETE</h1>
+        <p>Las sentencias <code>INSERT</code>, <code>UPDATE</code> y <code>DELETE</code> forman parte del sublenguaje DML (Data Manipulation Language) de SQL y permiten modificar los datos almacenados en las tablas. Mientras que <code>SELECT</code> solo lee información, estas tres instrucciones permiten crear, modificar y eliminar registros, completando así el ciclo de gestión de datos en MySQL.</p>
+
+        <h2>Datos de ejemplo: estudiantes</h2>
+        <p>Usaremos la tabla <code>estudiantes</code> para los ejemplos de esta lección.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE estudiantes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(50),
+  carrera VARCHAR(40),
+  promedio DECIMAL(3,2)
+);
+
+INSERT INTO estudiantes VALUES
+(1, 'Sofía Martínez', 'Ing. Sistemas', 8.5),
+(2, 'Miguel Ángel', 'Medicina', 9.1),
+(3, 'Diana Torres', 'Derecho', 7.8),
+(4, 'Luis Herrera', 'Arquitectura', 8.9);</code></pre>
+        </div>
+
+        <h2>INSERT INTO con valores</h2>
+        <p>La forma más común de insertar datos es usando <code>INSERT INTO</code> seguido de la tabla, las columnas (opcional) y la palabra clave <code>VALUES</code> con los valores en el mismo orden. Si se omiten las columnas, se asume que se proporcionan valores para todas las columnas en el orden definido en la tabla. Es buena práctica especificar las columnas para hacer el código más claro y resistente a cambios en la estructura de la tabla.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">INSERT INTO estudiantes (nombre, carrera, promedio)
+VALUES ('Carmen Flores', 'Contabilidad', 8.2);</code></pre>
+        </div>
+
+        <h2>INSERT múltiples filas</h2>
+        <p>MySQL permite insertar varias filas en una sola sentencia separando cada conjunto de valores con comas. Esto es mucho más eficiente que ejecutar múltiples sentencias <code>INSERT</code> individuales, ya que reduce la comunicación entre la aplicación y el servidor de base de datos.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">INSERT INTO estudiantes (nombre, carrera, promedio) VALUES
+('Roberto Vega', 'Ing. Sistemas', 7.5),
+('Ana Paula Ruiz', 'Medicina', 9.5);</code></pre>
+        </div>
+
+        <h2>INSERT SELECT</h2>
+        <p>La combinación <code>INSERT ... SELECT</code> permite insertar en una tabla el resultado de una consulta <code>SELECT</code>. Es útil para copiar datos entre tablas, crear tablas de respaldo o poblar tablas de reporte. Las columnas devueltas por el <code>SELECT</code> deben coincidir en cantidad y tipo con las columnas de destino.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE becarios AS SELECT * FROM estudiantes WHERE promedio >= 9.0;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id</th><th>nombre</th><th>carrera</th><th>promedio</th></tr></thead>
+            <tbody>
+              <tr><td>2</td><td>Miguel Ángel</td><td>Medicina</td><td>9.1</td></tr>
+              <tr><td>6</td><td>Ana Paula Ruiz</td><td>Medicina</td><td>9.5</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>UPDATE para modificar registros</h2>
+        <p>La sentencia <code>UPDATE</code> modifica los valores de una o más columnas en las filas que cumplen la condición especificada en <code>WHERE</code>. Sin <code>WHERE</code>, se actualizarían todas las filas de la tabla. Siempre se debe verificar la condición antes de ejecutar un <code>UPDATE</code>, especialmente en producción.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">UPDATE estudiantes SET promedio = 9.2 WHERE nombre = 'Sofía Martínez';</code></pre>
+        </div>
+
+        <p>Para verificar el cambio, consultamos los datos actualizados:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT * FROM estudiantes WHERE id = 1;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id</th><th>nombre</th><th>carrera</th><th>promedio</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Sofía Martínez</td><td>Ing. Sistemas</td><td>9.2</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>DELETE para eliminar registros</h2>
+        <p>La sentencia <code>DELETE</code> elimina filas de una tabla. Al igual que <code>UPDATE</code>, si se omite <code>WHERE</code> se eliminarán todas las filas. Es importante diferenciar <code>DELETE</code> de <code>TRUNCATE</code>: <code>DELETE</code> elimina filas una por una (puede tener condiciones y activar triggers), mientras que <code>TRUNCATE</code> elimina todas las filas de golpe y reinicia los contadores AUTO_INCREMENT.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DELETE FROM estudiantes WHERE id = 4;
+
+-- Verificar la eliminación
+SELECT * FROM estudiantes;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id</th><th>nombre</th><th>carrera</th><th>promedio</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Sofía Martínez</td><td>Ing. Sistemas</td><td>9.2</td></tr>
+              <tr><td>2</td><td>Miguel Ángel</td><td>Medicina</td><td>9.1</td></tr>
+              <tr><td>3</td><td>Diana Torres</td><td>Derecho</td><td>7.8</td></tr>
+              <tr><td>5</td><td>Roberto Vega</td><td>Ing. Sistemas</td><td>7.5</td></tr>
+              <tr><td>6</td><td>Ana Paula Ruiz</td><td>Medicina</td><td>9.5</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>Siempre ejecuta un <code>SELECT</code> con la misma condición del <code>WHERE</code> antes de hacer un <code>UPDATE</code> o <code>DELETE</code> para verificar qué filas serán afectadas.</p></div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="callout-content"><p>¡Cuidado! Un <code>UPDATE</code> o <code>DELETE</code> sin <code>WHERE</code> afecta a TODAS las filas de la tabla. Siempre verifica que tu condición <code>WHERE</code> esté correctamente escrita antes de ejecutar la sentencia.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="order-by-limit.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="operadores.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

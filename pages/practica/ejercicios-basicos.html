@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicios básicos de SQL - Guía MySQL</title>
+  <meta name="description" content="Practica SELECT, WHERE, ORDER BY, LIMIT, INSERT, UPDATE y DELETE con ejercicios guiados.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="practica" data-page="ejercicios-basicos">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Práctica</a></li>
+      <li class="active">Ejercicios básicos</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Ejercicios básicos de SQL</h1>
+        <p>Pon a prueba tus conocimientos fundamentales de SQL con estos ejercicios prácticos. Trabajaremos con una tabla de empleados donde aplicarás consultas <code>SELECT</code>, filtros <code>WHERE</code>, ordenamiento, inserciones, actualizaciones y eliminaciones. Cada ejercicio incluye su solución y el resultado esperado.</p>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Antes de empezar los ejercicios, crea la base de datos y la tabla de ejemplo. Puedes practicar online en <a href="https://www.db-fiddle.com/" target="_blank" rel="noopener noreferrer">DB Fiddle</a> usando MySQL 8.0.</p></div></div>
+
+        <h2>Tabla de ejemplo: empleados</h2>
+        <p>Ejecuta este script para crear y poblar la tabla que usaremos en todos los ejercicios básicos.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE empleados (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(50),
+  apellido VARCHAR(50),
+  puesto VARCHAR(50),
+  salario DECIMAL(10,2),
+  departamento VARCHAR(30),
+  fecha_contratacion DATE
+);
+
+INSERT INTO empleados (nombre, apellido, puesto, salario, departamento, fecha_contratacion) VALUES
+('Ana', 'López', 'Analista de Ventas', 45000.00, 'Ventas', '2020-03-15'),
+('Carlos', 'Ruiz', 'Desarrollador Senior', 62000.00, 'TI', '2019-07-01'),
+('María', 'García', 'Ejecutiva de Ventas', 48000.00, 'Ventas', '2021-01-10'),
+('José', 'Pérez', 'Arquitecto de Software', 75000.00, 'TI', '2018-05-20'),
+('Laura', 'Díaz', 'Especialista en RH', 41000.00, 'Recursos Humanos', '2022-09-05'),
+('Pedro', 'Sánchez', 'Representante de Ventas', 39000.00, 'Ventas', '2023-02-14'),
+('Sofía', 'Martínez', 'DevOps Engineer', 68000.00, 'TI', '2020-11-30'),
+('Miguel', 'Torres', 'Analista de RH', 38000.00, 'Recursos Humanos', '2021-06-22'),
+('Lucía', 'Ramírez', 'Desarrolladora Junior', 42000.00, 'TI', '2023-08-01'),
+('Diego', 'Hernández', 'Gerente de Ventas', 85000.00, 'Ventas', '2017-04-18');</code></pre>
+        </div>
+
+        <h2>Ejercicio 1: Filtrar empleados por departamento</h2>
+        <p>Obtén el nombre, apellido, puesto y salario de todos los empleados que trabajan en el departamento de <strong>TI</strong>. Ordena los resultados por salario de mayor a menor.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT nombre, apellido, puesto, salario
+FROM empleados
+WHERE departamento = 'TI'
+ORDER BY salario DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>apellido</th><th>puesto</th><th>salario</th></tr></thead>
+              <tbody>
+                <tr><td>José</td><td>Pérez</td><td>Arquitecto de Software</td><td>75000.00</td></tr>
+                <tr><td>Sofía</td><td>Martínez</td><td>DevOps Engineer</td><td>68000.00</td></tr>
+                <tr><td>Carlos</td><td>Ruiz</td><td>Desarrollador Senior</td><td>62000.00</td></tr>
+                <tr><td>Lucía</td><td>Ramírez</td><td>Desarrolladora Junior</td><td>42000.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <h2>Ejercicio 2: ORDER BY y LIMIT</h2>
+        <p>Obtén los 3 empleados con el salario más alto de toda la empresa. Muestra su nombre completo (concatena nombre y apellido), puesto y salario.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT CONCAT(nombre, ' ', apellido) AS nombre_completo, puesto, salario
+FROM empleados
+ORDER BY salario DESC
+LIMIT 3;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre_completo</th><th>puesto</th><th>salario</th></tr></thead>
+              <tbody>
+                <tr><td>Diego Hernández</td><td>Gerente de Ventas</td><td>85000.00</td></tr>
+                <tr><td>José Pérez</td><td>Arquitecto de Software</td><td>75000.00</td></tr>
+                <tr><td>Sofía Martínez</td><td>DevOps Engineer</td><td>68000.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <h2>Ejercicio 3: INSERT de nuevo empleado</h2>
+        <p>Inserta un nuevo empleado en la tabla con los siguientes datos: nombre <strong>Valentina</strong>, apellido <strong>Ortiz</strong>, puesto <strong>Diseñadora UX</strong>, salario <strong>47000</strong>, departamento <strong>TI</strong>, fecha de contratación <strong>2024-06-01</strong>. Luego verifica que se haya insertado correctamente.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">INSERT INTO empleados (nombre, apellido, puesto, salario, departamento, fecha_contratacion)
+VALUES ('Valentina', 'Ortiz', 'Diseñadora UX', 47000.00, 'TI', '2024-06-01');
+
+SELECT * FROM empleados WHERE apellido = 'Ortiz';</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>id</th><th>nombre</th><th>apellido</th><th>puesto</th><th>salario</th><th>departamento</th><th>fecha_contratacion</th></tr></thead>
+              <tbody>
+                <tr><td>11</td><td>Valentina</td><td>Ortiz</td><td>Diseñadora UX</td><td>47000.00</td><td>TI</td><td>2024-06-01</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <h2>Ejercicio 4: UPDATE de salario</h2>
+        <p>Al empleado <strong>Pedro Sánchez</strong> se le ha otorgado un aumento del 15%. Actualiza su salario y verifica el cambio. Además, actualiza su puesto a 'Representante Senior de Ventas'.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">UPDATE empleados
+SET salario = salario * 1.15, puesto = 'Representante Senior de Ventas'
+WHERE nombre = 'Pedro' AND apellido = 'Sánchez';
+
+SELECT * FROM empleados WHERE nombre = 'Pedro' AND apellido = 'Sánchez';</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>id</th><th>nombre</th><th>apellido</th><th>puesto</th><th>salario</th><th>departamento</th><th>fecha_contratacion</th></tr></thead>
+              <tbody>
+                <tr><td>6</td><td>Pedro</td><td>Sánchez</td><td>Representante Senior de Ventas</td><td>44850.00</td><td>Ventas</td><td>2023-02-14</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <h2>Ejercicio 5: DELETE de empleados antiguos</h2>
+        <p>Elimina todos los empleados que fueron contratados antes del año <strong>2019</strong>. Usa <code>SELECT</code> primero para ver qué registros serán afectados, luego ejecuta el <code>DELETE</code>.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">-- Verificar registros antes de eliminar
+SELECT * FROM empleados WHERE fecha_contratacion < '2019-01-01';
+
+-- Eliminar los registros
+DELETE FROM empleados WHERE fecha_contratacion < '2019-01-01';
+
+-- Verificar que se eliminaron
+SELECT * FROM empleados;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>id</th><th>nombre</th><th>apellido</th><th>puesto</th><th>salario</th><th>departamento</th><th>fecha_contratacion</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Ana</td><td>López</td><td>Analista de Ventas</td><td>45000.00</td><td>Ventas</td><td>2020-03-15</td></tr>
+                <tr><td>2</td><td>Carlos</td><td>Ruiz</td><td>Desarrollador Senior</td><td>62000.00</td><td>TI</td><td>2019-07-01</td></tr>
+                <tr><td>3</td><td>María</td><td>García</td><td>Ejecutiva de Ventas</td><td>48000.00</td><td>Ventas</td><td>2021-01-10</td></tr>
+                <tr><td>5</td><td>Laura</td><td>Díaz</td><td>Especialista en RH</td><td>41000.00</td><td>Recursos Humanos</td><td>2022-09-05</td></tr>
+                <tr><td>6</td><td>Pedro</td><td>Sánchez</td><td>Representante Senior de Ventas</td><td>44850.00</td><td>Ventas</td><td>2023-02-14</td></tr>
+                <tr><td>7</td><td>Sofía</td><td>Martínez</td><td>DevOps Engineer</td><td>68000.00</td><td>TI</td><td>2020-11-30</td></tr>
+                <tr><td>8</td><td>Miguel</td><td>Torres</td><td>Analista de RH</td><td>38000.00</td><td>Recursos Humanos</td><td>2021-06-22</td></tr>
+                <tr><td>9</td><td>Lucía</td><td>Ramírez</td><td>Desarrolladora Junior</td><td>42000.00</td><td>TI</td><td>2023-08-01</td></tr>
+                <tr><td>11</td><td>Valentina</td><td>Ortiz</td><td>Diseñadora UX</td><td>47000.00</td><td>TI</td><td>2024-06-01</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Se eliminaron los empleados con id 4 (José Pérez) y 10 (Diego Hernández) por haber sido contratados antes de 2019.</p>
+        </details>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>Recuerda siempre ejecutar un <code>SELECT</code> con el mismo filtro antes de hacer un <code>UPDATE</code> o <code>DELETE</code> para verificar qué registros serán afectados. Esta buena práctica evita modificaciones accidentales.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="#" class="nav-prev disabled"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="ejercicios-intermedios.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

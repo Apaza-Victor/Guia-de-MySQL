@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glosario de términos SQL/MySQL - Guía MySQL</title>
+  <meta name="description" content="Diccionario de términos y conceptos de SQL y MySQL ordenados alfabéticamente. Más de 100 definiciones claras y concisas.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <style>
+    .glossary-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+    .glossary-nav a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      text-decoration: none;
+      transition: all var(--transition);
+    }
+    .glossary-nav a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+    .glossary-section {
+      margin-bottom: 2rem;
+      scroll-margin-top: 5rem;
+    }
+    .glossary-section h2 {
+      font-size: 1.5rem;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.35rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+    .glossary-term {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      transition: background var(--transition);
+    }
+    .glossary-term:hover {
+      background: var(--bg-secondary);
+    }
+    .glossary-term:last-child {
+      border-bottom: none;
+    }
+    .glossary-term h3 {
+      font-size: 1rem;
+      margin: 0 0 0.25rem 0;
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+    }
+    .glossary-term h3 .badge {
+      margin-left: 0.5rem;
+      font-family: var(--font-primary);
+      vertical-align: middle;
+    }
+    .glossary-term p {
+      font-size: 0.9rem;
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    .glossary-term code {
+      font-size: 0.85em;
+      padding: 0.1rem 0.3rem;
+      border-radius: var(--radius-sm);
+      background: var(--bg-tertiary);
+      color: var(--accent);
+    }
+    @media (min-width: 768px) {
+      .glossary-nav a {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="glosario" data-page="glosario">
+  <div id="header-placeholder"></div>
+  <ul class="breadcrumb" style="padding: 0.75rem 1.5rem; max-width: 1400px; margin: 0 auto;">
+    <li><a href="../../index.html">Inicio</a></li>
+    <li class="active">Glosario</li>
+  </ul>
+  <main class="content-area" style="padding: 1.5rem;">
+    <div class="module-header">
+      <h1>Glosario de términos SQL / MySQL</h1>
+      <p class="module-desc">Diccionario de términos y conceptos de SQL y MySQL ordenados alfabéticamente. Cada término incluye una definición clara y concisa en español.</p>
+    </div>
+
+        <div class="glossary-nav" data-aos="fade-down">
+          <a href="#a">A</a><a href="#b">B</a><a href="#c">C</a><a href="#d">D</a><a href="#e">E</a><a href="#f">F</a>
+          <a href="#g">G</a><a href="#h">H</a><a href="#i">I</a><a href="#j">J</a><a href="#k">K</a><a href="#l">L</a>
+          <a href="#m">M</a><a href="#n">N</a><a href="#o">O</a><a href="#p">P</a><a href="#q">Q</a><a href="#r">R</a>
+          <a href="#s">S</a><a href="#t">T</a><a href="#u">U</a><a href="#v">V</a><a href="#w">W</a><a href="#x">X</a>
+          <a href="#y">Y</a><a href="#z">Z</a>
+        </div>
+
+        <section id="a" class="glossary-section" data-aos="fade-up">
+          <h2>A</h2>
+          <div class="glossary-term"><h3>ACID</h3><p>Acrónimo de Atomicidad, Consistencia, Aislamiento y Durabilidad. Conjunto de propiedades que garantizan que las transacciones de bases de datos se procesen de manera fiable. InnoDB es el motor de MySQL que soporta transacciones ACID completamente.</p></div>
+          <div class="glossary-term"><h3>Aggregate functions</h3><p>Funciones agregadas que realizan cálculos sobre un conjunto de filas y devuelven un único resultado. Las principales son <code>SUM()</code>, <code>AVG()</code>, <code>COUNT()</code>, <code>MIN()</code> y <code>MAX()</code>.</p></div>
+          <div class="glossary-term"><h3>Alias</h3><p>Nombre temporal asignado a una columna o tabla dentro de una consulta SQL mediante la palabra clave <code>AS</code>. Mejora la legibilidad y permite referenciar nombres calculados.</p></div>
+          <div class="glossary-term"><h3>ALTER</h3><p>Sentencia DDL utilizada para modificar la estructura de una tabla existente. Permite agregar, eliminar o modificar columnas, así como cambiar restricciones e índices. Ejemplo: <code>ALTER TABLE usuarios ADD email VARCHAR(100);</code></p></div>
+          <div class="glossary-term"><h3>AUTO_INCREMENT</h3><p>Atributo de columna en MySQL que genera automáticamente un valor numérico secuencial único para cada nueva fila insertada. Se usa comúnmente para claves primarias.</p></div>
+        </section>
+
+        <section id="b" class="glossary-section" data-aos="fade-up">
+          <h2>B</h2>
+          <div class="glossary-term"><h3>B-tree</h3><p>Estructura de datos de árbol balanceado utilizada por MySQL para los índices. Permite búsquedas rápidas, inserciones y eliminaciones en tiempo logarítmico. Es el tipo de índice predeterminado en InnoDB y MyISAM.</p></div>
+          <div class="glossary-term"><h3>BACKUP</h3><p>Copia de seguridad de una base de datos. MySQL ofrece herramientas como <code>mysqldump</code> para realizar backups lógicos, y opciones de backup físico como la copia de archivos de datos.</p></div>
+          <div class="glossary-term"><h3>BETWEEN</h3><p>Operador SQL utilizado para filtrar resultados dentro de un rango inclusive. Ejemplo: <code>SELECT * FROM productos WHERE precio BETWEEN 10 AND 50;</code></p></div>
+          <div class="glossary-term"><h3>BLOB</h3><p>Tipo de dato binario que almacena objetos grandes como imágenes, archivos o datos multimedia. Puede ser TINYBLOB, BLOB, MEDIUMBLOB o LONGBLOB según la capacidad.</p></div>
+          <div class="glossary-term"><h3>BOOLEAN</h3><p>Tipo de dato lógico que puede tener valores verdadero (<code>TRUE</code> o <code>1</code>) o falso (<code>FALSE</code> o <code>0</code>). En MySQL, <code>BOOL</code> y <code>BOOLEAN</code> son sinónimos de <code>TINYINT(1)</code>.</p></div>
+        </section>
+
+        <section id="c" class="glossary-section" data-aos="fade-up">
+          <h2>C</h2>
+          <div class="glossary-term"><h3>CASCADE</h3><p>Opción de integridad referencial que propaga automáticamente las operaciones de actualización o eliminación de una tabla padre a las tablas hijas. Ejemplo: <code>ON DELETE CASCADE</code> elimina en cascada los registros relacionados.</p></div>
+          <div class="glossary-term"><h3>CHAR</h3><p>Tipo de dato de cadena de longitud fija. Almacena exactamente la longitud especificada, rellenando con espacios a la derecha si es necesario. Más rápido que VARCHAR para longitudes cortas y fijas.</p></div>
+          <div class="glossary-term"><h3>CHECK</h3><p>Restricción que limita los valores que pueden insertarse en una columna según una condición. Aunque MySQL la acepta sintácticamente, solo la evalúa en versiones recientes con determinados motores.</p></div>
+          <div class="glossary-term"><h3>Clave foránea (FOREIGN KEY)</h3><p>Campo o combinación de campos que establece una relación entre dos tablas, referenciando la clave primaria de otra tabla. Garantiza la integridad referencial de los datos.</p></div>
+          <div class="glossary-term"><h3>Clave primaria (PRIMARY KEY)</h3><p>Columna o conjunto de columnas que identifica de forma única cada fila de una tabla. Debe ser única y no nula. Cada tabla puede tener solo una clave primaria.</p></div>
+          <div class="glossary-term"><h3>COMMIT</h3><p>Sentencia que guarda permanentemente todas las modificaciones realizadas en la transacción actual. Una vez ejecutada, los cambios no pueden revertirse con ROLLBACK.</p></div>
+          <div class="glossary-term"><h3>CONSTRAINT</h3><p>Palabra clave utilizada para definir restricciones en las columnas de una tabla, como <code>PRIMARY KEY</code>, <code>FOREIGN KEY</code>, <code>UNIQUE</code>, <code>CHECK</code> y <code>NOT NULL</code>.</p></div>
+          <div class="glossary-term"><h3>CREATE</h3><p>Sentencia DDL utilizada para crear nuevos objetos en la base de datos, como bases de datos, tablas, vistas, índices, procedimientos almacenados y funciones.</p></div>
+          <div class="glossary-term"><h3>CROSS JOIN</h3><p>Tipo de JOIN que produce el producto cartesiano de dos tablas, combinando cada fila de la primera tabla con todas las filas de la segunda. También conocido como JOIN cruzado.</p></div>
+        </section>
+
+        <section id="d" class="glossary-section" data-aos="fade-up">
+          <h2>D</h2>
+          <div class="glossary-term"><h3>DATABASE</h3><p>Conjunto organizado de datos estructurados almacenados electrónicamente. En MySQL, se crea con <code>CREATE DATABASE</code> y puede contener múltiples tablas, vistas, procedimientos y otros objetos.</p></div>
+          <div class="glossary-term"><h3>DATE</h3><p>Tipo de dato que almacena fechas en formato <code>YYYY-MM-DD</code>. El rango soportado va desde <code>1000-01-01</code> hasta <code>9999-12-31</code>.</p></div>
+          <div class="glossary-term"><h3>DATETIME</h3><p>Tipo de dato que almacena fecha y hora en formato <code>YYYY-MM-DD HH:MM:SS</code>. Combina las funcionalidades de DATE y TIME en un solo campo.</p></div>
+          <div class="glossary-term"><h3>DECIMAL</h3><p>Tipo de dato numérico de precisión exacta, ideal para valores monetarios y cálculos financieros donde no se toleran errores de redondeo. Ejemplo: <code>DECIMAL(10,2)</code> almacena números con 2 decimales.</p></div>
+          <div class="glossary-term"><h3>DEFAULT</h3><p>Valor predeterminado asignado a una columna cuando no se especifica un valor en la inserción. Se define al crear o modificar la tabla con la cláusula <code>DEFAULT</code>.</p></div>
+          <div class="glossary-term"><h3>DELETE</h3><p>Sentencia DML que elimina una o más filas de una tabla. Si no se usa <code>WHERE</code>, elimina todas las filas. Ejemplo: <code>DELETE FROM usuarios WHERE id = 5;</code></p></div>
+          <div class="glossary-term"><h3>DISTINCT</h3><p>Palabra clave que elimina filas duplicadas del resultado de una consulta. Ejemplo: <code>SELECT DISTINCT ciudad FROM clientes;</code></p></div>
+          <div class="glossary-term"><h3>DROP</h3><p>Sentencia DDL que elimina permanentemente objetos de la base de datos como tablas, bases de datos, vistas o índices. Ejemplo: <code>DROP TABLE usuarios;</code></p></div>
+        </section>
+
+        <section id="e" class="glossary-section" data-aos="fade-up">
+          <h2>E</h2>
+          <div class="glossary-term"><h3>ENUM</h3><p>Tipo de dato que permite definir una columna con un conjunto fijo de valores permitidos. Ejemplo: <code>estado ENUM('activo', 'inactivo', 'suspendido')</code>. Optimiza el almacenamiento al usar índices internos.</p></div>
+          <div class="glossary-term"><h3>Entity (Entidad)</h3><p>Objeto del mundo real representado en una base de datos, como una persona, producto o pedido. En el modelo entidad-relación, las entidades se convierten en tablas dentro del esquema relacional.</p></div>
+          <div class="glossary-term"><h3>ER diagram (Diagrama ER)</h3><p>Representación gráfica de las entidades y relaciones de una base de datos. Muestra tablas, atributos, claves y las conexiones entre ellas, facilitando el diseño conceptual del esquema.</p></div>
+          <div class="glossary-term"><h3>EVENT</h3><p>Tarea programada que se ejecuta automáticamente en MySQL según un calendario definido. Similar a los cron jobs de Linux, permite automatizar tareas como limpieza de datos o generación de informes.</p></div>
+          <div class="glossary-term"><h3>EXPLAIN</h3><p>Sentencia que muestra el plan de ejecución de una consulta SQL. Fundamental para optimizar consultas lentas, ya que revela cómo MySQL accede a las tablas y qué índices utiliza.</p></div>
+        </section>
+
+        <section id="f" class="glossary-section" data-aos="fade-up">
+          <h2>F</h2>
+          <div class="glossary-term"><h3>FLOAT</h3><p>Tipo de dato numérico de coma flotante de precisión simple. Almacena números con decimales pero puede introducir errores de redondeo. Para precisión exacta se recomienda <code>DECIMAL</code>.</p></div>
+          <div class="glossary-term"><h3>FOREIGN KEY</h3><p>Véase <em>Clave foránea</em>. Restricción que vincula una columna de una tabla con la clave primaria de otra tabla para mantener la integridad referencial.</p></div>
+          <div class="glossary-term"><h3>FULLTEXT</h3><p>Tipo de índice especializado para búsquedas de texto completo en columnas de tipo <code>CHAR</code>, <code>VARCHAR</code> o <code>TEXT</code>. Permite búsquedas avanzadas con <code>MATCH...AGAINST</code>.</p></div>
+          <div class="glossary-term"><h3>FUNCTION</h3><p>Bloque de código SQL reutilizable que acepta parámetros, realiza operaciones y devuelve un valor. En MySQL existen funciones incorporadas y funciones definidas por el usuario (UDF).</p></div>
+        </section>
+
+        <section id="g" class="glossary-section" data-aos="fade-up">
+          <h2>G</h2>
+          <div class="glossary-term"><h3>GET_FORMAT</h3><p>Función de MySQL que devuelve una cadena de formato para usar con <code>DATE_FORMAT</code> y <code>STR_TO_DATE</code>. Admite valores predefinidos como <code>DATE</code>, <code>TIME</code>, <code>DATETIME</code> y <code>TIMESTAMP</code>.</p></div>
+          <div class="glossary-term"><h3>GRANT</h3><p>Sentencia DCL utilizada para otorgar permisos y privilegios a usuarios de MySQL. Ejemplo: <code>GRANT SELECT, INSERT ON basedatos.* TO 'usuario'@'localhost';</code></p></div>
+          <div class="glossary-term"><h3>GROUP BY</h3><p>Cláusula que agrupa filas que tienen los mismos valores en columnas especificadas, permitiendo aplicar funciones de agregación a cada grupo. Ejemplo: <code>SELECT ciudad, COUNT(*) FROM clientes GROUP BY ciudad;</code></p></div>
+        </section>
+
+        <section id="h" class="glossary-section" data-aos="fade-up">
+          <h2>H</h2>
+          <div class="glossary-term"><h3>HASH index</h3><p>Tipo de índice basado en una tabla hash, óptimo para búsquedas de igualdad (<code>=</code> o <code>IN</code>). En MySQL, solo está disponible para el motor MEMORY y NDB Cluster.</p></div>
+          <div class="glossary-term"><h3>HAVING</h3><p>Cláusula que filtra grupos creados por <code>GROUP BY</code> según una condición. Similar a <code>WHERE</code> pero aplica a nivel de grupos, no de filas individuales. Ejemplo: <code>HAVING COUNT(*) > 5</code>.</p></div>
+        </section>
+
+        <section id="i" class="glossary-section" data-aos="fade-up">
+          <h2>I</h2>
+          <div class="glossary-term"><h3>IF</h3><p>Función de control de flujo en MySQL que evalúa una condición y devuelve un valor si es verdadera y otro si es falsa. Ejemplo: <code>IF(edad >= 18, 'Mayor', 'Menor')</code>.</p></div>
+          <div class="glossary-term"><h3>IN</h3><p>Operador que verifica si un valor está dentro de un conjunto de valores. Ejemplo: <code>SELECT * FROM productos WHERE categoria IN ('electronica', 'hogar');</code></p></div>
+          <div class="glossary-term"><h3>INDEX</h3><p>Estructura de datos que mejora la velocidad de las operaciones de búsqueda en una tabla. Similar al índice de un libro, permite localizar filas sin escanear toda la tabla.</p></div>
+          <div class="glossary-term"><h3>INNER JOIN</h3><p>Tipo de JOIN que devuelve solo las filas que tienen coincidencia en ambas tablas. Es el tipo de JOIN más común y se usa para combinar datos relacionados de dos tablas.</p></div>
+          <div class="glossary-term"><h3>INSERT</h3><p>Sentencia DML que agrega nuevas filas a una tabla. Ejemplo: <code>INSERT INTO usuarios (nombre, email) VALUES ('Juan', 'juan@email.com');</code></p></div>
+          <div class="glossary-term"><h3>INT</h3><p>Tipo de dato numérico entero que almacena números sin decimales. Puede ser TINYINT, SMALLINT, MEDIUMINT, INT o BIGINT, variando el rango de valores y el espacio de almacenamiento.</p></div>
+          <div class="glossary-term"><h3>Integridad referencial</h3><p>Principio que garantiza que las relaciones entre tablas se mantengan consistentes. Evita huérfanos asegurando que todo valor de clave foránea exista como clave primaria en la tabla referenciada.</p></div>
+          <div class="glossary-term"><h3>IS NULL</h3><p>Operador que verifica si un valor es nulo (<code>NULL</code>). No puede usarse <code>= NULL</code> porque NULL no es un valor, sino la ausencia de valor. Ejemplo: <code>WHERE telefono IS NULL</code>.</p></div>
+        </section>
+
+        <section id="j" class="glossary-section" data-aos="fade-up">
+          <h2>J</h2>
+          <div class="glossary-term"><h3>JOIN</h3><p>Operación que combina columnas de dos o más tablas basándose en una condición relacionada. Los tipos principales son INNER, LEFT, RIGHT, FULL y CROSS JOIN.</p></div>
+          <div class="glossary-term"><h3>JSON</h3><p>Tipo de dato que permite almacenar documentos JSON en MySQL. Soporta funciones nativas para manipular, consultar y extraer datos JSON, incluyendo <code>JSON_EXTRACT()</code> e índices virtuales.</p></div>
+        </section>
+
+        <section id="k" class="glossary-section" data-aos="fade-up">
+          <h2>K</h2>
+          <div class="glossary-term"><h3>KEY</h3><p>Sinónimo de <code>INDEX</code> en MySQL. Se usa para crear índices en una tabla. También aparece en definiciones de <code>PRIMARY KEY</code>, <code>FOREIGN KEY</code> y <code>UNIQUE KEY</code>.</p></div>
+          <div class="glossary-term"><h3>KEY_BLOCK_SIZE</h3><p>Opción de compresión de índices en InnoDB que especifica el tamaño de bloque para índices comprimidos. Reduce el uso de espacio en disco a costa de mayor uso de CPU.</p></div>
+        </section>
+
+        <section id="l" class="glossary-section" data-aos="fade-up">
+          <h2>L</h2>
+          <div class="glossary-term"><h3>LEFT JOIN</h3><p>Tipo de JOIN que devuelve todas las filas de la tabla izquierda y las coincidencias de la tabla derecha. Si no hay coincidencia, las columnas de la derecha aparecen como NULL.</p></div>
+          <div class="glossary-term"><h3>LIKE</h3><p>Operador utilizado en búsquedas de patrones en cadenas. Usa <code>%</code> como comodín para múltiples caracteres y <code>_</code> para un solo carácter. Ejemplo: <code>WHERE nombre LIKE 'Ana%'</code>.</p></div>
+          <div class="glossary-term"><h3>LIMIT</h3><p>Cláusula que restringe el número de filas devueltas por una consulta. Ejemplo: <code>SELECT * FROM productos LIMIT 10;</code> devuelve solo las primeras 10 filas.</p></div>
+          <div class="glossary-term"><h3>LOG</h3><p>Archivos de registro que MySQL genera para registrar actividades, errores, consultas lentas y transacciones. Son fundamentales para auditoría, depuración y recuperación de datos.</p></div>
+        </section>
+
+        <section id="m" class="glossary-section" data-aos="fade-up">
+          <h2>M</h2>
+          <div class="glossary-term"><h3>InnoDB</h3><p>Motor de almacenamiento predeterminado en MySQL desde la versión 5.5. Soporta transacciones ACID, claves foráneas, control de concurrencia multiversión (MVCC) y recuperación ante fallos.</p></div>
+          <div class="glossary-term"><h3>MATCH...AGAINST</h3><p>Función de búsqueda de texto completo que utiliza índices FULLTEXT. Permite búsquedas por relevancia, modo booleano y expansión de consultas. Ejemplo: <code>WHERE MATCH(titulo) AGAINST('MySQL' IN BOOLEAN MODE)</code>.</p></div>
+          <div class="glossary-term"><h3>Memory</h3><p>Motor de almacenamiento que mantiene los datos en memoria RAM. Ofrece velocidades extremadamente rápidas pero los datos se pierden al reiniciar el servidor. Ideal para tablas temporales y cachés.</p></div>
+          <div class="glossary-term"><h3>MyISAM</h3><p>Motor de almacenamiento anterior a InnoDB, conocido por su simplicidad y buen rendimiento en lecturas. No soporta transacciones ACID ni claves foráneas. Fue el motor predeterminado hasta MySQL 5.4.</p></div>
+          <div class="glossary-term"><h3>mysqldump</h3><p>Herramienta de línea de comandos para realizar backups lógicos de bases de datos MySQL. Genera archivos SQL con sentencias CREATE y INSERT que permiten recrear la base de datos completamente.</p></div>
+        </section>
+
+        <section id="n" class="glossary-section" data-aos="fade-up">
+          <h2>N</h2>
+          <div class="glossary-term"><h3>Normalización 1FN, 2FN, 3FN</h3><p>Proceso de diseño de bases de datos que elimina redundancias y dependencias. 1FN elimina grupos repetitivos, 2FN elimina dependencias parciales, 3FN elimina dependencias transitivas. El objetivo es un diseño eficiente y consistente.</p></div>
+          <div class="glossary-term"><h3>NOT NULL</h3><p>Restricción que impide que una columna almacene valores nulos (<code>NULL</code>). Garantiza que toda fila tenga un valor obligatorio en esa columna.</p></div>
+        </section>
+
+        <section id="o" class="glossary-section" data-aos="fade-up">
+          <h2>O</h2>
+          <div class="glossary-term"><h3>OFFSET</h3><p>Cláusula utilizada junto con <code>LIMIT</code> para especificar desde qué fila comenzar a devolver resultados. Ejemplo: <code>LIMIT 10 OFFSET 20</code> devuelve 10 filas saltando las primeras 20.</p></div>
+          <div class="glossary-term"><h3>ON DELETE CASCADE</h3><p>Opción de clave foránea que elimina automáticamente las filas hijas cuando se elimina la fila padre correspondiente. Útil para mantener la integridad referencial sin acciones manuales.</p></div>
+          <div class="glossary-term"><h3>OR</h3><p>Operador lógico que combina condiciones en SQL. Devuelve verdadero si al menos una de las condiciones es verdadera. Ejemplo: <code>WHERE ciudad = 'Madrid' OR ciudad = 'Barcelona'</code>.</p></div>
+          <div class="glossary-term"><h3>ORDER BY</h3><p>Cláusula que ordena los resultados de una consulta de forma ascendente (<code>ASC</code>) o descendente (<code>DESC</code>). Ejemplo: <code>ORDER BY precio DESC</code>.</p></div>
+        </section>
+
+        <section id="p" class="glossary-section" data-aos="fade-up">
+          <h2>P</h2>
+          <div class="glossary-term"><h3>PARTITION</h3><p>Técnica que divide una tabla grande en segmentos más pequeños llamados particiones, basándose en una regla como rango, lista o hash. Mejora el rendimiento y facilita la administración de datos masivos.</p></div>
+          <div class="glossary-term"><h3>Prepared statements</h3><p>Consultas SQL precompiladas que separan el código SQL de los datos. Mejoran la seguridad al prevenir inyección SQL y optimizan el rendimiento cuando se ejecutan múltiples veces.</p></div>
+          <div class="glossary-term"><h3>PRIMARY KEY</h3><p>Véase <em>Clave primaria</em>. Restricción que identifica de forma única cada fila de una tabla. Una tabla puede tener solo una clave primaria, que puede ser simple o compuesta.</p></div>
+          <div class="glossary-term"><h3>PROCEDURE</h3><p>Bloque de código SQL almacenado que puede aceptar parámetros y ejecutar operaciones complejas. A diferencia de las funciones, no está obligado a devolver un valor.</p></div>
+        </section>
+
+        <section id="q" class="glossary-section" data-aos="fade-up">
+          <h2>Q</h2>
+          <div class="glossary-term"><h3>Query</h3><p>Consulta o petición que se envía a la base de datos para recuperar, insertar, actualizar o eliminar datos. En MySQL se escribe utilizando el lenguaje SQL.</p></div>
+        </section>
+
+        <section id="r" class="glossary-section" data-aos="fade-up">
+          <h2>R</h2>
+          <div class="glossary-term"><h3>REGEXP</h3><p>Operador que realiza búsquedas mediante expresiones regulares en MySQL. Más potente que <code>LIKE</code>, permite patrones complejos. Ejemplo: <code>WHERE email REGEXP '^[a-z]+@'</code>.</p></div>
+          <div class="glossary-term"><h3>REPLACE</h3><p>Sentencia similar a <code>INSERT</code> pero que reemplaza un registro existente si encuentra un conflicto de clave primaria o única. Si no existe, inserta una nueva fila.</p></div>
+          <div class="glossary-term"><h3>REVOKE</h3><p>Sentencia DCL utilizada para retirar permisos y privilegios previamente otorgados a un usuario. Ejemplo: <code>REVOKE DELETE ON basedatos.* FROM 'usuario'@'localhost';</code></p></div>
+          <div class="glossary-term"><h3>RIGHT JOIN</h3><p>Tipo de JOIN que devuelve todas las filas de la tabla derecha y las coincidencias de la tabla izquierda. Es el inverso de <code>LEFT JOIN</code>.</p></div>
+          <div class="glossary-term"><h3>ROLLBACK</h3><p>Sentencia que deshace todas las modificaciones realizadas en la transacción actual, devolviendo la base de datos al estado anterior al <code>COMMIT</code> o <code>BEGIN</code>.</p></div>
+        </section>
+
+        <section id="s" class="glossary-section" data-aos="fade-up">
+          <h2>S</h2>
+          <div class="glossary-term"><h3>SAVEPOINT</h3><p>Punto de control dentro de una transacción que permite deshacer solo una parte de la transacción sin afectar al resto. Se usa con <code>ROLLBACK TO SAVEPOINT</code>.</p></div>
+          <div class="glossary-term"><h3>SELECT</h3><p>Sentencia DML fundamental para recuperar datos de una o más tablas. Es la instrucción más utilizada en SQL y admite múltiples cláusulas como WHERE, JOIN, GROUP BY, HAVING y ORDER BY.</p></div>
+          <div class="glossary-term"><h3>SET</h3><p>Sentencia utilizada para asignar valores a variables o modificar configuraciones del servidor. Ejemplos: <code>SET @variable = 10;</code> o <code>SET NAMES utf8mb4;</code></p></div>
+          <div class="glossary-term"><h3>SHOW</h3><p>Sentencia que muestra información sobre objetos de la base de datos. Ejemplos: <code>SHOW DATABASES;</code>, <code>SHOW TABLES;</code>, <code>SHOW CREATE TABLE usuarios;</code></p></div>
+          <div class="glossary-term"><h3>SSL</h3><p>Protocolo de cifrado que MySQL soporta para conexiones seguras entre cliente y servidor. Garantiza que los datos transferidos estén encriptados y protegidos contra interceptaciones.</p></div>
+          <div class="glossary-term"><h3>SUBQUERY</h3><p>Consulta anidada dentro de otra consulta SQL. Puede usarse en cláusulas SELECT, FROM, WHERE, HAVING y con operadores como IN, EXISTS, ANY y ALL.</p></div>
+          <div class="glossary-term"><h3>SUM</h3><p>Función de agregación que calcula la suma total de los valores de una columna numérica. Ejemplo: <code>SELECT SUM(total) FROM pedidos;</code></p></div>
+        </section>
+
+        <section id="t" class="glossary-section" data-aos="fade-up">
+          <h2>T</h2>
+          <div class="glossary-term"><h3>TABLE</h3><p>Estructura fundamental de almacenamiento en una base de datos relacional. Organiza los datos en filas (registros) y columnas (campos), con un esquema definido que especifica los tipos de datos y restricciones.</p></div>
+          <div class="glossary-term"><h3>TEXT</h3><p>Tipo de dato para almacenar cadenas de texto largas. Puede ser TINYTEXT, TEXT, MEDIUMTEXT o LONGTEXT, con capacidad desde 255 bytes hasta 4 GB.</p></div>
+          <div class="glossary-term"><h3>TIMESTAMP</h3><p>Tipo de dato que almacena fecha y hora con zona horaria. Se actualiza automáticamente al valor actual en inserciones y modificaciones si se define con <code>DEFAULT CURRENT_TIMESTAMP</code>.</p></div>
+          <div class="glossary-term"><h3>TRANSACTION</h3><p>Unidad de trabajo compuesta por una o más operaciones SQL que se ejecutan de forma atómica. Las transacciones siguen las propiedades ACID y se controlan con <code>COMMIT</code> y <code>ROLLBACK</code>.</p></div>
+          <div class="glossary-term"><h3>TRIGGER</h3><p>Bloque de código SQL que se ejecuta automáticamente en respuesta a eventos como INSERT, UPDATE o DELETE sobre una tabla. Útil para auditoría, validaciones y actualizaciones en cascada.</p></div>
+          <div class="glossary-term"><h3>TRUNCATE</h3><p>Sentencia DDL que elimina todas las filas de una tabla de forma rápida, reiniciando además los contadores AUTO_INCREMENT. Es más rápido que DELETE sin WHERE pero no permite condiciones.</p></div>
+          <div class="glossary-term"><h3>Types (data)</h3><p>Categorías de datos que MySQL puede almacenar: numéricos (INT, DECIMAL, FLOAT), cadenas (CHAR, VARCHAR, TEXT), fecha/hora (DATE, DATETIME, TIMESTAMP) y especiales (JSON, ENUM, BLOB).</p></div>
+        </section>
+
+        <section id="u" class="glossary-section" data-aos="fade-up">
+          <h2>U</h2>
+          <div class="glossary-term"><h3>UNION</h3><p>Operador que combina los resultados de dos o más consultas SELECT en un único conjunto de resultados, eliminando filas duplicadas por defecto. <code>UNION ALL</code> conserva los duplicados.</p></div>
+          <div class="glossary-term"><h3>UNIQUE</h3><p>Restricción que garantiza que todos los valores de una columna o combinación de columnas sean distintos entre sí. Permite valores NULL, a diferencia de la clave primaria.</p></div>
+          <div class="glossary-term"><h3>UPDATE</h3><p>Sentencia DML que modifica los valores de una o más columnas en filas existentes. Ejemplo: <code>UPDATE usuarios SET email = 'nuevo@email.com' WHERE id = 1;</code></p></div>
+          <div class="glossary-term"><h3>USER</h3><p>Cuenta que puede conectarse al servidor MySQL. Cada usuario tiene un nombre y un host asociado, y puede tener privilegios específicos gestionados con GRANT y REVOKE.</p></div>
+          <div class="glossary-term"><h3>USING</h3><p>Cláusula alternativa a <code>ON</code> en JOIN cuando las columnas de enlace tienen el mismo nombre en ambas tablas. Ejemplo: <code>JOIN pedidos USING (id_cliente)</code>.</p></div>
+        </section>
+
+        <section id="v" class="glossary-section" data-aos="fade-up">
+          <h2>V</h2>
+          <div class="glossary-term"><h3>VALUES</h3><p>Palabra clave utilizada en la sentencia INSERT para especificar los datos a insertar. También se usa en <code>SHOW COLUMNS</code> para mostrar los valores permitidos de un ENUM.</p></div>
+          <div class="glossary-term"><h3>VARCHAR</h3><p>Tipo de dato de cadena de longitud variable. Almacena solo los caracteres introducidos más un prefijo de longitud. Más eficiente en espacio que CHAR para cadenas de longitud variable.</p></div>
+          <div class="glossary-term"><h3>VIEW</h3><p>Tabla virtual basada en el resultado de una consulta SELECT. No almacena datos físicamente sino que muestra una perspectiva de los datos subyacentes. Útil para seguridad y simplificación.</p></div>
+        </section>
+
+        <section id="w" class="glossary-section" data-aos="fade-up">
+          <h2>W</h2>
+          <div class="glossary-term"><h3>WHERE</h3><p>Cláusula que filtra filas según una condición especificada. Es la forma principal de restringir resultados en consultas SELECT, UPDATE y DELETE.</p></div>
+          <div class="glossary-term"><h3>WITH</h3><p>Cláusula que define una expresión de tabla común (CTE), una tabla temporal con nombre que existe dentro del ámbito de una consulta. Mejora la legibilidad de consultas complejas.</p></div>
+          <div class="glossary-term"><h3>WORK</h3><p>Palabra clave opcional en las sentencias de transacción <code>BEGIN WORK</code>, <code>COMMIT WORK</code> y <code>ROLLBACK WORK</code>. Especificada por el estándar SQL pero no tiene efecto funcional en MySQL.</p></div>
+        </section>
+
+        <section id="x" class="glossary-section" data-aos="fade-up">
+          <h2>X</h2>
+          <div class="glossary-term"><h3>XA transactions</h3><p>Protocolo de transacciones distribuidas que permite coordinar transacciones entre múltiples gestores de bases de datos. MySQL soporta XA para garantizar consistencia en entornos heterogéneos.</p></div>
+        </section>
+
+        <section id="y" class="glossary-section" data-aos="fade-up">
+          <h2>Y</h2>
+          <div class="glossary-term"><h3>YEAR</h3><p>Tipo de dato que almacena años en formato de 4 dígitos. Rango soportado: 1901 a 2155. Puede almacenarse como string o número.</p></div>
+        </section>
+
+        <section id="z" class="glossary-section" data-aos="fade-up">
+          <h2>Z</h2>
+          <div class="glossary-term"><h3>ZEROFILL</h3><p>Atributo de columna numérica que rellena con ceros a la izquierda hasta completar la longitud definida. Ejemplo: <code>INT(5) ZEROFILL</code> muestra <code>00005</code> en lugar de <code>5</code>.</p></div>
+        </section>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Usa <code>Ctrl+F</code> en tu navegador para buscar términos rápidamente dentro de esta página. Los términos marcados con código (<code>SQL</code>) son palabras clave o funciones de MySQL.</p></div></div>
+
+      </main>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

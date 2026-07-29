@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modelo Entidad-Relación (ER) - Guía MySQL</title>
+  <meta name="description" content="Aprende a diseñar bases de datos con diagramas entidad-relación.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="diseno-bd" data-page="modelo-entidad-relacion">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Diseño de BD</a></li>
+      <li class="active">Modelo ER</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Modelo Entidad-Relación (ER)</h1>
+        <p>El modelo Entidad-Relación (ER) es una herramienta de diseño conceptual que representa la estructura lógica de una base de datos mediante entidades, atributos y relaciones. Fue propuesto por Peter Chen en 1976 y sigue siendo el estándar para modelar datos antes de implementarlos en un SGBD relacional.</p>
+
+        <h2>¿Qué es una entidad?</h2>
+        <p>Una <strong>entidad</strong> es un objeto del mundo real con existencia propia que puede identificarse de forma única. Se representa como un rectángulo en el diagrama ER. Ejemplos: <code>Libro</code>, <code>Autor</code>, <code>Socio</code>, <code>Préstamo</code>.</p>
+
+        <h2>Atributos</h2>
+        <p>Los <strong>atributos</strong> son las propiedades que describen a una entidad. Se representan como óvalos conectados a su entidad. Pueden ser simples (único valor) o compuestos (varios componentes), monovaluados o multivaluados, y derivados (calculados a partir de otros).</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Entidad</th><th>Atributos</th><th>Tipo</th></tr></thead>
+            <tbody>
+              <tr><td>Libro</td><td>ISBN, título, año_publicación, género</td><td>Débil (depende de Autor vía escribe)</td></tr>
+              <tr><td>Autor</td><td>id_autor, nombre, apellido, nacionalidad</td><td>Fuerte</td></tr>
+              <tr><td>Socio</td><td>id_socio, nombre, dirección, teléfono, email</td><td>Fuerte</td></tr>
+              <tr><td>Préstamo</td><td>id_préstamo, fecha_inicio, fecha_devolución, estado</td><td>Débil (depende de Socio y Libro)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Relaciones y cardinalidad</h2>
+        <p>Una <strong>relación</strong> es una asociación entre dos o más entidades. Se representa con un rombo. La <strong>cardinalidad</strong> define cuántas instancias de una entidad pueden asociarse con otra:</p>
+
+        <ul>
+          <li><strong>1:1 (uno a uno):</strong> Un socio tiene un único carnet. Un carnet pertenece a un solo socio.</li>
+          <li><strong>1:N (uno a muchos):</strong> Un autor puede escribir varios libros. Un libro es escrito por un solo autor (en este modelo simplificado).</li>
+          <li><strong>N:M (muchos a muchos):</strong> Un libro puede tener varios autores y un autor puede escribir varios libros. Requiere tabla intermedia.</li>
+        </ul>
+
+        <h2>Ejemplo: Sistema de Biblioteca</h2>
+        <p>Modelamos un sistema de biblioteca con las entidades <code>Libro</code>, <code>Autor</code>, <code>Socio</code> y <code>Préstamo</code>. La relación <code>escribe</code> vincula Autor con Libro (1:N). La relación <code>realiza</code> vincula Socio con Préstamo (1:N). La relación <code>incluye</code> vincula Préstamo con Libro (1:N).</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE DATABASE biblioteca;
+USE biblioteca;
+
+CREATE TABLE autor (
+    id_autor INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    nacionalidad VARCHAR(30)
+);
+
+CREATE TABLE libro (
+    isbn VARCHAR(13) PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
+    anio_publicacion YEAR,
+    genero VARCHAR(30),
+    id_autor INT NOT NULL,
+    FOREIGN KEY (id_autor) REFERENCES autor(id_autor)
+);
+
+CREATE TABLE socio (
+    id_socio INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    direccion VARCHAR(150),
+    telefono VARCHAR(15),
+    email VARCHAR(100) UNIQUE
+);
+
+CREATE TABLE prestamo (
+    id_prestamo INT AUTO_INCREMENT PRIMARY KEY,
+    fecha_inicio DATE NOT NULL,
+    fecha_devolucion DATE,
+    estado ENUM('activo', 'devuelto', 'vencido') DEFAULT 'activo',
+    id_socio INT NOT NULL,
+    isbn VARCHAR(13) NOT NULL,
+    FOREIGN KEY (id_socio) REFERENCES socio(id_socio),
+    FOREIGN KEY (isbn) REFERENCES libro(isbn)
+);</code></pre>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Puedes dibujar diagramas ER gratis con herramientas como <a href="https://draw.io" target="_blank" rel="noopener">draw.io</a>, <a href="https://dbdiagram.io" target="_blank" rel="noopener">dbdiagram.io</a> o <a href="https://lucidchart.com" target="_blank" rel="noopener">Lucidchart</a>. dbdiagram.io además genera el código SQL automáticamente a partir del diagrama.</p></div></div>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>El modelo ER es independiente del SGBD. Puedes diseñarlo sin pensar en MySQL, PostgreSQL u otros. Luego lo transformas en un modelo relacional (tablas, claves, etc.) para implementarlo.</p></div></div>
+
+        <nav class="page-nav">
+          <span class="nav-prev disabled"><i class="bi bi-arrow-left"></i> Anterior</span>
+          <a href="normalizacion.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

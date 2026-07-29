@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procedimientos almacenados - Guía MySQL</title>
+  <meta name="description" content="Aprende a crear y usar procedimientos almacenados con CREATE PROCEDURE.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="avanzado" data-page="procedimientos-almacenados">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Avanzado</a></li>
+      <li class="active">Procedimientos almacenados</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Procedimientos almacenados</h1>
+        <p>Un procedimiento almacenado (stored procedure) es un bloque de código SQL con nombre que se almacena en el servidor de base de datos. Puede aceptar parámetros, ejecutar consultas, contener lógica condicional y bucles, y devolver múltiples conjuntos de resultados. Los procedimientos se invocan con la instrucción <code>CALL</code>.</p>
+
+        <h2>CREATE PROCEDURE</h2>
+        <p>La sintaxis básica para crear un procedimiento requiere especificar el nombre, los parámetros (opcionales) y el cuerpo del procedimiento delimitado por <code>BEGIN ... END</code>:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DELIMITER $$
+
+CREATE PROCEDURE obtener_empleados_por_depto(IN depto_nombre VARCHAR(50))
+BEGIN
+    SELECT e.id, e.nombre, e.apellido, e.salario
+    FROM empleados e
+    INNER JOIN departamentos d ON e.depto_id = d.id
+    WHERE d.nombre = depto_nombre
+    ORDER BY e.apellido;
+END$$
+
+DELIMITER ;</code></pre>
+        </div>
+
+        <h2>Parámetros IN, OUT, INOUT</h2>
+        <p>MySQL ofrece tres tipos de parámetros:</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Tipo</th><th>Función</th><th>Ejemplo</th></tr></thead>
+            <tbody>
+              <tr><td><code>IN</code></td><td>El procedimiento recibe un valor (parámetro de entrada)</td><td>IN depto_nombre VARCHAR(50)</td></tr>
+              <tr><td><code>OUT</code></td><td>El procedimiento asigna un valor que la llamada recibe</td><td>OUT total INT</td></tr>
+              <tr><td><code>INOUT</code></td><td>El procedimiento recibe un valor y puede modificarlo</td><td>INOUT contador INT</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DELIMITER $$
+
+CREATE PROCEDURE contar_empleados(IN depto_id INT, OUT total INT)
+BEGIN
+    SELECT COUNT(*) INTO total
+    FROM empleados
+    WHERE depto_id = depto_id;
+END$$
+
+DELIMITER ;
+
+-- Llamada
+CALL contar_empleados(3, @total);
+SELECT @total AS total_empleados;</code></pre>
+        </div>
+
+        <h2>Variables y estructuras de control</h2>
+        <p>Dentro de un procedimiento puedes declarar variables locales con <code>DECLARE</code> y usar estructuras como <code>IF</code>, <code>CASE</code>, <code>WHILE</code>, <code>LOOP</code> y <code>REPEAT</code>:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DELIMITER $$
+
+CREATE PROCEDURE calcular_bono_anual(IN empleado_id INT, OUT bono DECIMAL(10,2))
+BEGIN
+    DECLARE salario_actual DECIMAL(10,2);
+    DECLARE antiguedad INT;
+
+    -- Obtener datos del empleado
+    SELECT salario, TIMESTAMPDIFF(YEAR, fecha_contratacion, CURDATE())
+    INTO salario_actual, antiguedad
+    FROM empleados WHERE id = empleado_id;
+
+    -- Calcular bono según antigüedad
+    IF antiguedad >= 10 THEN
+        SET bono = salario_actual * 0.20;
+    ELSEIF antiguedad >= 5 THEN
+        SET bono = salario_actual * 0.10;
+    ELSE
+        SET bono = salario_actual * 0.05;
+    END IF;
+END$$
+
+DELIMITER ;</code></pre>
+        </div>
+
+        <h2>WHILE y bucles</h2>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DELIMITER $$
+
+CREATE PROCEDURE generar_serie(IN limite INT)
+BEGIN
+    DECLARE contador INT DEFAULT 1;
+    DECLARE resultado TEXT DEFAULT '';
+
+    WHILE contador <= limite DO
+        SET resultado = CONCAT(resultado, contador, ', ');
+        SET contador = contador + 1;
+    END WHILE;
+
+    SELECT resultado AS serie_numeros;
+END$$
+
+DELIMITER ;
+
+CALL generar_serie(10);</code></pre>
+        </div>
+
+        <h2>Ejemplo completo: empleados por departamento</h2>
+        <p>Procedimiento que devuelve los empleados de un departamento específico junto con el salario promedio del mismo:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DELIMITER $$
+
+CREATE PROCEDURE reporte_departamento(IN depto_nombre VARCHAR(50))
+BEGIN
+    DECLARE promedio_salario DECIMAL(10,2);
+
+    -- Calcular salario promedio
+    SELECT AVG(e.salario) INTO promedio_salario
+    FROM empleados e
+    INNER JOIN departamentos d ON e.depto_id = d.id
+    WHERE d.nombre = depto_nombre;
+
+    -- Mostrar empleados
+    SELECT e.id, e.nombre, e.apellido, e.salario,
+           e.salario - promedio_salario AS diferencia_promedio
+    FROM empleados e
+    INNER JOIN departamentos d ON e.depto_id = d.id
+    WHERE d.nombre = depto_nombre
+    ORDER BY e.salario DESC;
+
+    -- Mostrar resumen
+    SELECT depto_nombre AS departamento,
+           COUNT(*) AS total_empleados,
+           promedio_salario AS salario_promedio;
+END$$
+
+DELIMITER ;
+
+CALL reporte_departamento('Ventas');</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id</th><th>nombre</th><th>apellido</th><th>salario</th><th>diferencia_promedio</th></tr></thead>
+            <tbody>
+              <tr><td>12</td><td>María</td><td>López</td><td>4800.00</td><td>950.00</td></tr>
+              <tr><td>7</td><td>Carlos</td><td>Mendoza</td><td>4200.00</td><td>350.00</td></tr>
+              <tr><td>15</td><td>Ana</td><td>Rivas</td><td>3500.00</td><td>-350.00</td></tr>
+              <tr><td>3</td><td>Luis</td><td>García</td><td>2900.00</td><td>-950.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Los procedimientos almacenados mejoran la seguridad (los usuarios ejecutan el procedimiento sin acceso directo a las tablas), reducen el tráfico de red (la lógica viaja al servidor), y centralizan la lógica de negocio. También permiten reutilización y facilitan el mantenimiento.</p></div></div>
+
+        <div class="callout callout-warning"><div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div><div class="callout-content"><p>Depurar procedimientos almacenados es más difícil que el código de aplicación. MySQL no tiene un depurador integrado; usa <code>SELECT</code> temporales o tablas de log para rastrear valores. Además, los procedimientos pueden ser menos portables entre distintos motores de base de datos.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="transacciones.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="funciones-personalizadas.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

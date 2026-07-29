@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Optimización de consultas SQL - Guía MySQL</title>
+  <meta name="description" content="Técnicas para optimizar consultas MySQL: evitar SELECT *, índices correctos, y más.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="optimizacion" data-page="optimizacion-consultas">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Optimización</a></li>
+      <li class="active">Optimización de consultas</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Optimización de consultas SQL</h1>
+        <p>Escribir consultas SQL eficientes es tan importante como tener buenos índices. Una consulta mal formulada puede ignorar los mejores índices y saturar el servidor. En esta página verás patrones concretos para escribir SQL rápido y evitar los errores más comunes que degradan el rendimiento.</p>
+
+        <h2>1. Evita SELECT *</h2>
+        <p><code>SELECT *</code> obliga a MySQL a leer todas las columnas de la tabla, incluido el contenido de columnas grandes como <code>TEXT</code> o <code>BLOB</code>. Además, impide que el índice cubra la consulta (covering index). Siempre especifica solo las columnas que necesitas.</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Malo vs. Bueno</div>
+          <pre><code class="language-sql">-- ❌ Lento: trae todas las columnas
+SELECT * FROM usuarios WHERE email LIKE '%@gmail.com';
+
+-- ✅ Rápido: solo las columnas necesarias
+SELECT id, nombre, email FROM usuarios WHERE email LIKE '%@gmail.com';</code></pre>
+        </div>
+
+        <h2>2. EXISTS vs. IN</h2>
+        <p>Cuando la subconsulta externa filtra por una columna de la tabla interna, <code>EXISTS</code> suele ser más eficiente porque MySQL puede detenerse al encontrar la primera coincidencia. <code>IN</code> evalúa todos los registros de la subconsulta primero.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- ❌ IN materializa toda la subconsulta
+SELECT * FROM clientes c
+WHERE c.id IN (SELECT cliente_id FROM pedidos WHERE total > 1000);
+
+-- ✅ EXISTS corta al encontrar la primera coincidencia
+SELECT * FROM clientes c
+WHERE EXISTS (SELECT 1 FROM pedidos p WHERE p.cliente_id = c.id AND p.total > 1000);</code></pre>
+        </div>
+
+        <h2>3. LIKE con prefijo fijo</h2>
+        <p>Un <code>LIKE 'abc%'</code> puede usar índices, pero <code>LIKE '%abc'</code> o <code>LIKE '%abc%'</code> nunca pueden usar índices porque el comodín está al inicio.</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Índice usable vs. no usable</div>
+          <pre><code class="language-sql">-- ✅ Usa índice (prefijo fijo)
+SELECT * FROM productos WHERE nombre LIKE 'lap%';
+
+-- ❌ No usa índice (comodín al inicio)
+SELECT * FROM productos WHERE nombre LIKE '%top';</code></pre>
+        </div>
+
+        <h2>4. No apliques funciones a columnas indexadas</h2>
+        <p>Usar <code>YEAR()</code>, <code>DATE()</code>, <code>LOWER()</code> o cualquier función directa sobre la columna hace que el índice sea inservible. Se llama "no sargable".</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- ❌ No sargable: fuerza full table scan
+SELECT * FROM pedidos WHERE YEAR(fecha) = 2024;
+
+-- ✅ Sargable: usa índice en fecha (si existe)
+SELECT * FROM pedidos WHERE fecha >= '2024-01-01' AND fecha < '2025-01-01';</code></pre>
+        </div>
+
+        <h2>5. JOINs óptimos</h2>
+        <p>En un JOIN, la tabla con el filtro más restrictivo debe ir primero (MySQL suele optimizarlo automáticamente, pero el orden lógico importa). Asegúrate de que las columnas del JOIN estén indexadas.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Asegura índices en ambas tablas
+CREATE INDEX idx_pedidos_cliente ON pedidos(cliente_id);
+CREATE INDEX idx_clientes_id ON clientes(id);
+
+-- JOIN eficiente: cliente_id está indexado
+SELECT c.nombre, SUM(p.total) AS gasto
+FROM clientes c
+JOIN pedidos p ON p.cliente_id = c.id
+WHERE c.activo = 1
+GROUP BY c.id;</code></pre>
+        </div>
+
+        <h2>6. LIMIT con subconsultas para paginación</h2>
+        <p>En tablas grandes, <code>LIMIT 100000, 20</code> recorre y descarta 100.000 filas. Una técnica más eficiente es usar una subconsulta que recorra solo el índice.</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Paginación eficiente</div>
+          <pre><code class="language-sql">-- ❌ Lento: OFFSET alto recorre muchas filas
+SELECT * FROM pedidos ORDER BY id LIMIT 100000, 20;
+
+-- ✅ Rápido: subconsulta sobre índice
+SELECT p.* FROM pedidos p
+INNER JOIN (SELECT id FROM pedidos ORDER BY id LIMIT 100000, 20) AS sub
+ON p.id = sub.id;</code></pre>
+        </div>
+
+        <h2>Comparativa rápida: lento vs. rápido</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Práctica lenta</th><th>Práctica rápida</th></tr></thead>
+            <tbody>
+              <tr><td><code>SELECT *</code></td><td>Columnas explícitas</td></tr>
+              <tr><td><code>WHERE YEAR(col) = 2024</code></td><td><code>WHERE col BETWEEN ...</code></td></tr>
+              <tr><td><code>LIKE '%texto%'</code></td><td><code>LIKE 'texto%'</code> o índice FULLTEXT</td></tr>
+              <tr><td><code>IN (SELECT ...)</code></td><td><code>EXISTS (SELECT 1 ...)</code></td></tr>
+              <tr><td><code>OFFSET alto + LIMIT</code></td><td>Keyset pagination o subconsulta</td></tr>
+              <tr><td>Función en columna indexada</td><td>Rango equivalente</td></tr>
+              <tr><td>JOIN sin índice en columna FK</td><td>Índice en la columna del JOIN</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>Usa <code>EXPLAIN</code> antes y después de cada optimización para confirmar que el plan de ejecución mejoró. Sin medición, no hay optimización.</p></div>
+        </div>
+
+        <div class="callout callout-important">
+          <div class="callout-icon"><i class="bi bi-info-circle"></i></div>
+          <div class="callout-content"><p>Checklist de optimización: (1) ¿Hay <code>SELECT *</code>? → cámbialo. (2) ¿Los filtros usan funciones sobre la columna? → hazlos sargables. (3) ¿Las columnas de JOIN tienen índice? → créalo. (4) ¿Hay LIKE con comodín inicial? → evalúa FULLTEXT. (5) ¿El OFFSET es alto? → aplica keyset pagination.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="explain.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="indices-avanzados.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

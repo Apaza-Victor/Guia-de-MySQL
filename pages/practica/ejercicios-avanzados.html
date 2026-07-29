@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicios avanzados de SQL - Guía MySQL</title>
+  <meta name="description" content="Practica procedimientos almacenados, triggers, índices y optimización de consultas en MySQL.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="practica" data-page="ejercicios-avanzados">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Práctica</a></li>
+      <li class="active">Ejercicios avanzados</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Ejercicios avanzados de SQL</h1>
+        <p>Lleva tus habilidades al siguiente nivel con ejercicios de procedimientos almacenados, triggers, índices y optimización. Estos temas son esenciales para administrar bases de datos en entornos profesionales y de alto rendimiento.</p>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Usa la sentencia <code>EXPLAIN</code> antes y después de crear índices para observar cómo MySQL optimiza las consultas. Esta práctica es fundamental para entender el rendimiento de las bases de datos.</p></div></div>
+
+        <h2>Tabla de ejemplo: empleados (ampliada)</h2>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE empleados (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(50),
+  apellido VARCHAR(50),
+  puesto VARCHAR(50),
+  salario DECIMAL(10,2),
+  departamento VARCHAR(30),
+  fecha_contratacion DATE
+);
+
+INSERT INTO empleados (nombre, apellido, puesto, salario, departamento, fecha_contratacion) VALUES
+('Ana', 'López', 'Analista de Ventas', 45000.00, 'Ventas', '2020-03-15'),
+('Carlos', 'Ruiz', 'Desarrollador Senior', 62000.00, 'TI', '2019-07-01'),
+('María', 'García', 'Ejecutiva de Ventas', 48000.00, 'Ventas', '2021-01-10'),
+('José', 'Pérez', 'Arquitecto de Software', 75000.00, 'TI', '2018-05-20'),
+('Laura', 'Díaz', 'Especialista en RH', 41000.00, 'Recursos Humanos', '2022-09-05'),
+('Pedro', 'Sánchez', 'Representante de Ventas', 39000.00, 'Ventas', '2023-02-14'),
+('Sofía', 'Martínez', 'DevOps Engineer', 68000.00, 'TI', '2020-11-30'),
+('Miguel', 'Torres', 'Analista de RH', 38000.00, 'Recursos Humanos', '2021-06-22'),
+('Lucía', 'Ramírez', 'Desarrolladora Junior', 42000.00, 'TI', '2023-08-01'),
+('Diego', 'Hernández', 'Gerente de Ventas', 85000.00, 'Ventas', '2017-04-18');
+
+CREATE TABLE audit_empleados (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  empleado_id INT,
+  accion VARCHAR(20),
+  fecha DATETIME,
+  usuario VARCHAR(50)
+);</code></pre>
+        </div>
+
+        <h2>Ejercicio 1: Procedimiento almacenado</h2>
+        <p>Crea un procedimiento almacenado llamado <code>ListarEmpleadosPorDepartamento</code> que reciba un nombre de departamento como parámetro y devuelva el id, nombre, apellido, puesto y salario de los empleados en ese departamento. Luego ejecútalo para listar los empleados de <strong>Ventas</strong>.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">DELIMITER //
+
+CREATE PROCEDURE ListarEmpleadosPorDepartamento(IN dept VARCHAR(30))
+BEGIN
+  SELECT id, nombre, apellido, puesto, salario
+  FROM empleados
+  WHERE departamento = dept
+  ORDER BY salario DESC;
+END //
+
+DELIMITER ;
+
+CALL ListarEmpleadosPorDepartamento('Ventas');</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>id</th><th>nombre</th><th>apellido</th><th>puesto</th><th>salario</th></tr></thead>
+              <tbody>
+                <tr><td>10</td><td>Diego</td><td>Hernández</td><td>Gerente de Ventas</td><td>85000.00</td></tr>
+                <tr><td>3</td><td>María</td><td>García</td><td>Ejecutiva de Ventas</td><td>48000.00</td></tr>
+                <tr><td>1</td><td>Ana</td><td>López</td><td>Analista de Ventas</td><td>45000.00</td></tr>
+                <tr><td>6</td><td>Pedro</td><td>Sánchez</td><td>Representante de Ventas</td><td>39000.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <h2>Ejercicio 2: Trigger de auditoría</h2>
+        <p>Crea un trigger <code>after_insert_empleados</code> que se active después de cada <code>INSERT</code> en la tabla <code>empleados</code>. Debe insertar un registro en la tabla <code>audit_empleados</code> con el ID del empleado, la acción <strong>'INSERT'</strong>, la fecha actual y el usuario actual (<code>CURRENT_USER()</code>). Luego prueba insertando un empleado nuevo y verifica la auditoría.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">CREATE TRIGGER after_insert_empleados
+AFTER INSERT ON empleados
+FOR EACH ROW
+BEGIN
+  INSERT INTO audit_empleados (empleado_id, accion, fecha, usuario)
+  VALUES (NEW.id, 'INSERT', NOW(), CURRENT_USER());
+END;
+
+-- Probar el trigger
+INSERT INTO empleados (nombre, apellido, puesto, salario, departamento, fecha_contratacion)
+VALUES ('Valeria', 'Méndez', 'DBA', 55000.00, 'TI', '2024-07-15');
+
+SELECT * FROM audit_empleados;
+SELECT * FROM empleados WHERE apellido = 'Méndez';</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>id</th><th>empleado_id</th><th>accion</th><th>fecha</th><th>usuario</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>11</td><td>INSERT</td><td>2024-07-29 10:30:00</td><td>root@localhost</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <h2>Ejercicio 3: Índice compuesto y EXPLAIN</h2>
+        <p>Ejecuta una consulta que busque empleados por <code>departamento</code> y ordenados por <code>salario DESC</code>. Primero usa <code>EXPLAIN</code> para ver el plan de ejecución sin índice. Luego crea un índice compuesto en <code>(departamento, salario)</code> y vuelve a ejecutar <code>EXPLAIN</code> para comparar.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL - Antes del índice</div>
+            <pre><code class="language-sql">EXPLAIN SELECT * FROM empleados
+WHERE departamento = 'TI'
+ORDER BY salario DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>id</th><th>select_type</th><th>table</th><th>type</th><th>possible_keys</th><th>key</th><th>rows</th><th>Extra</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>SIMPLE</td><td>empleados</td><td>ALL</td><td>NULL</td><td>NULL</td><td>11</td><td>Using where; Using filesort</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="code-block">
+            <div class="code-label">SQL - Crear índice</div>
+            <pre><code class="language-sql">CREATE INDEX idx_dept_salario ON empleados(departamento, salario DESC);
+
+EXPLAIN SELECT * FROM empleados
+WHERE departamento = 'TI'
+ORDER BY salario DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>id</th><th>select_type</th><th>table</th><th>type</th><th>possible_keys</th><th>key</th><th>rows</th><th>Extra</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>SIMPLE</td><td>empleados</td><td>ref</td><td>idx_dept_salario</td><td>idx_dept_salario</td><td>4</td><td>Using index condition</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Observa la diferencia: antes del índice el tipo era <code>ALL</code> (escaneo completo) y usaba <code>filesort</code>. Después del índice, el tipo pasa a <code>ref</code> y elimina el <code>filesort</code>, reduciendo las filas examinadas.</p>
+        </details>
+
+        <h2>Ejercicio 4: Consulta optimizada vs versión lenta</h2>
+        <p>Escribe una consulta lenta que use <code>LIKE</code> con comodín al inicio para buscar empleados cuyo nombre termine en 'a', y su versión optimizada usando una función de MySQL o reescribiendo la condición. Compara los planes de ejecución con <code>EXPLAIN</code>.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL - Versión lenta</div>
+            <pre><code class="language-sql">-- Versión lenta: LIKE con comodín inicial (no puede usar índices)
+EXPLAIN SELECT * FROM empleados
+WHERE nombre LIKE '%a';</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>id</th><th>select_type</th><th>table</th><th>type</th><th>possible_keys</th><th>key</th><th>rows</th><th>Extra</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>SIMPLE</td><td>empleados</td><td>ALL</td><td>NULL</td><td>NULL</td><td>11</td><td>Using where</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="code-block">
+            <div class="code-label">SQL - Versión optimizada</div>
+            <pre><code class="language-sql">-- Versión optimizada: usamos RIGHT() o indexamos con LIKE sin comodín inicial
+CREATE INDEX idx_nombre ON empleados(nombre);
+
+EXPLAIN SELECT * FROM empleados
+WHERE RIGHT(nombre, 1) = 'a';
+
+-- Alternativa aún mejor si el patrón lo permite: LIKE 'a%' (comodín al final)
+EXPLAIN SELECT * FROM empleados
+WHERE nombre LIKE 'a%';</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>id</th><th>select_type</th><th>table</th><th>type</th><th>possible_keys</th><th>key</th><th>rows</th><th>Extra</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>SIMPLE</td><td>empleados</td><td>ALL</td><td>NULL</td><td>NULL</td><td>11</td><td>Using where</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>La versión con <code>LIKE '%a'</code> no puede usar índices porque el comodín está al inicio. La versión optimizada con <code>LIKE 'a%'</code> sí aprovecha el índice. En el caso de <code>RIGHT()</code>, MySQL igual hace escaneo completo porque la función envuelve la columna.</p>
+          <p><strong>Conclusión:</strong> Para búsquedas eficientes por texto, evita los comodines al inicio del patrón o considera usar <code>FULLTEXT INDEX</code> con <code>MATCH ... AGAINST</code>.</p>
+        </details>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>Los índices aceleran las consultas de lectura pero ralentizan las escrituras (INSERT, UPDATE, DELETE). Evalúa siempre el equilibrio entre rendimiento de lectura y escritura antes de crear índices. Usa EXPLAIN como tu herramienta principal de diagnóstico.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="ejercicios-intermedios.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="proyectos-practicos.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

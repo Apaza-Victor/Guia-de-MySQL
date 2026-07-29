@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instalación y configuración de MySQL - Guía MySQL</title>
+  <meta name="description" content="Guía paso a paso para instalar MySQL en Windows, Linux y macOS usando XAMPP, WAMP y el instalador oficial.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="fundamentos" data-page="instalacion">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Fundamentos</a></li>
+      <li class="active">Instalación y configuración de MySQL</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Instalación y configuración de MySQL</h1>
+        <p>Existen múltiples formas de instalar MySQL dependiendo del sistema operativo y del entorno de desarrollo que prefieras. Desde paquetes todo-en-uno como XAMPP hasta el instalador oficial de MySQL, en esta guía cubriremos las opciones más comunes para que puedas empezar a trabajar con bases de datos relacionales en pocos minutos.</p>
+
+        <h2>Instalación en Windows</h2>
+        <p>En Windows, la forma más sencilla es usar el instalador oficial de MySQL (MySQL Installer), que permite elegir qué componentes instalar: servidor, cliente, workbench, conectores, etc. También puedes optar por paquetes integrados como XAMPP o WAMP que incluyen Apache, MySQL y PHP en un solo instalador, ideales para entornos de desarrollo web.</p>
+
+        <h3>Verificar la instalación</h3>
+        <div class="code-block">
+          <div class="code-label">Terminal</div>
+          <pre><code class="language-sql">mysql --version</code></pre>
+        </div>
+
+        <h2>Instalación en Linux</h2>
+        <p>En distribuciones basadas en Debian/Ubuntu, MySQL se instala fácilmente con el gestor de paquetes apt. En sistemas basados en Red Hat como Fedora o CentOS, se utiliza dnf o yum. Los repositorios oficiales de MySQL también ofrecen versiones actualizadas para las distribuciones más populares.</p>
+
+        <h3>Instalar MySQL en Ubuntu</h3>
+        <div class="code-block">
+          <div class="code-label">Terminal</div>
+          <pre><code class="language-sql">sudo apt update
+sudo apt install mysql-server</code></pre>
+        </div>
+
+        <h2>Instalación en macOS</h2>
+        <p>En macOS, el método más recomendado es usar Homebrew, el gestor de paquetes para macOS. También puedes descargar el DMG oficial desde el sitio de MySQL, que incluye un asistente gráfico de instalación. Otra opción es usar MAMP, similar a XAMPP en Windows.</p>
+
+        <h3>Instalar MySQL con Homebrew</h3>
+        <div class="code-block">
+          <div class="code-label">Terminal</div>
+          <pre><code class="language-sql">brew install mysql</code></pre>
+        </div>
+
+        <h2>Primeros pasos: conectar a MySQL</h2>
+        <p>Una vez instalado, puedes conectarte al servidor MySQL usando el cliente de línea de comandos con el usuario root. Durante la instalación se te pedirá establecer una contraseña para el usuario root. Si usas XAMPP, el usuario root no tiene contraseña por defecto.</p>
+
+        <h3>Conectar al servidor MySQL</h3>
+        <div class="code-block">
+          <div class="code-label">Terminal</div>
+          <pre><code class="language-sql">mysql -u root -p</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Método</th><th>Sistema Operativo</th><th>Incluye</th><th>Dificultad</th></tr></thead>
+            <tbody>
+              <tr><td>MySQL Installer</td><td>Windows</td><td>Servidor + Cliente + Workbench</td><td>Baja</td></tr>
+              <tr><td>XAMPP / WAMP</td><td>Windows</td><td>Apache + MySQL + PHP + phpMyAdmin</td><td>Muy baja</td></tr>
+              <tr><td>apt (Ubuntu/Debian)</td><td>Linux</td><td>Servidor MySQL</td><td>Media</td></tr>
+              <tr><td>dnf (Fedora/CentOS)</td><td>Linux</td><td>Servidor MySQL</td><td>Media</td></tr>
+              <tr><td>Homebrew</td><td>macOS</td><td>Servidor MySQL</td><td>Baja</td></tr>
+              <tr><td>MAMP</td><td>macOS</td><td>Apache + MySQL + PHP + phpMyAdmin</td><td>Muy baja</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>Si eres principiante, usa XAMPP en Windows o MAMP en macOS. Incluyen phpMyAdmin, una interfaz gráfica web que facilita la administración de bases de datos sin escribir comandos SQL.</p></div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="callout-content"><p>Nunca uses el usuario root sin contraseña en un entorno de producción. Siempre establece una contraseña segura y crea usuarios con privilegios limitados para cada aplicación.</p></div>
+        </div>
+
+        <div class="callout callout-important">
+          <div class="callout-icon"><i class="bi bi-info-circle"></i></div>
+          <div class="callout-content"><p>Después de instalar MySQL, ejecuta <code>mysql_secure_installation</code> para mejorar la seguridad: establecer contraseña de root, eliminar usuarios anónimos, deshabilitar login remoto de root y eliminar bases de datos de prueba.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="que-es-mysql.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="clientes-mysql.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

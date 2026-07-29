@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subconsultas (subqueries) - Guía MySQL</title>
+  <meta name="description" content="Domina las subconsultas en MySQL: en WHERE, FROM y SELECT.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="consultas-intermedias" data-page="subconsultas">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Intermedio</a></li>
+      <li class="active">Subconsultas</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Subconsultas (subqueries)</h1>
+        <p>Una subconsulta es una consulta anidada dentro de otra consulta. Se escribe entre paréntesis y puede usarse en las cláusulas WHERE, FROM, SELECT, HAVING e incluso dentro de INSERT, UPDATE y DELETE. Las subconsultas permiten resolver problemas complejos dividiéndolos en partes más pequeñas.</p>
+
+        <h2>Subconsulta escalar en WHERE</h2>
+        <p>Devuelve un único valor y se usa con operadores de comparación (=, >, <, etc.).</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Clientes con pedido mayor al promedio
+SELECT c.nombre, p.total, p.fecha
+FROM clientes c
+INNER JOIN pedidos p ON c.id = p.cliente_id
+WHERE p.total > (
+  SELECT AVG(total) FROM pedidos
+);</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>total</th><th>fecha</th></tr></thead>
+            <tbody><tr><td>Ana López</td><td>480.00</td><td>2024-03-15</td></tr><tr><td>Elena Gómez</td><td>920.00</td><td>2024-04-01</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>Subconsulta de múltiples filas con IN</h2>
+        <p>Cuando la subconsulta devuelve varias filas, usamos IN, NOT IN, ANY o ALL.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Clientes que han realizado al menos un pedido
+SELECT nombre, ciudad
+FROM clientes
+WHERE id IN (
+  SELECT DISTINCT cliente_id
+  FROM pedidos
+  WHERE cliente_id IS NOT NULL
+);</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>ciudad</th></tr></thead>
+            <tbody><tr><td>Ana López</td><td>Madrid</td></tr><tr><td>Carlos Ruiz</td><td>Barcelona</td></tr><tr><td>Elena Gómez</td><td>Valencia</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>ANY y ALL</h2>
+        <p>ANY compara un valor con cada elemento devuelto por la subconsulta y devuelve verdadero si alguna comparación es verdadera. ALL requiere que todas las comparaciones sean verdaderas.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Pedidos mayores a cualquier pedido del cliente 1
+SELECT * FROM pedidos
+WHERE total > ANY (
+  SELECT total FROM pedidos WHERE cliente_id = 1
+);
+
+-- Pedidos mayores a todos los pedidos del cliente 1
+SELECT * FROM pedidos
+WHERE total > ALL (
+  SELECT total FROM pedidos WHERE cliente_id = 1
+);</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id</th><th>cliente_id</th><th>total</th><th>fecha</th></tr></thead>
+            <tbody><tr><td>103</td><td>2</td><td>150.00</td><td>2024-03-20</td></tr><tr><td>104</td><td>3</td><td>920.00</td><td>2024-04-01</td></tr><tr><td>105</td><td>NULL</td><td>300.00</td><td>2024-04-10</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>Subconsultas correlacionadas</h2>
+        <p>Una subconsulta correlacionada hace referencia a columnas de la consulta externa. Se evalúa una vez por cada fila procesada por la consulta externa, lo que puede hacerlas lentas en tablas grandes.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Pedido más caro de cada cliente
+SELECT c.nombre, p.total, p.fecha
+FROM pedidos p
+INNER JOIN clientes c ON p.cliente_id = c.id
+WHERE p.total = (
+  SELECT MAX(p2.total)
+  FROM pedidos p2
+  WHERE p2.cliente_id = p.cliente_id
+);</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>total</th><th>fecha</th></tr></thead>
+            <tbody><tr><td>Ana López</td><td>480.00</td><td>2024-03-15</td></tr><tr><td>Carlos Ruiz</td><td>150.00</td><td>2024-03-20</td></tr><tr><td>Elena Gómez</td><td>920.00</td><td>2024-04-01</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>Subconsultas en FROM (tablas derivadas)</h2>
+        <p>Una subconsulta en FROM actúa como una tabla temporal (tabla derivada). Debes asignarle un alias obligatoriamente.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Promedio de pedidos por cliente
+SELECT
+  ROUND(AVG(total_por_cliente), 2) AS promedio_gasto
+FROM (
+  SELECT cliente_id, SUM(total) AS total_por_cliente
+  FROM pedidos
+  WHERE cliente_id IS NOT NULL
+  GROUP BY cliente_id
+) AS resumen;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>promedio_gasto</th></tr></thead>
+            <tbody><tr><td>516.67</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>Subconsulta en SELECT</h2>
+        <p>Puedes usar una subconsulta como una columna calculada en el SELECT. Debe devolver un único valor escalar.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT
+  c.nombre,
+  c.ciudad,
+  (
+    SELECT COUNT(*)
+    FROM pedidos p
+    WHERE p.cliente_id = c.id
+  ) AS total_pedidos,
+  (
+    SELECT COALESCE(SUM(p2.total), 0)
+    FROM pedidos p2
+    WHERE p2.cliente_id = c.id
+  ) AS gasto_total
+FROM clientes c;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>ciudad</th><th>total_pedidos</th><th>gasto_total</th></tr></thead>
+            <tbody><tr><td>Ana López</td><td>Madrid</td><td>2</td><td>730.00</td></tr><tr><td>Carlos Ruiz</td><td>Barcelona</td><td>1</td><td>150.00</td></tr><tr><td>Elena Gómez</td><td>Valencia</td><td>1</td><td>920.00</td></tr><tr><td>David Mora</td><td>Sevilla</td><td>0</td><td>0</td></tr></tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p><strong>Rendimiento:</strong> En muchos casos, un JOIN es más eficiente que una subconsulta correlacionada porque MySQL puede optimizar mejor el plan de ejecución. Sin embargo, las subconsultas suelen ser más legibles para problemas específicos. Evalúa cada caso: para agregaciones complejas, las subconsultas en FROM (tablas derivadas) son una excelente opción.</p></div></div>
+        <nav class="page-nav">
+          <a href="joins.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="vistas.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

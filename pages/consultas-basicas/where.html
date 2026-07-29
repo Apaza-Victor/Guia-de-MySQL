@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WHERE - Filtrando resultados - Guía MySQL</title>
+  <meta name="description" content="Aprende a filtrar registros con WHERE usando operadores de comparación, BETWEEN, IN, LIKE, IS NULL y operadores lógicos AND, OR, NOT.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="consultas-basicas" data-page="where">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Básico</a></li>
+      <li class="active">WHERE</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>WHERE - Filtrando resultados</h1>
+        <p>La cláusula <code>WHERE</code> permite filtrar filas de una consulta según una condición específica. Solo las filas que cumplen la condición pasan a formar parte del resultado. Es una de las herramientas más poderosas de SQL, ya que permite extraer información precisa de conjuntos de datos grandes. Sin <code>WHERE</code>, las consultas devolverían todas las filas de la tabla, lo que rara vez es útil en aplicaciones reales.</p>
+
+        <h2>Operadores de comparación</h2>
+        <p>Los operadores de comparación permiten evaluar relaciones entre valores. Los más comunes son <code>=</code> (igual), <code>&lt;&gt;</code> o <code>!=</code> (distinto), <code>&gt;</code> (mayor que), <code>&lt;</code> (menor que), <code>&gt;=</code> (mayor o igual) y <code>&lt;=</code> (menor o igual). Las condiciones se escriben después de la cláusula <code>WHERE</code> y antes de cualquier cláusula de ordenamiento.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, salario FROM empleados WHERE salario > 50000;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>salario</th></tr></thead>
+            <tbody>
+              <tr><td>Carlos Ruiz</td><td>52000.00</td></tr>
+              <tr><td>José Pérez</td><td>55000.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>BETWEEN</h2>
+        <p>El operador <code>BETWEEN</code> permite filtrar valores que se encuentran dentro de un rango, incluyendo los extremos. Es una forma más legible de escribir <code>columna &gt;= valor1 AND columna &lt;= valor2</code>. Funciona con números, fechas y texto, aunque con texto el orden se determina alfabéticamente.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, salario FROM empleados WHERE salario BETWEEN 40000 AND 50000;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>salario</th></tr></thead>
+            <tbody>
+              <tr><td>Ana López</td><td>45000.00</td></tr>
+              <tr><td>María García</td><td>48000.00</td></tr>
+              <tr><td>Laura Díaz</td><td>41000.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>IN</h2>
+        <p>El operador <code>IN</code> permite comparar una columna contra una lista de valores posibles. Es más limpio y eficiente que encadenar múltiples condiciones con <code>OR</code>. La lista de valores se escribe entre paréntesis y separada por comas. Es especialmente útil cuando se conocen los valores exactos que se desea incluir.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, departamento FROM empleados WHERE departamento IN ('TI', 'RH');</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>departamento</th></tr></thead>
+            <tbody>
+              <tr><td>Carlos Ruiz</td><td>TI</td></tr>
+              <tr><td>José Pérez</td><td>TI</td></tr>
+              <tr><td>Laura Díaz</td><td>RH</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>LIKE y patrones de búsqueda</h2>
+        <p>El operador <code>LIKE</code> se usa para buscar patrones en cadenas de texto. El símbolo <code>%</code> representa cualquier secuencia de caracteres (incluyendo cero caracteres), mientras que <code>_</code> representa exactamente un carácter. <code>LIKE</code> no distingue entre mayúsculas y minúsculas en MySQL por defecto cuando se usa con collation <code>utf8_general_ci</code>.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre FROM empleados WHERE nombre LIKE 'A%';</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th></tr></thead>
+            <tbody>
+              <tr><td>Ana López</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>IS NULL</h2>
+        <p>Para filtrar valores nulos se usa <code>IS NULL</code>. No se puede usar <code>= NULL</code> porque NULL no es un valor, sino la ausencia de él. Cualquier comparación con NULL usando operadores normales siempre produce un resultado desconocido. <code>IS NOT NULL</code> devuelve las filas que tienen un valor asignado.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT * FROM empleados WHERE salario IS NOT NULL;</code></pre>
+        </div>
+
+        <h2>AND, OR y NOT</h2>
+        <p>Los operadores lógicos permiten combinar múltiples condiciones. <code>AND</code> requiere que todas las condiciones sean verdaderas. <code>OR</code> requiere que al menos una lo sea. <code>NOT</code> invierte el resultado de una condición. Se pueden agrupar condiciones con paréntesis para controlar el orden de evaluación, similar a las expresiones matemáticas.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, salario, departamento FROM empleados WHERE departamento = 'Ventas' AND salario > 40000;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>salario</th><th>departamento</th></tr></thead>
+            <tbody>
+              <tr><td>Ana López</td><td>45000.00</td><td>Ventas</td></tr>
+              <tr><td>María García</td><td>48000.00</td><td>Ventas</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>Usa paréntesis para agrupar condiciones lógicas combinadas. Por ejemplo: <code>WHERE (departamento = 'TI' OR departamento = 'Ventas') AND salario > 45000</code> mejora la legibilidad y evita errores de precedencia.</p></div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="callout-content"><p>Error común: usar <code>= NULL</code> en lugar de <code>IS NULL</code>. Recuerda que NULL no es un valor, por lo que las comparaciones con <code>=</code> siempre devuelven NULL (falso). Siempre usa <code>IS NULL</code> o <code>IS NOT NULL</code>.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="select.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="order-by-limit.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

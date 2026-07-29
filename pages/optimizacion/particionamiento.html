@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particionamiento de tablas - Guía MySQL</title>
+  <meta name="description" content="Divide tablas grandes en partes manejables con particionamiento en MySQL.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="optimizacion" data-page="particionamiento">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Optimización</a></li>
+      <li class="active">Particionamiento</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Particionamiento de tablas</h1>
+        <p>El particionamiento divide una tabla grande en fragmentos físicos más pequeños llamados particiones, cada uno con su propio segmento de datos. Las consultas siguen viendo una sola tabla lógica, pero MySQL puede saltarse particiones enteras (partition pruning) cuando las condiciones del WHERE se alinean con la clave de partición. El resultado: lecturas más rápidas y mantenimiento más ágil.</p>
+
+        <h2>Tipos de particionamiento</h2>
+        <p>MySQL 8.0 soporta cuatro tipos principales de particionamiento. La elección depende de la naturaleza de tus datos y de los patrones de consulta.</p>
+
+        <h3>PARTITION BY RANGE</h3>
+        <p>Divide los datos en intervalos de valores. Ideal para datos con una dimensión temporal (fechas, años).</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Partición por RANGE</div>
+          <pre><code class="language-sql">CREATE TABLE pedidos (
+    id INT NOT NULL,
+    cliente_id INT,
+    total DECIMAL(10,2),
+    fecha DATE,
+    PRIMARY KEY (id, fecha)
+) PARTITION BY RANGE (YEAR(fecha)) (
+    PARTITION p_antes_2022 VALUES LESS THAN (2022),
+    PARTITION p_2022 VALUES LESS THAN (2023),
+    PARTITION p_2023 VALUES LESS THAN (2024),
+    PARTITION p_2024 VALUES LESS THAN (2025),
+    PARTITION p_futuro VALUES LESS THAN MAXVALUE
+);</code></pre>
+        </div>
+
+        <h3>PARTITION BY LIST</h3>
+        <p>Asigna filas a particiones según una lista de valores discretos. Útil para categorías o regiones geográficas.</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Partición por LIST</div>
+          <pre><code class="language-sql">CREATE TABLE clientes (
+    id INT NOT NULL,
+    nombre VARCHAR(100),
+    region VARCHAR(20),
+    PRIMARY KEY (id, region)
+) PARTITION BY LIST COLUMNS(region) (
+    PARTITION p_norte VALUES IN ('Norte', 'Noreste', 'Noroeste'),
+    PARTITION p_centro VALUES IN ('Centro', 'Centro-Occidente'),
+    PARTITION p_sur VALUES IN ('Sur', 'Sureste', 'Suroeste')
+);</code></pre>
+        </div>
+
+        <h3>PARTITION BY HASH</h3>
+        <p>Distribuye los datos uniformemente aplicando una función hash a la clave de partición. Ideal cuando no hay una agrupación natural clara.</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Partición por HASH</div>
+          <pre><code class="language-sql">CREATE TABLE logs (
+    id INT NOT NULL AUTO_INCREMENT,
+    severidad TINYINT,
+    mensaje TEXT,
+    creado_en TIMESTAMP,
+    PRIMARY KEY (id)
+) PARTITION BY HASH(id) PARTITIONS 8;</code></pre>
+        </div>
+
+        <h3>PARTITION BY KEY</h3>
+        <p>Similar a HASH pero usa el hash interno de MySQL (MD5-like). La clave debe ser parte de la PRIMARY KEY.</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Partición por KEY</div>
+          <pre><code class="language-sql">CREATE TABLE sesiones (
+    sesion_id CHAR(36) NOT NULL,
+    usuario_id INT,
+    datos JSON,
+    PRIMARY KEY (sesion_id)
+) PARTITION BY KEY() PARTITIONS 4;</code></pre>
+        </div>
+
+        <h2>Cuándo particionar</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Caso de uso</th><th>Recomendación</th></tr></thead>
+            <tbody>
+              <tr><td>Tablas > 10 millones de filas (InnoDB)</td><td>Considera particionar por rango de fechas</td></tr>
+              <tr><td>Purgar datos antiguos regularmente</td><td><code>TRUNCATE PARTITION</code> es instantáneo vs. <code>DELETE</code> lento</td></tr>
+              <tr><td>Datos con segmentación natural (región, año)</td><td>RANGE o LIST según el caso</td></tr>
+              <tr><td>Carga uniforme sin agrupación natural</td><td>HASH o KEY</td></tr>
+              <tr><td>Tablas pequeñas (&lt; 1M filas)</td><td>No particiones — la sobrecarga no lo justifica</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Ventajas del particionamiento</h2>
+        <p>El particionamiento ofrece beneficios claros en rendimiento y administración:</p>
+        <ul style="margin-bottom:1.5rem;line-height:1.8">
+          <li><strong>Partition Pruning:</strong> MySQL ignora particiones enteras cuando el WHERE filtra por la clave de partición.</li>
+          <li><strong>Mantenimiento selectivo:</strong> puedes reparar, optimizar o truncar una partición sin afectar al resto.</li>
+          <li><strong>Archivado eficiente:</strong> mueve particiones completas a tablas de archivo con <code>ALTER TABLE ... REORGANIZE PARTITION</code>.</li>
+          <li><strong>Paralelismo:</strong> algunas operaciones (como escaneos grandes) pueden procesar particiones en paralelo.</li>
+        </ul>
+
+        <h2>Limitaciones importantes</h2>
+        <ul style="margin-bottom:1.5rem;line-height:1.8">
+          <li>La clave de partición debe ser parte de todas las claves únicas (incluida la PRIMARY KEY).</li>
+          <li>No soporta claves foráneas en tablas particionadas.</li>
+          <li>El número máximo de particiones es 8192.</li>
+          <li>No se pueden usar índices FULLTEXT o SPATIAL en tablas particionadas.</li>
+          <li><code>ALTER TABLE</code> en tablas particionadas puede requerir reconstruir todas las particiones.</li>
+        </ul>
+
+        <h2>ALTER TABLE con particiones</h2>
+        <div class="code-block">
+          <div class="code-label">SQL — Gestión de particiones</div>
+          <pre><code class="language-sql">-- Agregar una partición
+ALTER TABLE pedidos ADD PARTITION (
+    PARTITION p_2025 VALUES LESS THAN (2026)
+);
+
+-- Eliminar una partición (borra los datos también)
+ALTER TABLE pedidos DROP PARTITION p_antes_2022;
+
+-- Dividir una partición en dos
+ALTER TABLE pedidos REORGANIZE PARTITION p_futuro INTO (
+    PARTITION p_2025 VALUES LESS THAN (2026),
+    PARTITION p_futuro VALUES LESS THAN MAXVALUE
+);
+
+-- Verificar particiones
+SELECT TABLE_NAME, PARTITION_NAME, TABLE_ROWS
+FROM INFORMATION_SCHEMA.PARTITIONS
+WHERE TABLE_SCHEMA = 'midb' AND TABLE_NAME = 'pedidos';</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>El partition pruning solo funciona si la consulta filtra directamente por la clave de partición. Por ejemplo, si particionas por <code>YEAR(fecha)</code>, la consulta <code>WHERE fecha BETWEEN '2024-01-01' AND '2024-12-31'</code> NO hará pruning porque MySQL no puede deducir que YEAR(fecha) = 2024. Usa <code>WHERE fecha >= '2024-01-01' AND fecha &lt; '2025-01-01'</code> después de particionar por <code>RANGE COLUMNS(fecha)</code>.</p></div>
+        </div>
+
+        <div class="callout callout-important">
+          <div class="callout-icon"><i class="bi bi-info-circle"></i></div>
+          <div class="callout-content"><p>Elegir la clave de partición incorrecta es el error más común. La clave debe: (1) estar presente en la mayoría de los WHERE, (2) distribuir los datos uniformemente (evitar particiones "calientes" que concentren la mayoría de los datos), y (3) permitir pruning. Una mala elección puede hacer que las consultas sean más lentas que sin particionamiento.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="indices-avanzados.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="../../index.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

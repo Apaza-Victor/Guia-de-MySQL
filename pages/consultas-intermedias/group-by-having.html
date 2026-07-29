@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GROUP BY y HAVING - Guía MySQL</title>
+  <meta name="description" content="Agrupa datos con GROUP BY y filtra grupos con HAVING.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="consultas-intermedias" data-page="group-by-having">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Intermedio</a></li>
+      <li class="active">GROUP BY y HAVING</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>GROUP BY y HAVING</h1>
+        <p>GROUP BY agrupa filas que tienen los mismos valores en columnas específicas, permitiendo aplicar funciones agregadas a cada grupo. HAVING filtra grupos después de la agregación, a diferencia de WHERE que filtra filas antes de agrupar.</p>
+
+        <h2>GROUP BY con una columna</h2>
+        <p>Agrupemos las ventas por categoría para obtener estadísticas de cada grupo.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT
+  categoria,
+  COUNT(*) AS total_productos,
+  SUM(cantidad) AS unidades_vendidas,
+  ROUND(AVG(precio), 2) AS precio_promedio,
+  SUM(cantidad * precio) AS ingreso_total
+FROM ventas
+GROUP BY categoria;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>categoria</th><th>total_productos</th><th>unidades_vendidas</th><th>precio_promedio</th><th>ingreso_total</th></tr></thead>
+            <tbody><tr><td>Electrónica</td><td>4</td><td>20</td><td>5137.50</td><td>69500.00</td></tr><tr><td>Papelería</td><td>2</td><td>70</td><td>22.50</td><td>1200.00</td></tr><tr><td>Muebles</td><td>2</td><td>5</td><td>2500.00</td><td>13200.00</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>GROUP BY con varias columnas</h2>
+        <p>Puedes agrupar por múltiples columnas para obtener desgloses más detallados. El orden de las columnas en GROUP BY afecta la forma en que se presentan los resultados.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Agrupar por año y categoría
+SELECT
+  YEAR(fecha) AS anio,
+  categoria,
+  SUM(cantidad) AS unidades,
+  SUM(cantidad * precio) AS ingreso
+FROM ventas
+GROUP BY YEAR(fecha), categoria
+ORDER BY anio, categoria;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>anio</th><th>categoria</th><th>unidades</th><th>ingreso</th></tr></thead>
+            <tbody><tr><td>2024</td><td>Electrónica</td><td>20</td><td>69500.00</td></tr><tr><td>2024</td><td>Muebles</td><td>5</td><td>13200.00</td></tr><tr><td>2024</td><td>Papelería</td><td>70</td><td>1200.00</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>HAVING vs WHERE</h2>
+        <p>WHERE filtra filas antes de la agrupación. HAVING filtra grupos después de la agregación. No puedes usar funciones agregadas en WHERE, pero sí en HAVING.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Filtrar categorías con ingreso total mayor a 5000
+SELECT
+  categoria,
+  SUM(cantidad * precio) AS ingreso_total
+FROM ventas
+WHERE YEAR(fecha) = 2024
+GROUP BY categoria
+HAVING SUM(cantidad * precio) > 5000;
+
+-- Error común: no puedes usar SUM en WHERE
+-- WHERE SUM(cantidad * precio) > 5000  -- ESTO FALLA</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>categoria</th><th>ingreso_total</th></tr></thead>
+            <tbody><tr><td>Electrónica</td><td>69500.00</td></tr><tr><td>Muebles</td><td>13200.00</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>Orden de ejecución en SQL</h2>
+        <p>Es fundamental entender el orden lógico en que MySQL ejecuta las cláusulas: FROM, WHERE, GROUP BY, HAVING, SELECT, ORDER BY, LIMIT. Saber esto te ayuda a escribir consultas correctas y optimizadas.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Orden de ejecución demostrado
+SELECT categoria, COUNT(*) AS total
+FROM ventas              -- 1. FROM
+WHERE precio > 100       -- 2. WHERE (fila individual)
+GROUP BY categoria       -- 3. GROUP BY
+HAVING COUNT(*) >= 2     -- 4. HAVING (grupo)
+ORDER BY total DESC;     -- 5. ORDER BY</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>categoria</th><th>total</th></tr></thead>
+            <tbody><tr><td>Electrónica</td><td>4</td></tr><tr><td>Muebles</td><td>2</td></tr></tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p><strong>Error común:</strong> Intentar usar <code>WHERE</code> para filtrar funciones agregadas. Recuerda: <code>WHERE</code> se ejecuta antes de <code>GROUP BY</code>, por lo que no puede evaluar agregaciones. Usa <code>HAVING</code> para filtrar grupos y <code>WHERE</code> para filtrar filas individuales antes de agrupar.</p></div></div>
+        <nav class="page-nav">
+          <a href="funciones-agregadas.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="joins.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

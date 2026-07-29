@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MySQL con ORMs - Guía MySQL</title>
+  <meta name="description" content="Conceptos de uso de MySQL con ORMs como Sequelize, Eloquent y TypeORM.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="experto" data-page="mysql-y-orm">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Nivel Experto</a></li>
+      <li class="active">MySQL con ORMs</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>MySQL con ORMs</h1>
+        <p>Un ORM (Object-Relational Mapper) es una capa de abstracción que permite interactuar con la base de datos usando objetos del lenguaje de programación en lugar de escribir SQL directamente. Los ORMs más populares ofrecen integración con MySQL y facilitan el desarrollo ágil.</p>
+
+        <h2>Qué es un ORM</h2>
+        <p>Un ORM mapea las tablas de la base de datos a clases (modelos) y las filas a instancias de esas clases. Las relaciones (uno a muchos, muchos a muchos) se definen como propiedades del modelo y el ORM se encarga de generar el SQL necesario.</p>
+        <div class="code-block">
+          <div class="code-label">JavaScript (Sequelize)</div>
+          <pre><code class="language-javascript">// Definición de modelo en Sequelize (Node.js)
+const Usuario = sequelize.define('Usuario', {
+  nombre: { type: DataTypes.STRING, allowNull: false },
+  email: { type: DataTypes.STRING, unique: true },
+  edad: DataTypes.INTEGER
+});
+
+// El ORM traduce esto a:
+// CREATE TABLE Usuarios (
+//   id INT AUTO_INCREMENT PRIMARY KEY,
+//   nombre VARCHAR(255) NOT NULL,
+//   email VARCHAR(255) UNIQUE,
+//   edad INT,
+//   createdAt DATETIME,
+//   updatedAt DATETIME
+// );
+
+// Consultar: equivalente a SELECT * FROM Usuarios WHERE email = 'ana@email.com'
+const usuario = await Usuario.findOne({ where: { email: 'ana@email.com' } });</code></pre>
+        </div>
+
+        <h2>Ventajas y desventajas</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Ventajas</th><th>Desventajas</th></tr></thead>
+            <tbody>
+              <tr><td>Productividad: menos código repetitivo</td><td>Abstracción que puede ocultar consultas ineficientes</td></tr>
+              <tr><td>Mantenibilidad: cambios de esquema centralizados</td><td>Curva de aprendizaje de la API del ORM</td></tr>
+              <tr><td>Seguridad: previene inyección SQL por defecto</td><td>Dificultad para usar features específicos de MySQL</td></tr>
+              <tr><td>Migraciones automatizadas</td><td>Problema N+1 si no se manejan las relaciones correctamente</td></tr>
+              <tr><td>Cambio de BD más sencillo (en teoría)</td><td>Rendimiento inferior a SQL optimizado a mano</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Ejemplos conceptuales por ORM</h2>
+
+        <h3>Sequelize (Node.js)</h3>
+        <div class="code-block">
+          <div class="code-label">JavaScript</div>
+          <pre><code class="language-javascript">// Definir relación uno a muchos
+Usuario.hasMany(Pedido, { foreignKey: 'usuarioId' });
+Pedido.belongsTo(Usuario, { foreignKey: 'usuarioId' });
+
+// Obtener usuario con sus pedidos (eager loading)
+const usuario = await Usuario.findByPk(1, {
+  include: [Pedido]
+});
+// Traduce a: SELECT * FROM Usuarios WHERE id = 1;
+//            SELECT * FROM Pedidos WHERE usuarioId = 1;</code></pre>
+        </div>
+
+        <h3>Eloquent (Laravel - PHP)</h3>
+        <div class="code-block">
+          <div class="code-label">PHP</div>
+          <pre><code class="language-php">// Definir modelo en Laravel
+class Usuario extends Model {
+    protected $table = 'usuarios';
+
+    public function pedidos() {
+        return $this->hasMany(Pedido::class);
+    }
+}
+
+// Consulta con relación
+$usuario = Usuario::with('pedidos')->find(1);
+// SELECT * FROM usuarios WHERE id = 1 LIMIT 1
+// SELECT * FROM pedidos WHERE usuario_id IN (1)</code></pre>
+        </div>
+
+        <h3>TypeORM (TypeScript)</h3>
+        <div class="code-block">
+          <div class="code-label">TypeScript</div>
+          <pre><code class="language-typescript">// Definir entidad con decoradores
+@Entity('usuarios')
+class Usuario {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ length: 100 })
+  nombre: string;
+
+  @OneToMany(() => Pedido, pedido => pedido.usuario)
+  pedidos: Pedido[];
+}
+
+// Consulta con relaciones
+const usuario = await usuarioRepository.findOne({
+  where: { id: 1 },
+  relations: ['pedidos']
+});</code></pre>
+        </div>
+
+        <h2>Problema N+1</h2>
+        <p>El problema N+1 ocurre cuando el ORM ejecuta una consulta para obtener la lista principal y luego N consultas adicionales para cargar las relaciones de cada fila. Es la causa más común de lentitud en aplicaciones que usan ORM.</p>
+        <div class="code-block">
+          <div class="code-label">SQL generado (N+1)</div>
+          <pre><code class="language-sql">-- 1 consulta para obtener 100 usuarios
+SELECT * FROM usuarios LIMIT 100;
+
+-- 100 consultas adicionales (una por usuario)
+SELECT * FROM pedidos WHERE usuario_id = 1;
+SELECT * FROM pedidos WHERE usuario_id = 2;
+-- ... 98 más
+
+-- Solución: eager loading con JOIN
+-- Sequelize: Usuario.findAll({ include: [Pedido] })
+-- Genera una sola consulta con LEFT JOIN</code></pre>
+        </div>
+
+        <h2>Migraciones</h2>
+        <p>Las migraciones permiten versionar los cambios del esquema de la base de datos. Cada migración es un archivo con las instrucciones para avanzar (up) o retroceder (down) un cambio.</p>
+        <div class="code-block">
+          <div class="code-label">JavaScript (Sequelize)</div>
+          <pre><code class="language-javascript">// Migración: agregar columna 'telefono' a la tabla usuarios
+module.exports = {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.addColumn('usuarios', 'telefono', {
+      type: Sequelize.STRING(20),
+      allowNull: true
+    });
+  },
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeColumn('usuarios', 'telefono');
+  }
+};
+
+// Ejecutar migración: npx sequelize-cli db:migrate</code></pre>
+        </div>
+
+        <h2>Tabla comparativa de ORMs populares</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>ORM</th><th>Lenguaje</th><th>Estilo</th><th>Soporte MySQL</th><th>Migraciones</th><th>Relaciones</th></tr></thead>
+            <tbody>
+              <tr><td>Sequelize</td><td>Node.js</td><td>Promise-based</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td>1:1, 1:N, N:M</td></tr>
+              <tr><td>TypeORM</td><td>TypeScript</td><td>Decoradores / Active Record</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td>1:1, 1:N, N:M</td></tr>
+              <tr><td>Eloquent</td><td>PHP (Laravel)</td><td>Active Record</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td>1:1, 1:N, N:M, polimórficas</td></tr>
+              <tr><td>Prisma</td><td>Node.js / TypeScript</td><td>Schema-first</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td>1:1, 1:N, N:M</td></tr>
+              <tr><td>Doctrine</td><td>PHP (Symfony)</td><td>Data Mapper</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td>1:1, 1:N, N:M</td></tr>
+              <tr><td>SQLAlchemy</td><td>Python</td><td>Data Mapper</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td>1:1, 1:N, N:M</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Usa ORM cuando desarrolles aplicaciones con modelos de datos bien definidos y necesites productividad. Recurre a SQL puro para informes complejos, operaciones masivas o consultas que requieran optimización extrema. La combinación de ambos suele ser la mejor estrategia.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="motores-de-almacenamiento.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="escalabilidad.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

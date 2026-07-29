@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buenas prácticas profesionales - Guía MySQL</title>
+  <meta name="description" content="Checklist de buenas prácticas para DBA y desarrolladores MySQL.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="experto" data-page="buenas-practicas">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Nivel Experto</a></li>
+      <li class="active">Buenas prácticas profesionales</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Buenas prácticas profesionales</h1>
+        <p>Esta guía reúne las mejores prácticas para diseñar, mantener y operar bases de datos MySQL en entornos profesionales. Aplicarlas consistentemente mejora el rendimiento, la seguridad y la mantenibilidad del sistema.</p>
+
+        <h2>Nombrado de bases de datos, tablas y columnas</h2>
+        <p>Un buen nombrado hace que el esquema sea autodocumentado y reduce la confusión en equipos grandes.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Buenas prácticas de nombrado
+-- BD: snake_case, descriptiva
+CREATE DATABASE ecommerce_ventas;
+
+-- Tablas: plural, snake_case
+CREATE TABLE productos_categorias ( ... );
+
+-- Columnas: snake_case, sin prefijos redundantes
+-- Mal:  nombre_producto (la tabla ya es productos)
+-- Bien: nombre
+
+-- Claves foráneas: tabla_origen_id
+CREATE TABLE pedidos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+);
+
+-- Índices: idx_tabla_columna
+CREATE INDEX idx_pedidos_usuario_id ON pedidos(usuario_id);</code></pre>
+        </div>
+
+        <h2>Elegir tipos de datos correctos</h2>
+        <p>Usar el tipo de dato adecuado ahorra espacio y mejora el rendimiento. Cada byte cuenta cuando trabajas con millones de filas.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Enteros: TINYINT (1 byte), SMALLINT (2), MEDIUMINT (3), INT (4), BIGINT (8)
+CREATE TABLE ejemplo (
+    edad TINYINT UNSIGNED,          -- 0-255, 1 byte
+    poblacion MEDIUMINT UNSIGNED,   -- 0-16M, 3 bytes
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY  -- IDs grandes
+);
+
+-- Decimales: DECIMAL para precisión exacta, FLOAT/DOUBLE para aproximada
+CREATE TABLE finanzas (
+    precio DECIMAL(10,2) NOT NULL,  -- 10 dígitos, 2 decimales
+    tasa FLOAT                      -- Aproximado, suficiente para estadísticas
+);
+
+-- Texto: CHAR vs VARCHAR
+CREATE TABLE usuarios (
+    genero CHAR(1),                -- Fijo: 1 carácter
+    email VARCHAR(255) NOT NULL    -- Variable: solo almacena lo usado
+);
+
+-- Fechas: DATE, DATETIME, TIMESTAMP
+CREATE TABLE eventos (
+    fecha_evento DATE,              -- Solo fecha
+    created_at DATETIME,            -- Fecha + hora
+    updated_at TIMESTAMP            -- Fecha + hora, auto-actualizable
+);</code></pre>
+        </div>
+
+        <h2>Siempre usar NOT NULL cuando corresponda</h2>
+        <p>NULL complica las consultas, ocupa espacio adicional y puede dar resultados inesperados en comparaciones y agregaciones.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Preferir NOT NULL + valor por defecto
+CREATE TABLE clientes (
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    telefono VARCHAR(20) NOT NULL DEFAULT '',
+    activo BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+-- NULL solo cuando tenga significado real (ej: fecha de baja si no aplica)
+CREATE TABLE suscripciones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT NOT NULL,
+    fecha_baja DATE NULL  -- NULL significa "aún activo"
+);</code></pre>
+        </div>
+
+        <h2>Índices estratégicos</h2>
+        <p>Los índices aceleran las lecturas pero ralentizan las escrituras. Indexa con intención, no por inercia.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Indexar columnas usadas en WHERE, JOIN y ORDER BY
+CREATE INDEX idx_pedidos_estado ON pedidos(estado);
+
+-- Índices compuestos: ordenar por selectividad (mayor primero)
+CREATE INDEX idx_ubicacion ON clientes(pais, ciudad, codigo_postal);
+
+-- No indexar columnas con baja selectividad (ej: sexo con M/F)
+-- No indexar columnas que raramente aparecen en filtros
+
+-- Verificar índices existentes
+SHOW INDEX FROM pedidos;
+
+-- Monitorear índices no usados (desde Performance Schema)
+SELECT * FROM sys.schema_unused_indexes;</code></pre>
+        </div>
+
+        <h2>Normalizar sin exagerar</h2>
+        <p>La normalización elimina redundancia, pero en exceso puede perjudicar el rendimiento por la cantidad de JOINs necesarios.</p>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Nivel</th><th>Descripción</th><th>Cuándo aplicar</th></tr></thead>
+            <tbody>
+              <tr><td>1FN</td><td>Valores atómicos, sin grupos repetitivos</td><td>Siempre</td></tr>
+              <tr><td>2FN</td><td>Dependencia total de la clave primaria</td><td>Siempre</td></tr>
+              <tr><td>3FN</td><td>Sin dependencias transitivas</td><td>Casi siempre</td></tr>
+              <tr><td>Desnormalización</td><td>Duplicar datos para evitar JOINs</td><td>Reportes, data warehouses, lecturas masivas</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Usar transacciones</h2>
+        <p>Toda operación que involucre múltiples escrituras debe ejecutarse dentro de una transacción para garantizar la consistencia.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">START TRANSACTION;
+    UPDATE cuentas SET saldo = saldo - 100 WHERE id = 1;
+    UPDATE cuentas SET saldo = saldo + 100 WHERE id = 2;
+    INSERT INTO movimientos (cuenta_id, tipo, monto) VALUES (1, 'transferencia_egreso', 100);
+    INSERT INTO movimientos (cuenta_id, tipo, monto) VALUES (2, 'transferencia_ingreso', 100);
+COMMIT;
+-- Si algo falla, ROLLBACK deshace todo</code></pre>
+        </div>
+
+        <h2>Prepared statements</h2>
+        <p>Las consultas parametrizadas previenen inyección SQL y mejoran el rendimiento al reutilizar planes de ejecución.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Prepared statement en MySQL
+PREPARE stmt FROM 'SELECT * FROM usuarios WHERE email = ? AND activo = ?';
+SET @email = 'ana@email.com';
+SET @activo = 1;
+EXECUTE stmt USING @email, @activo;
+DEALLOCATE PREPARE stmt;
+
+-- En código (PHP con PDO)
+-- $stmt = $pdo->prepare('SELECT * FROM usuarios WHERE email = ?');
+-- $stmt->execute(['ana@email.com']);</code></pre>
+        </div>
+
+        <h2>Backups automáticos</h2>
+        <p>Un backup que no se prueba periódicamente no es un backup. Automatiza y verifica las restauraciones.</p>
+        <div class="code-block">
+          <div class="code-label">Shell</div>
+          <pre><code class="language-bash"># Backup lógico con mysqldump (todas las BD)
+mysqldump -u root -p --all-databases --routines --triggers --events > full_backup.sql
+
+# Backup físico con MySQL Enterprise Backup o XtraBackup
+# xtrabackup --backup --target-dir=/backups/2025-01-15
+
+# Automatizar con cron (Linux)
+# 0 2 * * * /usr/bin/mysqldump -u root -p'pass' --all-databases | gzip > /backups/db_$(date +\%Y\%m\%d).sql.gz</code></pre>
+        </div>
+
+        <h2>Monitoreo: Slow Query Log y Performance Schema</h2>
+        <p>El monitoreo continuo permite detectar cuellos de botella antes de que afecten a los usuarios.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Activar Slow Query Log
+SET GLOBAL slow_query_log = ON;
+SET GLOBAL long_query_time = 2;      -- Consultas que tardan más de 2 segundos
+SET GLOBAL slow_query_log_file = '/var/log/mysql/slow.log';
+
+-- Consultar Performance Schema
+SELECT * FROM sys.statements_with_runtimes_in_95th_percentile;
+
+-- Tablas más accedidas
+SELECT * FROM sys.io_global_by_file_by_bytes;
+
+-- Eventos de espera más comunes
+SELECT * FROM sys.wait_classes_global_by_avg_latency;</code></pre>
+        </div>
+
+        <h2>Documentar el esquema</h2>
+        <p>Un esquema bien documentado acelera la incorporación de nuevos miembros y facilita el mantenimiento.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Usar COMMENT en tablas y columnas
+CREATE TABLE pedidos (
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador único del pedido',
+    usuario_id INT NOT NULL COMMENT 'FK a usuarios.id del cliente que realizó el pedido',
+    total DECIMAL(10,2) NOT NULL COMMENT 'Monto total del pedido antes de impuestos',
+    estado ENUM('pendiente', 'pagado', 'enviado', 'entregado', 'cancelado')
+        NOT NULL DEFAULT 'pendiente' COMMENT 'Estado actual del pedido',
+    creado_en DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora de creación'
+) COMMENT='Tabla que almacena los pedidos realizados por los clientes';
+
+-- Ver comentarios
+SHOW FULL COLUMNS FROM pedidos;
+SHOW TABLE STATUS WHERE Name = 'pedidos';</code></pre>
+        </div>
+
+        <h2>Checklist final de buenas prácticas</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>#</th><th>Práctica</th><th>Impacto</th><th>Prioridad</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Usar InnoDB como motor de almacenamiento</td><td>Integridad, concurrencia, recuperación</td><td>Crítica</td></tr>
+              <tr><td>2</td><td>Nombrado consistente (snake_case, plural para tablas)</td><td>Mantenibilidad</td><td>Alta</td></tr>
+              <tr><td>3</td><td>Elegir tipos de datos mínimos suficientes</td><td>Rendimiento, espacio</td><td>Alta</td></tr>
+              <tr><td>4</td><td>Declarar columnas como NOT NULL siempre que sea posible</td><td>Consistencia, rendimiento</td><td>Alta</td></tr>
+              <tr><td>5</td><td>Definir PRIMARY KEY en todas las tablas</td><td>Integridad, rendimiento</td><td>Crítica</td></tr>
+              <tr><td>6</td><td>Indexar columnas de WHERE, JOIN y ORDER BY</td><td>Rendimiento</td><td>Alta</td></tr>
+              <tr><td>7</td><td>Usar FOREIGN KEY para garantizar integridad referencial</td><td>Integridad</td><td>Alta</td></tr>
+              <tr><td>8</td><td>Normalizar hasta 3FN; desnormalizar solo con justificación</td><td>Consistencia, rendimiento</td><td>Media</td></tr>
+              <tr><td>9</td><td>Usar transacciones para operaciones atómicas</td><td>Integridad</td><td>Crítica</td></tr>
+              <tr><td>10</td><td>Implementar prepared statements contra inyección SQL</td><td>Seguridad</td><td>Crítica</td></tr>
+              <tr><td>11</td><td>Configurar backups automáticos y probar restauraciones</td><td>Disponibilidad</td><td>Crítica</td></tr>
+              <tr><td>12</td><td>Activar Slow Query Log y monitorear con Performance Schema</td><td>Rendimiento, diagnóstico</td><td>Alta</td></tr>
+              <tr><td>13</td><td>Usar EXPLAIN para analizar consultas lentas</td><td>Rendimiento</td><td>Alta</td></tr>
+              <tr><td>14</td><td>Documentar tablas y columnas con COMMENT</td><td>Mantenibilidad</td><td>Media</td></tr>
+              <tr><td>15</td><td>Mantener MySQL actualizado (última versión del minor)</td><td>Seguridad, rendimiento</td><td>Alta</td></tr>
+              <tr><td>16</td><td>Usar contraseñas seguras y gestionar permisos con el principio de mínimo privilegio</td><td>Seguridad</td><td>Crítica</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>Planificar antes de codificar. Invertir tiempo en diseñar el esquema, elegir los tipos de datos y definir los índices al inicio del proyecto evita dolores de cabeza cuando la base de datos crece. Un mal diseño es costosísimo de revertir en producción.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="escalabilidad.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="../../index.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

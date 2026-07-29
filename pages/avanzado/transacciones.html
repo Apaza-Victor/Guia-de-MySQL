@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transacciones en MySQL - Guía MySQL</title>
+  <meta name="description" content="Domina las transacciones: COMMIT, ROLLBACK, SAVEPOINT y propiedades ACID.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="avanzado" data-page="transacciones">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Avanzado</a></li>
+      <li class="active">Transacciones en MySQL</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Transacciones en MySQL</h1>
+        <p>Una transacción es una unidad lógica de trabajo compuesta por una o más operaciones SQL que se ejecutan como un bloque atómico. Si alguna operación falla, toda la transacción se deshace (rollback) para mantener la consistencia de los datos. Las transacciones son fundamentales para garantizar la integridad en sistemas bancarios, pedidos, inventarios y cualquier escenario donde los datos deban permanecer en un estado coherente.</p>
+
+        <h2>START TRANSACTION, COMMIT y ROLLBACK</h2>
+        <p>MySQL trabaja en modo autocommit por defecto (cada sentencia es una transacción implícita). Para agrupar varias operaciones, iniciamos una transacción explícita:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Iniciar transacción
+START TRANSACTION;
+
+-- Descontar $500 de la cuenta A
+UPDATE cuentas SET saldo = saldo - 500 WHERE id = 1;
+
+-- Acreditar $500 a la cuenta B
+UPDATE cuentas SET saldo = saldo + 500 WHERE id = 2;
+
+-- Si todo va bien, confirmar cambios
+COMMIT;
+
+-- Si algo falla, deshacer cambios
+ROLLBACK;</code></pre>
+        </div>
+
+        <h2>Propiedades ACID</h2>
+        <p>Las transacciones en InnoDB garantizan las cuatro propiedades ACID:</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Propiedad</th><th>Significado</th><th>Cómo lo garantiza MySQL</th></tr></thead>
+            <tbody>
+              <tr><td><strong>A</strong>tomicity</td><td>La transacción se ejecuta completamente o no se ejecuta</td><td>Redo / Undo logs en InnoDB</td></tr>
+              <tr><td><strong>C</strong>onsistency</td><td>Los datos siempre cumplen las reglas de integridad</td><td>Restricciones, claves foráneas, triggers</td></tr>
+              <tr><td><strong>I</strong>solation</td><td>Las transacciones concurrentes no se interfieren</td><td>Niveles de aislamiento (READ COMMITTED, etc.)</td></tr>
+              <tr><td><strong>D</strong>urability</td><td>Los datos confirmados persisten ante fallos</td><td>Buffer pool + write-ahead logging</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>SAVEPOINT y ROLLBACK TO SAVEPOINT</h2>
+        <p>Los savepoints permiten establecer puntos intermedios dentro de una transacción para deshacer solo una parte de ella sin abortar completamente:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">START TRANSACTION;
+
+INSERT INTO logs(accion) VALUES('Paso 1');
+SAVEPOINT paso1;
+
+INSERT INTO logs(accion) VALUES('Paso 2');
+SAVEPOINT paso2;
+
+INSERT INTO logs(accion) VALUES('Paso 3 (fallará)');
+
+-- Deshacer solo hasta paso2
+ROLLBACK TO SAVEPOINT paso2;
+
+-- Confirmar (solo quedan Paso 1 y Paso 2)
+COMMIT;</code></pre>
+        </div>
+
+        <h2>Ejemplo completo: transferencia bancaria</h2>
+        <p>Imagina una transferencia de $200 entre dos cuentas. Si falla el crédito después del débito, el dinero no debe perderse:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">START TRANSACTION;
+
+-- 1. Verificar saldo disponible
+SELECT saldo FROM cuentas WHERE id = 1 FOR UPDATE;
+-- Resultado: 1000
+
+-- 2. Débito de la cuenta origen (id = 1)
+UPDATE cuentas SET saldo = saldo - 200 WHERE id = 1;
+-- Si el saldo se vuelve negativo, la app debe hacer ROLLBACK
+
+-- 3. Crédito a la cuenta destino (id = 2)
+UPDATE cuentas SET saldo = saldo + 200 WHERE id = 2;
+
+-- 4. Registrar en auditoría
+INSERT INTO transferencias(cuenta_origen, cuenta_destino, monto, fecha)
+VALUES(1, 2, 200, NOW());
+
+-- 5. Confirmar
+COMMIT;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Momento</th><th>Cuenta 1 (origen)</th><th>Cuenta 2 (destino)</th></tr></thead>
+            <tbody>
+              <tr><td>Antes de la transferencia</td><td>$1000.00</td><td>$500.00</td></tr>
+              <tr><td>Después del débito (aún sin COMMIT)</td><td>$800.00</td><td>$500.00</td></tr>
+              <tr><td>Después del crédito + COMMIT</td><td>$800.00</td><td>$700.00</td></tr>
+              <tr><td>Si ocurre ROLLBACK</td><td>$1000.00</td><td>$500.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-warning"><div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div><div class="callout-content"><p>Errores típicos con transacciones: olvidar el <code>COMMIT</code> dejando la transacción abierta (bloquea filas con locks), no manejar excepciones en la aplicación provocando que el <code>ROLLBACK</code> nunca se ejecute, y mezclar motores de almacenamiento (MyISAM no soporta transacciones, lo que causa un commit implícito).</p></div></div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Usa <code>SET autocommit = 0</code> para deshabilitar el autocommit globalmente en una sesión. Revisa las transacciones activas con <code>SELECT * FROM information_schema.INNODB_TRX\G</code>.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="indices.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="procedimientos-almacenados.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

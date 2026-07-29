@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vistas avanzadas - Guía MySQL</title>
+  <meta name="description" content="Vistas actualizables, WITH CHECK OPTION y vistas materializadas simuladas.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="avanzado" data-page="vistas-avanzadas">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Avanzado</a></li>
+      <li class="active">Vistas avanzadas</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Vistas avanzadas</h1>
+        <p>Las vistas son consultas almacenadas que se comportan como tablas virtuales. Más allá de las vistas básicas, MySQL ofrece funcionalidades avanzadas como vistas actualizables, la cláusula <code>WITH CHECK OPTION</code> y técnicas para simular vistas materializadas.</p>
+
+        <h2>Vistas actualizables</h2>
+        <p>No todas las vistas permiten operaciones <code>INSERT</code>, <code>UPDATE</code> o <code>DELETE</code>. Una vista es actualizable si cumple ciertas condiciones: no usa funciones de agregación (<code>SUM</code>, <code>COUNT</code>, etc.), no usa <code>DISTINCT</code>, <code>GROUP BY</code>, <code>HAVING</code>, <code>UNION</code>, ni subconsultas en la cláusula <code>SELECT</code>. Cuando una vista es actualizable, los cambios se reflejan directamente en la tabla subyacente.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Vista actualizable: empleados activos
+CREATE VIEW empleados_activos AS
+SELECT id, nombre, apellido, email, salario, depto_id
+FROM empleados
+WHERE activo = 1;
+
+-- INSERT a través de la vista
+INSERT INTO empleados_activos(nombre, apellido, email, salario, depto_id)
+VALUES('Pedro', 'Ramírez', 'pedro@email.com', 3500, 2);
+
+-- Esto inserta en la tabla 'empleados' con activo = 1 (si tiene valor por defecto)
+-- o con activo = NULL si está definida como NULL por defecto
+
+-- UPDATE a través de la vista
+UPDATE empleados_activos
+SET salario = 3800
+WHERE id = 10;
+
+-- DELETE a través de la vista
+DELETE FROM empleados_activos WHERE id = 15;</code></pre>
+        </div>
+
+        <h2>WITH CHECK OPTION</h2>
+        <p><code>WITH CHECK OPTION</code> evita que se inserten o modifiquen filas que no cumplan la condición <code>WHERE</code> de la vista. Esto garantiza que todas las operaciones a través de la vista mantengan la coherencia del subconjunto que la vista representa:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Vista con WITH CHECK OPTION
+CREATE VIEW empleados_salario_alto AS
+SELECT id, nombre, apellido, salario
+FROM empleados
+WHERE salario >= 5000
+WITH CHECK OPTION;
+
+-- Esto funciona (salario >= 5000)
+INSERT INTO empleados_salario_alto(nombre, apellido, salario)
+VALUES('Laura', 'Gómez', 5500);
+
+-- Esto FALLA con error: CHECK OPTION failed
+INSERT INTO empleados_salario_alto(nombre, apellido, salario)
+VALUES('Tomás', 'Pérez', 3000);
+
+-- También evita UPDATE que saque la fila de la vista
+UPDATE empleados_salario_alto
+SET salario = 4000
+WHERE id = 20;
+-- Error: CHECK OPTION failed 'db.empleados_salario_alto'</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Operación</th><th>Sin CHECK OPTION</th><th>Con CHECK OPTION</th></tr></thead>
+            <tbody>
+              <tr><td>INSERT salario >= 5000</td><td>Permitido</td><td>Permitido</td></tr>
+              <tr><td>INSERT salario &lt; 5000</td><td>Permitido (invisible en vista)</td><td>Rechazado (error)</td></tr>
+              <tr><td>UPDATE bajar salario a &lt; 5000</td><td>Permitido (desaparece de vista)</td><td>Rechazado (error)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Limitaciones de las vistas en MySQL</h2>
+        <ul>
+          <li>No se pueden crear índices directamente sobre una vista. La vista usa los índices de las tablas subyacentes.</li>
+          <li>Las vistas con <code>GROUP BY</code> o funciones de agregación no son actualizables.</li>
+          <li>El rendimiento de una vista compleja puede ser pobre porque MySQL ejecuta la consulta subyacente cada vez que se accede a la vista (no hay almacenamiento en caché).</li>
+          <li>No se pueden usar tablas temporales en la definición de una vista.</li>
+          <li>Las vistas pueden ocultar índices útiles, haciendo que el optimizador elija planes subóptimos.</li>
+        </ul>
+
+        <h2>Simular vistas materializadas</h2>
+        <p>MySQL no soporta vistas materializadas nativamente (como Oracle o PostgreSQL). Sin embargo, se pueden simular combinando una tabla física que almacene los datos precalculados y un evento que la actualice periódicamente. Esto es útil para reportes pesados que no requieren datos en tiempo real:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- 1. Crear tabla física para la "vista materializada"
+CREATE TABLE resumen_ventas_mensual AS
+SELECT DATE_FORMAT(fecha, '%Y-%m') AS mes,
+       COUNT(*) AS total_pedidos,
+       SUM(total) AS ingresos_totales,
+       AVG(total) AS ticket_promedio
+FROM pedidos
+GROUP BY mes
+WITH NO DATA;
+
+-- 2. Crear procedimiento para refrescar los datos
+DELIMITER $$
+
+CREATE PROCEDURE refrescar_resumen_ventas()
+BEGIN
+    TRUNCATE TABLE resumen_ventas_mensual;
+
+    INSERT INTO resumen_ventas_mensual (mes, total_pedidos, ingresos_totales, ticket_promedio)
+    SELECT DATE_FORMAT(fecha, '%Y-%m') AS mes,
+           COUNT(*) AS total_pedidos,
+           SUM(total) AS ingresos_totales,
+           AVG(total) AS ticket_promedio
+    FROM pedidos
+    GROUP BY mes;
+END$$
+
+DELIMITER ;
+
+-- 3. Evento para refrescar cada noche a las 2 AM
+CREATE EVENT refrescar_resumen_ventas
+ON SCHEDULE EVERY 1 DAY
+STARTS '2025-01-01 02:00:00'
+DO
+    CALL refrescar_resumen_ventas();</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>mes</th><th>total_pedidos</th><th>ingresos_totales</th><th>ticket_promedio</th></tr></thead>
+            <tbody>
+              <tr><td>2025-01</td><td>1245</td><td>187,350.00</td><td>150.48</td></tr>
+              <tr><td>2025-02</td><td>1089</td><td>163,245.00</td><td>149.90</td></tr>
+              <tr><td>2025-03</td><td>1456</td><td>234,560.00</td><td>161.10</td></tr>
+              <tr><td>2025-04</td><td>1320</td><td>198,000.00</td><td>150.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Para reportes en tiempo real, usa vistas regulares (los datos siempre están actualizados). Para reportes pesados o históricos, la técnica de tabla física + evento es más eficiente porque evita recalcular datos cada vez que se consulta. También puedes refrescar la tabla manualmente con <code>CALL refrescar_resumen_ventas()</code> después de una carga importante de datos.</p></div></div>
+
+        <div class="callout callout-warning"><div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div><div class="callout-content"><p>Las tablas que simulan vistas materializadas contienen datos redundantes. Debes considerar el espacio de almacenamiento adicional y la posible desincronización entre los datos originales y la copia. Diseña la frecuencia de actualización según la tolerancia a la desactualización del negocio.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="eventos.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="../../index.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicios intermedios de SQL - Guía MySQL</title>
+  <meta name="description" content="Practica JOINs, GROUP BY, HAVING, funciones agregadas y subconsultas con ejercicios guiados.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="practica" data-page="ejercicios-intermedios">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Práctica</a></li>
+      <li class="active">Ejercicios intermedios</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Ejercicios intermedios de SQL</h1>
+        <p>En esta sección practicarás consultas más avanzadas que involucran múltiples tablas, agrupaciones, filtros sobre agregados y subconsultas. Utilizaremos tres tablas relacionadas: <code>clientes</code>, <code>pedidos</code> y <code>productos</code>.</p>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Ejecuta todo el script de creación de tablas antes de comenzar los ejercicios. Puedes copiar cada bloque SQL directamente en MySQL Workbench o DB Fiddle.</p></div></div>
+
+        <h2>Tablas de ejemplo</h2>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE clientes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(60),
+  ciudad VARCHAR(40)
+);
+
+CREATE TABLE pedidos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  cliente_id INT,
+  total DECIMAL(10,2),
+  fecha DATE,
+  FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+);
+
+CREATE TABLE productos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(60),
+  precio DECIMAL(10,2),
+  categoria VARCHAR(40)
+);
+
+INSERT INTO clientes (nombre, ciudad) VALUES
+('Juan Mendoza', 'Ciudad de México'),
+('Carmen Flores', 'Guadalajara'),
+('Roberto Silva', 'Monterrey'),
+('Patricia Vega', 'Ciudad de México'),
+('Luis Torres', 'Guadalajara');
+
+INSERT INTO pedidos (cliente_id, total, fecha) VALUES
+(1, 1500.00, '2024-01-15'),
+(1, 2300.00, '2024-02-20'),
+(2, 3200.00, '2024-01-28'),
+(3, 1800.00, '2024-03-05'),
+(3, 950.00, '2024-03-22'),
+(3, 4100.00, '2024-04-10'),
+(5, 2700.00, '2024-02-14'),
+(5, 1100.00, '2024-03-30');
+
+INSERT INTO productos (nombre, precio, categoria) VALUES
+('Laptop HP', 25000.00, 'Electrónica'),
+('Teclado mecánico', 1800.00, 'Accesorios'),
+('Monitor 27 pulgadas', 6500.00, 'Electrónica'),
+('Mouse inalámbrico', 850.00, 'Accesorios'),
+('Webcam HD', 2200.00, 'Electrónica'),
+('Audífonos Bluetooth', 1600.00, 'Accesorios');</code></pre>
+        </div>
+
+        <h2>Ejercicio 1: INNER JOIN clientes-pedidos</h2>
+        <p>Obtén el nombre del cliente, el total y la fecha de todos los pedidos realizados. Combina las tablas <code>clientes</code> y <code>pedidos</code> con un <code>INNER JOIN</code>. Ordena por fecha descendente.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT c.nombre, p.total, p.fecha
+FROM clientes c
+INNER JOIN pedidos p ON c.id = p.cliente_id
+ORDER BY p.fecha DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>total</th><th>fecha</th></tr></thead>
+              <tbody>
+                <tr><td>Roberto Silva</td><td>4100.00</td><td>2024-04-10</td></tr>
+                <tr><td>Luis Torres</td><td>1100.00</td><td>2024-03-30</td></tr>
+                <tr><td>Roberto Silva</td><td>950.00</td><td>2024-03-22</td></tr>
+                <tr><td>Roberto Silva</td><td>1800.00</td><td>2024-03-05</td></tr>
+                <tr><td>Juan Mendoza</td><td>2300.00</td><td>2024-02-20</td></tr>
+                <tr><td>Luis Torres</td><td>2700.00</td><td>2024-02-14</td></tr>
+                <tr><td>Carmen Flores</td><td>3200.00</td><td>2024-01-28</td></tr>
+                <tr><td>Juan Mendoza</td><td>1500.00</td><td>2024-01-15</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <h2>Ejercicio 2: LEFT JOIN con clientes sin pedidos</h2>
+        <p>Obtén todos los clientes, incluyendo aquellos que nunca han realizado un pedido. Muestra el nombre del cliente, ciudad y el total del pedido (como <code>NULL</code> si no tiene). Identifica al cliente sin pedidos.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT c.nombre, c.ciudad, p.total
+FROM clientes c
+LEFT JOIN pedidos p ON c.id = p.cliente_id
+ORDER BY c.nombre;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>ciudad</th><th>total</th></tr></thead>
+              <tbody>
+                <tr><td>Carmen Flores</td><td>Guadalajara</td><td>3200.00</td></tr>
+                <tr><td>Juan Mendoza</td><td>Ciudad de México</td><td>1500.00</td></tr>
+                <tr><td>Juan Mendoza</td><td>Ciudad de México</td><td>2300.00</td></tr>
+                <tr><td>Luis Torres</td><td>Guadalajara</td><td>2700.00</td></tr>
+                <tr><td>Luis Torres</td><td>Guadalajara</td><td>1100.00</td></tr>
+                <tr><td>Patricia Vega</td><td>Ciudad de México</td><td>NULL</td></tr>
+                <tr><td>Roberto Silva</td><td>Monterrey</td><td>1800.00</td></tr>
+                <tr><td>Roberto Silva</td><td>Monterrey</td><td>950.00</td></tr>
+                <tr><td>Roberto Silva</td><td>Monterrey</td><td>4100.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p><strong>Patricia Vega</strong> es la única cliente que no ha realizado ningún pedido.</p>
+        </details>
+
+        <h2>Ejercicio 3: GROUP BY con SUM total por cliente</h2>
+        <p>Calcula el gasto total de cada cliente sumando el total de todos sus pedidos. Muestra el nombre del cliente y el gasto total. Ordena de mayor a menor gasto.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT c.nombre, SUM(p.total) AS gasto_total
+FROM clientes c
+INNER JOIN pedidos p ON c.id = p.cliente_id
+GROUP BY c.id, c.nombre
+ORDER BY gasto_total DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>gasto_total</th></tr></thead>
+              <tbody>
+                <tr><td>Roberto Silva</td><td>6850.00</td></tr>
+                <tr><td>Carmen Flores</td><td>3200.00</td></tr>
+                <tr><td>Luis Torres</td><td>3800.00</td></tr>
+                <tr><td>Juan Mendoza</td><td>3800.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <h2>Ejercicio 4: HAVING para filtrar clientes con gasto alto</h2>
+        <p>Del resultado anterior, muestra únicamente los clientes cuyo gasto total sea mayor a <strong>3500</strong>. Usa <code>HAVING</code> para filtrar después de agrupar.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT c.nombre, SUM(p.total) AS gasto_total
+FROM clientes c
+INNER JOIN pedidos p ON c.id = p.cliente_id
+GROUP BY c.id, c.nombre
+HAVING gasto_total > 3500
+ORDER BY gasto_total DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>gasto_total</th></tr></thead>
+              <tbody>
+                <tr><td>Roberto Silva</td><td>6850.00</td></tr>
+                <tr><td>Luis Torres</td><td>3800.00</td></tr>
+                <tr><td>Juan Mendoza</td><td>3800.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <h2>Ejercicio 5: Subconsulta para producto más caro</h2>
+        <p>Encuentra el producto más caro de la tabla <code>productos</code> usando una subconsulta. Muestra su nombre, precio y categoría.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT nombre, precio, categoria
+FROM productos
+WHERE precio = (SELECT MAX(precio) FROM productos);</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>precio</th><th>categoria</th></tr></thead>
+              <tbody>
+                <tr><td>Laptop HP</td><td>25000.00</td><td>Electrónica</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>Verifica siempre tus resultados. En los JOINs, cuenta cuántas filas esperas obtener: un INNER JOIN muestra solo las coincidencias, mientras que LEFT JOIN incluye todas las filas de la tabla izquierda. Practica variando los tipos de JOIN para entender sus diferencias.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="ejercicios-basicos.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="ejercicios-avanzados.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

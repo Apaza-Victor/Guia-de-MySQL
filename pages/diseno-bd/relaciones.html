@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tipos de relaciones en BD - Guía MySQL</title>
+  <meta name="description" content="Aprende sobre relaciones 1:1, 1:N y N:M en bases de datos relacionales.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="diseno-bd" data-page="relaciones">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Diseño de BD</a></li>
+      <li class="active">Relaciones</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Tipos de relaciones en BD</h1>
+        <p>En las bases de datos relacionales, las <strong>relaciones</strong> definen cómo se asocian las tablas entre sí. Los tres tipos fundamentales son 1:1 (uno a uno), 1:N (uno a muchos) y N:M (muchos a muchos). Cada una se implementa de forma distinta usando claves foráneas.</p>
+
+        <h2>Relación 1:1 (Uno a uno)</h2>
+        <p>Cada fila de la tabla A se relaciona con exactamente una fila de la tabla B, y viceversa. Se implementa colocando una FK única en una de las tablas. Ejemplo: un usuario tiene un perfil, y un perfil pertenece a un solo usuario.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE usuario (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(30) NOT NULL UNIQUE
+);
+
+CREATE TABLE perfil (
+    id_perfil INT AUTO_INCREMENT PRIMARY KEY,
+    bio TEXT,
+    avatar_url VARCHAR(255),
+    id_usuario INT UNIQUE NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
+);</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_usuario</th><th>username</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>jperez</td></tr>
+              <tr><td>2</td><td>mlopez</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_perfil</th><th>bio</th><th>id_usuario (FK+UNIQUE)</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Desarrollador web</td><td>1</td></tr>
+              <tr><td>2</td><td>Diseñadora gráfica</td><td>2</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Relación 1:N (Uno a muchos)</h2>
+        <p>Una fila de la tabla A puede relacionarse con varias filas de la tabla B, pero cada fila de B se relaciona con solo una fila de A. Es el tipo más común. Se implementa colocando la FK en la tabla "muchos". Ejemplo: una categoría contiene varios productos.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE categoria (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE producto (
+    id_producto INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    id_categoria INT NOT NULL,
+    FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria)
+);</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_categoria</th><th>nombre</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Electrónica</td></tr>
+              <tr><td>2</td><td>Hogar</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_producto</th><th>nombre</th><th>precio</th><th>id_categoria</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Laptop</td><td>15000</td><td>1</td></tr>
+              <tr><td>2</td><td>Mouse</td><td>300</td><td>1</td></tr>
+              <tr><td>3</td><td>Sartén</td><td>450</td><td>2</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Relación N:M (Muchos a muchos)</h2>
+        <p>Una fila de la tabla A puede relacionarse con varias filas de la tabla B, y viceversa. Se implementa mediante una <strong>tabla intermedia</strong> (o tabla pivote) que contiene las FK de ambas tablas. Ejemplo: estudiantes se inscriben en cursos; un estudiante puede cursar varios cursos y un curso tiene varios estudiantes.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE estudiante (
+    id_estudiante INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE curso (
+    id_curso INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    creditos INT NOT NULL
+);
+
+-- Tabla intermedia para la relación N:M
+CREATE TABLE inscripcion (
+    id_estudiante INT NOT NULL,
+    id_curso INT NOT NULL,
+    fecha_inscripcion DATE NOT NULL,
+    PRIMARY KEY (id_estudiante, id_curso),
+    FOREIGN KEY (id_estudiante) REFERENCES estudiante(id_estudiante),
+    FOREIGN KEY (id_curso) REFERENCES curso(id_curso)
+);</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_estudiante</th><th>nombre</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Sofía García</td></tr>
+              <tr><td>2</td><td>Luis Mendoza</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_curso</th><th>nombre</th><th>créditos</th></tr></thead>
+            <tbody>
+              <tr><td>101</td><td>Álgebra</td><td>4</td></tr>
+              <tr><td>102</td><td>Programación</td><td>5</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_estudiante</th><th>id_curso</th><th>fecha_inscripcion</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>101</td><td>2025-02-01</td></tr>
+              <tr><td>1</td><td>102</td><td>2025-02-01</td></tr>
+              <tr><td>2</td><td>101</td><td>2025-02-02</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>La tabla intermedia en relaciones N:M puede incluir atributos adicionales como <code>fecha_inscripcion</code>, <code>calificación</code> o <code>semestre</code>. La clave primaria suele ser compuesta (ambas FK) o puedes agregar un <code>id_inscripcion</code> autoincremental como PK simple.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="claves-primarias-foraneas.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="integridad-referencial.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

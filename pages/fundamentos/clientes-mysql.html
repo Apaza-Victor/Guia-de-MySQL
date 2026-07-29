@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes para MySQL - Guía MySQL</title>
+  <meta name="description" content="Conoce las principales herramientas para conectarte y administrar MySQL: línea de comandos, MySQL Workbench, phpMyAdmin y DBeaver.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="fundamentos" data-page="clientes-mysql">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Fundamentos</a></li>
+      <li class="active">Clientes para MySQL</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Clientes para MySQL</h1>
+        <p>Para interactuar con MySQL necesitas un cliente, que es un programa que se conecta al servidor y envía consultas SQL. Existen clientes de terminal, aplicaciones de escritorio con interfaz gráfica y herramientas web. Cada uno tiene sus ventajas según el tipo de tarea que necesites realizar, desde consultas rápidas hasta diseño completo de bases de datos.</p>
+
+        <h2>Cliente de línea de comandos mysql</h2>
+        <p>El cliente mysql viene incluido con el servidor MySQL y es la herramienta más directa para ejecutar comandos SQL. Funciona en cualquier sistema operativo, consume muy pocos recursos y es ideal para scripts automatizados y tareas de administración. Permite ejecutar consultas, importar y exportar datos, y gestionar usuarios y privilegios.</p>
+
+        <h3>Ejemplo básico con el cliente mysql</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">mysql -u root -p
+
+-- Dentro del cliente:
+SHOW DATABASES;
+USE tienda;
+SELECT * FROM productos;</code></pre>
+        </div>
+
+        <h2>MySQL Workbench</h2>
+        <p>MySQL Workbench es la herramienta gráfica oficial de Oracle para MySQL. Ofrece un editor visual de consultas, modelado de bases de datos con diagramas entidad-relación, herramientas de administración de servidores y capacidades de migración desde otros motores de bases de datos. Es la opción preferida para diseñar esquemas complejos y administrar servidores de forma visual.</p>
+
+        <h2>phpMyAdmin</h2>
+        <p>phpMyAdmin es una aplicación web de código abierto escrita en PHP que permite administrar MySQL a través de un navegador. Viene incluido en paquetes como XAMPP, WAMP y MAMP. Es muy popular en entornos de hosting compartido y para principiantes, ya que no requiere instalar software adicional en el cliente más allá del navegador.</p>
+
+        <h2>DBeaver Community</h2>
+        <p>DBeaver es un cliente universal de bases de datos que soporta MySQL, PostgreSQL, SQLite, Oracle, SQL Server y muchos más. Su versión Community es gratuita y de código abierto. Ofrece un editor SQL con autocompletado, visualización de datos en tabla, exportación a múltiples formatos y un explorador de esquemas intuitivo.</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Herramienta</th><th>Tipo</th><th>Plataforma</th><th>Uso principal</th></tr></thead>
+            <tbody>
+              <tr><td>mysql (CLI)</td><td>Línea de comandos</td><td>Windows, Linux, macOS</td><td>Administración, scripts, consultas rápidas</td></tr>
+              <tr><td>MySQL Workbench</td><td>Escritorio</td><td>Windows, Linux, macOS</td><td>Diseño ER, administración visual, migraciones</td></tr>
+              <tr><td>phpMyAdmin</td><td>Web</td><td>Navegador (requiere servidor web)</td><td>Hosting compartido, principiantes</td></tr>
+              <tr><td>DBeaver</td><td>Escritorio</td><td>Windows, Linux, macOS</td><td>Cliente universal, múltiples bases de datos</td></tr>
+              <tr><td>TablePlus</td><td>Escritorio</td><td>Windows, macOS</td><td>Editor SQL moderno, liviano</td></tr>
+              <tr><td>HeidiSQL</td><td>Escritorio</td><td>Windows</td><td>Administración ligera de MySQL</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Cómo elegir la herramienta adecuada</h2>
+        <p>La elección del cliente depende de tu flujo de trabajo. Si prefieres velocidad y estás cómodo con la terminal, el cliente mysql es suficiente. Para diseño de bases de datos y administración visual, MySQL Workbench es la mejor opción. En entornos de hosting donde solo tienes acceso web, phpMyAdmin es indispensable. Si trabajas con múltiples motores de bases de datos, DBeaver te permite unificar todas tus conexiones en una sola herramienta.</p>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>No te limites a una sola herramienta. Usa la línea de comandos para tareas rápidas y scripting, Workbench para diseñar esquemas, y phpMyAdmin o DBeaver para explorar y editar datos visualmente.</p></div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="callout-content"><p>phpMyAdmin es sensible a ataques de seguridad si no se configura correctamente. Nunca expongas phpMyAdmin a internet sin autenticación fuerte y sin las actualizaciones de seguridad al día.</p></div>
+        </div>
+
+        <div class="callout callout-important">
+          <div class="callout-icon"><i class="bi bi-info-circle"></i></div>
+          <div class="callout-content"><p>MySQL Workbench incluye una herramienta de migración que permite convertir bases de datos de Microsoft SQL Server, PostgreSQL, SQLite y otros motores a MySQL, facilitando la migración entre plataformas.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="instalacion.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="tipos-de-datos.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

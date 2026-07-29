@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funciones agregadas (COUNT, SUM, AVG, MIN, MAX) - Guía MySQL</title>
+  <meta name="description" content="Aprende a usar funciones agregadas en MySQL para resumir datos.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="consultas-intermedias" data-page="funciones-agregadas">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Intermedio</a></li>
+      <li class="active">Funciones agregadas</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Funciones agregadas (COUNT, SUM, AVG, MIN, MAX)</h1>
+        <p>Las funciones agregadas en MySQL permiten realizar cálculos sobre un conjunto de filas y devolver un único resultado. Son esenciales para el análisis y resumen de datos en cualquier base de datos relacional.</p>
+
+        <h2>Tabla de ejemplo: ventas</h2>
+        <p>Para los ejemplos de esta página usaremos la siguiente tabla <code>ventas</code>:</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE ventas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  producto VARCHAR(50),
+  categoria VARCHAR(30),
+  cantidad INT,
+  precio DECIMAL(10,2),
+  fecha DATE
+);
+
+INSERT INTO ventas (producto, categoria, cantidad, precio, fecha) VALUES
+('Laptop', 'Electrónica', 3, 15000.00, '2024-01-15'),
+('Mouse', 'Electrónica', 10, 250.00, '2024-01-20'),
+('Teclado', 'Electrónica', 5, 800.00, '2024-02-05'),
+('Monitor', 'Electrónica', 2, 4500.00, '2024-02-10'),
+('Libreta', 'Papelería', 20, 35.00, '2024-02-15'),
+('Pluma', 'Papelería', 50, 10.00, '2024-03-01'),
+('Escritorio', 'Muebles', 1, 3200.00, '2024-03-10'),
+('Silla', 'Muebles', 4, 1800.00, '2024-03-20');</code></pre>
+        </div>
+
+        <h2>COUNT</h2>
+        <p>Cuenta el número de filas de un conjunto de resultados. <code>COUNT(*)</code> cuenta todas las filas incluyendo aquellas con valores NULL, mientras que <code>COUNT(columna)</code> solo cuenta las filas donde la columna no es NULL.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Contar todas las ventas
+SELECT COUNT(*) AS total_ventas FROM ventas;
+
+-- Contar productos vendidos (no NULL)
+SELECT COUNT(producto) AS total_productos FROM ventas;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>total_ventas</th></tr></thead>
+            <tbody><tr><td>8</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>SUM</h2>
+        <p>Suma los valores de una columna numérica. Es muy útil para calcular totales como ingresos, cantidades o cualquier métrica acumulativa.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Calcular el ingreso total por cada producto (cantidad * precio)
+SELECT SUM(cantidad * precio) AS ingreso_total FROM ventas;
+
+-- Sumar cantidades vendidas por categoría
+SELECT categoria, SUM(cantidad) AS total_unidades
+FROM ventas
+GROUP BY categoria;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>categoria</th><th>total_unidades</th></tr></thead>
+            <tbody><tr><td>Electrónica</td><td>20</td></tr><tr><td>Papelería</td><td>70</td></tr><tr><td>Muebles</td><td>5</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>AVG</h2>
+        <p>Calcula el promedio de los valores de una columna numérica. MySQL devuelve un decimal con la mayor precisión posible.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Precio promedio de todos los productos
+SELECT AVG(precio) AS precio_promedio FROM ventas;
+
+-- Promedio redondeado a 2 decimales
+SELECT ROUND(AVG(precio), 2) AS precio_promedio FROM ventas;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>precio_promedio</th></tr></thead>
+            <tbody><tr><td>3124.375000</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>MIN y MAX</h2>
+        <p>Devuelven el valor mínimo y máximo de una columna, respectivamente. Funcionan con cualquier tipo de dato: numérico, cadena o fecha.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Producto más barato, más caro y rango de fechas
+SELECT
+  MIN(precio) AS precio_minimo,
+  MAX(precio) AS precio_maximo,
+  MIN(fecha) AS primera_venta,
+  MAX(fecha) AS ultima_venta
+FROM ventas;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>precio_minimo</th><th>precio_maximo</th><th>primera_venta</th><th>ultima_venta</th></tr></thead>
+            <tbody><tr><td>10.00</td><td>15000.00</td><td>2024-01-15</td><td>2024-03-20</td></tr></tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Cuando uses <code>AVG()</code> con columnas que contienen valores enteros, MySQL devuelve un decimal. Si necesitas controlar la precisión, usa <code>ROUND(AVG(columna), n)</code>. Recuerda que <code>COUNT(*)</code> es más rápido que <code>COUNT(columna)</code> cuando solo necesitas saber el número total de filas.</p></div></div>
+        <nav class="page-nav">
+          <a href="#" class="nav-prev disabled"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="group-by-having.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

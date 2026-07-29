@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recursos para aprender MySQL - Guía MySQL</title>
+  <meta name="description" content="Recopilación de recursos gratuitos para aprender MySQL: documentación oficial, cursos, plataformas de práctica y herramientas.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="recursos" data-page="recursos">
+  <div id="header-placeholder"></div>
+  <ul class="breadcrumb" style="padding: 0.75rem 1.5rem; max-width: 1400px; margin: 0 auto;">
+    <li><a href="../../index.html">Inicio</a></li>
+    <li class="active">Recursos</li>
+  </ul>
+  <main class="content-area" style="padding: 1.5rem;">
+    <div class="module-header">
+      <h1>Recursos para aprender MySQL</h1>
+      <p class="module-desc">Recopilación de recursos gratuitos para aprender MySQL: documentación oficial, cursos, plataformas de práctica y herramientas. Todos los enlaces han sido verificados y son de acceso libre.</p>
+    </div>
+
+        <section data-aos="fade-up">
+          <h2><i class="bi bi-book" style="color: var(--accent); margin-right: 0.5rem;"></i>Documentación oficial</h2>
+          <div class="module-grid">
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-file-earmark-text"></i></div>
+              <h3>MySQL Reference Manual</h3>
+              <p>Documentación oficial completa de MySQL. Cubre todos los aspectos del motor, desde instalación hasta administración avanzada, con referencia detallada de todas las sentencias SQL, funciones y opciones de configuración.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://dev.mysql.com/doc/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-globe"></i></div>
+              <h3>W3Schools MySQL</h3>
+              <p>Tutorial interactivo de MySQL con ejemplos prácticos ejecutables en el navegador. Ideal para principiantes que quieren aprender la sintaxis SQL de forma visual y probar consultas sin instalar nada.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.w3schools.com/mysql/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-database"></i></div>
+              <h3>MDN Databases</h3>
+              <p>Guía de Mozilla Developer Network sobre bases de datos relacionales y SQL. Explica conceptos fundamentales con un enfoque claro y accesible para desarrolladores web.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://developer.mozilla.org/es/docs/Learn/Server-side/First_steps/Introduction" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+          </div>
+        </section>
+
+        <section data-aos="fade-up">
+          <h2><i class="bi bi-play-circle" style="color: var(--accent); margin-right: 0.5rem;"></i>Cursos gratuitos</h2>
+          <div class="module-grid">
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-youtube"></i></div>
+              <h3>freeCodeCamp</h3>
+              <p>Curso completo y gratuito de bases de datos relacionales y MySQL en YouTube. Incluye horas de contenido práctico con ejercicios y proyectos reales para afianzar los conocimientos.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.freecodecamp.org/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-code-square"></i></div>
+              <h3>Codecademy "Learn SQL"</h3>
+              <p>Curso interactivo de SQL con ejercicios prácticos en el navegador. Cubre desde consultas básicas hasta avanzadas con una metodología hands-on que permite aprender haciendo.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.codecademy.com/learn/learn-sql" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-mortarboard"></i></div>
+              <h3>Khan Academy Intro to SQL</h3>
+              <p>Curso introductorio gratuito de SQL impartido por Khan Academy. Ideal para quienes se inician en el mundo de las bases de datos, con explicaciones visuales y ejercicios guiados paso a paso.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.khanacademy.org/computing/computer-programming/sql" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-phone"></i></div>
+              <h3>SoloLearn SQL</h3>
+              <p>Plataforma de aprendizaje móvil con curso de SQL interactivo. Perfecto para aprender sobre la marcha con lecciones cortas, cuestionarios y un editor de código integrado en la aplicación.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.sololearn.com/learn/courses/sql" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-youtube"></i></div>
+              <h3>YouTube - HolaMundo</h3>
+              <p>Curso de MySQL y SQL desde cero en español por HolaMundo. Explicaciones claras y ejemplos prácticos para hispanohablantes que quieren aprender bases de datos relacionales.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.youtube.com/@HolaMundoDev" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-youtube"></i></div>
+              <h3>YouTube - Fazt</h3>
+              <p>Tutoriales de MySQL y bases de datos en español por Fazt. Contenido actualizado con proyectos prácticos que enseñan desde la instalación hasta el uso en aplicaciones reales.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.youtube.com/@FaztTech" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+          </div>
+        </section>
+
+        <section data-aos="fade-up">
+          <h2><i class="bi bi-laptop" style="color: var(--accent); margin-right: 0.5rem;"></i>Plataformas de práctica</h2>
+          <div class="module-grid">
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-joystick"></i></div>
+              <h3>SQLZoo</h3>
+              <p>Plataforma interactiva con tutoriales y ejercicios prácticos de SQL. Incluye bases de datos reales para practicar consultas SELECT, JOINs, subconsultas y más directamente en el navegador.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://sqlzoo.net/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-trophy"></i></div>
+              <h3>HackerRank SQL</h3>
+              <p>Plataforma de desafíos de SQL con problemas clasificados por dificultad. Ideal para preparar entrevistas técnicas y mejorar habilidades resolviendo problemas reales de bases de datos.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.hackerrank.com/domains/sql" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-code-slash"></i></div>
+              <h3>LeetCode Database</h3>
+              <p>Problemas de SQL para práctica y preparación de entrevistas técnicas. Ofrece desde consultas simples hasta desafíos complejos de optimización y diseño de bases de datos.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://leetcode.com/problemset/database/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-database-gear"></i></div>
+              <h3>DB Fiddle</h3>
+              <p>Editor SQL online que soporta MySQL, PostgreSQL y SQLite. Ideal para probar consultas rápidamente, compartir fragmentos de código y colaborar con otros desarrolladores.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.db-fiddle.com/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-lightning"></i></div>
+              <h3>SQLBolt</h3>
+              <p>Tutorial interactivo de SQL con lecciones cortas y ejercicios prácticos. Cubre los conceptos esenciales de forma progresiva, ideal para quienes prefieren un aprendizaje estructurado.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://sqlbolt.com/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-terminal"></i></div>
+              <h3>Programiz SQL Compiler</h3>
+              <p>Compilador SQL online gratuito con editor integrado. Permite escribir y ejecutar consultas SQL en tiempo real, ideal para practicar sintaxis y probar conceptos sin configuración.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.programiz.com/sql/online-compiler/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+          </div>
+        </section>
+
+        <section data-aos="fade-up">
+          <h2><i class="bi bi-tools" style="color: var(--accent); margin-right: 0.5rem;"></i>Herramientas</h2>
+          <div class="module-grid">
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-window-dock"></i></div>
+              <h3>MySQL Workbench</h3>
+              <p>Herramienta oficial de Oracle para modelado, diseño y administración de bases de datos MySQL. Incluye editor SQL, herramientas de migración, modelado ER y monitoreo de rendimiento.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.mysql.com/products/workbench/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Descargar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-cloud"></i></div>
+              <h3>phpMyAdmin</h3>
+              <p>Administrador web de MySQL escrito en PHP. Permite gestionar bases de datos, ejecutar consultas y administrar usuarios desde una interfaz gráfica accesible desde el navegador.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.phpmyadmin.net/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-database-fill-gear"></i></div>
+              <h3>DBeaver Community</h3>
+              <p>Cliente de base de datos universal y gratuito compatible con MySQL. Ofrece editor SQL avanzado, explorador de objetos, generación de diagramas ER y soporte para múltiples gestores.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://dbeaver.io/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Descargar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-server"></i></div>
+              <h3>XAMPP / WAMP / MAMP</h3>
+              <p>Paquetes todo-en-uno que incluyen Apache, MySQL y PHP. Ideales para entornos de desarrollo local, permitiendo instalar y configurar un servidor MySQL completo en minutos.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.apachefriends.org/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Descargar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-diagram-3"></i></div>
+              <h3>draw.io / dbdiagram.io</h3>
+              <p>Herramientas gratuitas para diseñar diagramas entidad-relación y modelos de bases de datos. Facilitan la planificación visual de esquemas antes de implementarlos en MySQL.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://app.diagrams.net/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> draw.io</a> <a href="https://dbdiagram.io/" target="_blank" rel="noopener" class="btn btn-outline" style="margin-left: 0.5rem;"><i class="bi bi-box-arrow-up-right"></i> dbdiagram</a></p>
+            </div>
+          </div>
+        </section>
+
+        <section data-aos="fade-up">
+          <h2><i class="bi bi-people" style="color: var(--accent); margin-right: 0.5rem;"></i>Comunidades</h2>
+          <div class="module-grid">
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-stack-overflow"></i></div>
+              <h3>Stack Overflow (mysql)</h3>
+              <p>La comunidad de programación más grande del mundo. La etiqueta "mysql" contiene miles de preguntas y respuestas sobre problemas reales, desde errores comunes hasta configuraciones avanzadas.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://stackoverflow.com/questions/tagged/mysql" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-reddit"></i></div>
+              <h3>Reddit r/SQL</h3>
+              <p>Subreddit dedicado a SQL y bases de datos. Comparte dudas, consejos, recursos y discusiones con una comunidad activa de desarrolladores y administradores de bases de datos.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://www.reddit.com/r/SQL/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+            <div class="card">
+              <div class="card-icon"><i class="bi bi-chat-dots"></i></div>
+              <h3>Foros del Web</h3>
+              <p>Comunidad hispanohablante con sección dedicada a MySQL y bases de datos. Ideal para resolver dudas en español y conectar con otros desarrolladores de habla hispana.</p>
+              <p style="margin-top: 0.75rem;"><a href="https://forosdelweb.com/" target="_blank" rel="noopener" class="btn btn-primary"><i class="bi bi-box-arrow-up-right"></i> Visitar</a></p>
+            </div>
+          </div>
+        </section>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Antes de usar cualquier recurso, verifica que los enlaces estén activos y actualizados. Algunos cursos pueden requerir registro gratuito. Recomendamos comenzar por la documentación oficial y complementar con ejercicios prácticos en SQLZoo o HackerRank.</p></div></div>
+
+      </main>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Funciones personalizadas - Guía MySQL</title>
+  <meta name="description" content="Crea funciones reutilizables en MySQL con CREATE FUNCTION.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="avanzado" data-page="funciones-personalizadas">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Avanzado</a></li>
+      <li class="active">Funciones personalizadas</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Funciones personalizadas</h1>
+        <p>Las funciones definidas por el usuario (UDF) permiten extender las capacidades de MySQL creando funciones reutilizables que devuelven un valor escalar. A diferencia de los procedimientos almacenados, las funciones se usan directamente dentro de expresiones SQL, como parte de <code>SELECT</code>, <code>WHERE</code>, <code>SET</code>, etc.</p>
+
+        <h2>CREATE FUNCTION</h2>
+        <p>La sintaxis para crear una función requiere definir el nombre, los parámetros de entrada, el tipo de retorno y las características como <code>DETERMINISTIC</code>:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DELIMITER $$
+
+CREATE FUNCTION calcular_edad(fecha_nacimiento DATE)
+RETURNS INT
+DETERMINISTIC
+BEGIN
+    DECLARE edad INT;
+    SET edad = TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE());
+    RETURN edad;
+END$$
+
+DELIMITER ;
+
+-- Uso en consulta
+SELECT id, nombre, fecha_nacimiento,
+       calcular_edad(fecha_nacimiento) AS edad
+FROM empleados;</code></pre>
+        </div>
+
+        <h2>Diferencias entre funciones y procedimientos</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Característica</th><th>Función (UDF)</th><th>Procedimiento</th></tr></thead>
+            <tbody>
+              <tr><td>Valor de retorno</td><td>Siempre devuelve un valor escalar (RETURNS)</td><td>Puede devolver 0 o más resultados (OUT)</td></tr>
+              <tr><td>Uso en SQL</td><td>Se usa dentro de SELECT, WHERE, etc.</td><td>Se invoca con CALL</td></tr>
+              <tr><td>Parámetros</td><td>Solo IN (todos son de entrada)</td><td>IN, OUT, INOUT</td></tr>
+              <tr><td>Transacciones</td><td>No puede iniciar ni confirmar transacciones</td><td>Soporta transacciones completas</td></tr>
+              <tr><td>SELECT dentro</td><td>Limitado (solo si no modifica datos)</td><td>Puede contener cualquier SELECT</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Ejemplos de funciones escalares</h2>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Función para formatear nombre completo
+DELIMITER $$
+
+CREATE FUNCTION nombre_completo(nombre VARCHAR(50), apellido VARCHAR(50))
+RETURNS VARCHAR(101)
+DETERMINISTIC
+BEGIN
+    RETURN CONCAT(nombre, ' ', apellido);
+END$$
+
+DELIMITER ;
+
+-- Función para calcular IVA (impuesto)
+DELIMITER $$
+
+CREATE FUNCTION calcular_iva(monto DECIMAL(10,2), tasa DECIMAL(5,2))
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+    RETURN monto * (tasa / 100);
+END$$
+
+DELIMITER ;
+
+-- Función para categorizar un salario
+DELIMITER $$
+
+CREATE FUNCTION categoria_salario(salario DECIMAL(10,2))
+RETURNS VARCHAR(20)
+DETERMINISTIC
+BEGIN
+    IF salario >= 5000 THEN
+        RETURN 'Alto';
+    ELSEIF salario >= 3000 THEN
+        RETURN 'Medio';
+    ELSE
+        RETURN 'Bajo';
+    END IF;
+END$$
+
+DELIMITER ;
+
+-- Consulta combinando funciones
+SELECT nombre_completo(nombre, apellido) AS empleado,
+       salario,
+       calcular_iva(salario, 19) AS iva_sobre_salario,
+       categoria_salario(salario) AS categoria
+FROM empleados;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>empleado</th><th>salario</th><th>iva_sobre_salario</th><th>categoria</th></tr></thead>
+            <tbody>
+              <tr><td>María López</td><td>4800.00</td><td>912.00</td><td>Medio</td></tr>
+              <tr><td>Carlos Mendoza</td><td>4200.00</td><td>798.00</td><td>Medio</td></tr>
+              <tr><td>Ana Rivas</td><td>3500.00</td><td>665.00</td><td>Medio</td></tr>
+              <tr><td>Luis García</td><td>6200.00</td><td>1178.00</td><td>Alto</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Manejo de NULLs en funciones</h2>
+        <p>Es buena práctica manejar valores nulos explícitamente para evitar resultados inesperados:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DELIMITER $$
+
+CREATE FUNCTION tasa_interes_mensual(tasa_anual DECIMAL(5,2))
+RETURNS DECIMAL(7,4)
+DETERMINISTIC
+BEGIN
+    IF tasa_anual IS NULL THEN
+        RETURN NULL;
+    END IF;
+    RETURN tasa_anual / 12 / 100;
+END$$
+
+DELIMITER ;
+
+SELECT tasa_interes_mensual(12.00);  -- 0.0100
+SELECT tasa_interes_mensual(NULL);   -- NULL</code></pre>
+        </div>
+
+        <div class="callout callout-warning"><div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div><div class="callout-content"><p><strong>DETERMINISTIC vs NOT DETERMINISTIC:</strong> Una función es <code>DETERMINISTIC</code> si siempre produce el mismo resultado para los mismos parámetros de entrada (ej: <code>calcular_iva</code>). Es <code>NOT DETERMINISTIC</code> si el resultado puede variar aunque los parámetros sean iguales (ej: una función que usa <code>NOW()</code> o <code>RAND()</code>). Declarar incorrectamente una función como <code>DETERMINISTIC</code> cuando no lo es puede causar resultados incorrectos en replicación y en el uso de índices. MySQL exige al menos una de estas características: <code>DETERMINISTIC</code>, <code>NO SQL</code> o <code>READS SQL DATA</code> para crear funciones. Si usas <code>NOW()</code>, <code>RAND()</code> o <code>CURDATE()</code>, declárala como <code>NOT DETERMINISTIC</code>.</p></div></div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Las funciones personalizadas son ideales para lógica que se repite en múltiples consultas. Sin embargo, ten en cuenta que una función se ejecuta una vez por cada fila del resultado, lo que puede impactar el rendimiento en conjuntos grandes. Para operaciones por lote, considera usar procedimientos almacenados.</p></div></div>
+
+        <h2>Eliminar y ver funciones</h2>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Eliminar una función
+DROP FUNCTION IF EXISTS calcular_edad;
+
+-- Ver todas las funciones de la base de datos
+SHOW FUNCTION STATUS WHERE Db = 'mi_base_datos';
+
+-- Ver la definición de una función
+SHOW CREATE FUNCTION nombre_completo;</code></pre>
+        </div>
+
+        <nav class="page-nav">
+          <a href="procedimientos-almacenados.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="triggers.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

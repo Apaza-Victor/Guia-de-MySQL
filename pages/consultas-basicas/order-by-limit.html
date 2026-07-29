@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ORDER BY y LIMIT - Guía MySQL</title>
+  <meta name="description" content="Aprende a ordenar resultados con ORDER BY y limitar filas con LIMIT y OFFSET para paginación en MySQL.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="consultas-basicas" data-page="order-by-limit">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Básico</a></li>
+      <li class="active">ORDER BY y LIMIT</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>ORDER BY y LIMIT</h1>
+        <p>Las cláusulas <code>ORDER BY</code> y <code>LIMIT</code> permiten controlar la presentación y cantidad de los resultados. Con <code>ORDER BY</code> se define el criterio de ordenamiento, y con <code>LIMIT</code> se restringe el número de filas devueltas. Son fundamentales para crear reportes ordenados, implementar paginación y obtener los registros más relevantes, como los primeros o últimos según algún criterio.</p>
+
+        <h2>Datos de ejemplo: productos</h2>
+        <p>Para esta lección usaremos una tabla <code>productos</code> con artículos de inventario, incluyendo nombre, precio y existencias.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE productos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(60),
+  precio DECIMAL(10,2),
+  stock INT
+);
+
+INSERT INTO productos VALUES
+(1, 'Laptop', 15000.00, 10),
+(2, 'Mouse', 250.00, 50),
+(3, 'Teclado', 800.00, 30),
+(4, 'Monitor', 4500.00, 15),
+(5, 'Audífonos', 600.00, 25),
+(6, 'Webcam', 1200.00, 8);</code></pre>
+        </div>
+
+        <h2>ORDER BY ASC y DESC</h2>
+        <p>Por defecto, <code>ORDER BY</code> ordena de forma ascendente (<code>ASC</code>). Para orden descendente se usa <code>DESC</code>. Es posible ordenar por cualquier columna, incluyendo aquellas que no aparecen en la lista de selección. El ordenamiento se aplica después de que se han evaluado todas las condiciones del <code>WHERE</code>.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, precio FROM productos ORDER BY precio DESC;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>precio</th></tr></thead>
+            <tbody>
+              <tr><td>Laptop</td><td>15000.00</td></tr>
+              <tr><td>Monitor</td><td>4500.00</td></tr>
+              <tr><td>Webcam</td><td>1200.00</td></tr>
+              <tr><td>Teclado</td><td>800.00</td></tr>
+              <tr><td>Audífonos</td><td>600.00</td></tr>
+              <tr><td>Mouse</td><td>250.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>ORDER BY con múltiples columnas</h2>
+        <p>Se puede ordenar por varias columnas separándolas con comas. La primera columna tiene prioridad; en caso de empate, se usa la segunda, y así sucesivamente. A cada columna se le puede indicar <code>ASC</code> o <code>DESC</code> de forma independiente, lo que permite crear ordenamientos complejos como "ordenar por departamento ascendente y salario descendente".</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, precio, stock FROM productos ORDER BY stock ASC, precio DESC;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>precio</th><th>stock</th></tr></thead>
+            <tbody>
+              <tr><td>Webcam</td><td>1200.00</td><td>8</td></tr>
+              <tr><td>Laptop</td><td>15000.00</td><td>10</td></tr>
+              <tr><td>Monitor</td><td>4500.00</td><td>15</td></tr>
+              <tr><td>Audífonos</td><td>600.00</td><td>25</td></tr>
+              <tr><td>Teclado</td><td>800.00</td><td>30</td></tr>
+              <tr><td>Mouse</td><td>250.00</td><td>50</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>LIMIT para restringir resultados</h2>
+        <p>La cláusula <code>LIMIT</code> especifica el número máximo de filas que devolverá la consulta. Se coloca al final de la sentencia, después de <code>ORDER BY</code> si existe. Es muy útil para obtener los "top N" registros, como los productos más caros o los empleados con mayor antigüedad.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, precio FROM productos ORDER BY precio DESC LIMIT 3;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>precio</th></tr></thead>
+            <tbody>
+              <tr><td>Laptop</td><td>15000.00</td></tr>
+              <tr><td>Monitor</td><td>4500.00</td></tr>
+              <tr><td>Webcam</td><td>1200.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>LIMIT con OFFSET para paginación</h2>
+        <p>La sintaxis <code>LIMIT n OFFSET m</code> permite saltar las primeras <code>m</code> filas y devolver las siguientes <code>n</code>. Esto es la base para implementar paginación en aplicaciones web. Por ejemplo, para mostrar 2 productos por página: página 1 sería <code>LIMIT 2 OFFSET 0</code>, página 2 sería <code>LIMIT 2 OFFSET 2</code>, y así sucesivamente. También existe la sintaxis abreviada <code>LIMIT m, n</code> donde <code>m</code> es el offset y <code>n</code> es el límite.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, precio FROM productos ORDER BY precio ASC LIMIT 2 OFFSET 2;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>precio</th></tr></thead>
+            <tbody>
+              <tr><td>Teclado</td><td>800.00</td></tr>
+              <tr><td>Mouse</td><td>250.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Combinación con WHERE</h2>
+        <p><code>WHERE</code>, <code>ORDER BY</code> y <code>LIMIT</code> se pueden combinar en una misma consulta. El orden de las cláusulas es estricto: primero <code>WHERE</code>, luego <code>ORDER BY</code> y finalmente <code>LIMIT</code>. Esto permite filtrar, ordenar y limitar los resultados en un solo paso.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, precio, stock FROM productos WHERE stock > 10 ORDER BY precio DESC LIMIT 2;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>precio</th><th>stock</th></tr></thead>
+            <tbody>
+              <tr><td>Monitor</td><td>4500.00</td><td>15</td></tr>
+              <tr><td>Teclado</td><td>800.00</td><td>30</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>Para paginación eficiente en tablas grandes, combina <code>LIMIT</code> con <code>OFFSET</code> o usa la sintaxis abreviada <code>LIMIT offset, cantidad</code>. Sin embargo, para conjuntos de datos muy grandes, considera alternativas como <code>WHERE id > último_id</code> que son más eficientes que OFFSET.</p></div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="callout-content"><p>Sin <code>ORDER BY</code>, el orden de los resultados no está garantizado. MySQL puede devolver las filas en cualquier orden, especialmente cuando los datos cambian. Siempre usa <code>ORDER BY</code> si necesitas un orden específico.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="where.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="insert-update-delete.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

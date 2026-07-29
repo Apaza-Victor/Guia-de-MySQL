@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backup y restauración - Guía MySQL</title>
+  <meta name="description" content="Aprende a realizar copias de seguridad y restaurar bases de datos MySQL con mysqldump.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="administracion" data-page="backup-restauracion">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Administración</a></li>
+      <li class="active">Backup y restauración</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Backup y restauración</h1>
+        <p>Realizar copias de seguridad periódicas es una de las tareas más importantes para cualquier administrador de bases de datos. MySQL incluye la herramienta <code>mysqldump</code>, que genera archivos SQL con la estructura y los datos de una o varias bases de datos.</p>
+
+        <h2>Tipos de backup con mysqldump</h2>
+        <p>Existen distintos enfoques para realizar backups según la necesidad: respaldo completo, solo estructura, solo datos o bases específicas. La siguiente tabla compara cada tipo:</p>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Tipo</th><th>Comando</th><th>Uso recomendado</th></tr></thead>
+            <tbody>
+              <tr><td>Base de datos completa</td><td><code>mysqldump -u root -p bd > bd.sql</code></td><td>Respaldo diario de una base</td></tr>
+              <tr><td>Todas las bases</td><td><code>mysqldump -u root -p --all-databases > todo.sql</code></td><td>Respaldo completo del servidor</td></tr>
+              <tr><td>Solo estructura</td><td><code>mysqldump -u root -p --no-data bd > estructura.sql</code></td><td>Versionado de esquemas</td></tr>
+              <tr><td>Solo datos</td><td><code>mysqldump -u root -p --no-create-info bd > datos.sql</code></td><td>Migración de datos entre servidores</td></tr>
+              <tr><td>Varias bases</td><td><code>mysqldump -u root -p --databases bd1 bd2 > varias.sql</code></td><td>Respaldo selectivo de múltiples bases</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Backup con rutinas y disparadores</h2>
+        <p>Por defecto <code>mysqldump</code> incluye los procedimientos almacenados, funciones y eventos, pero es recomendable usar las opciones explícitas para asegurarse de que no se omitan.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><code class="language-bash"># Incluir rutinas y disparadores explícitamente
+mysqldump -u root -p --routines --triggers --events mi_bd > mi_bd_completo.sql
+
+# Comprimir el backup en el momento
+mysqldump -u root -p mi_bd | gzip > mi_bd_$(date +%F).sql.gz</code></pre>
+        </div>
+
+        <h2>Restauración de una base de datos</h2>
+        <p>Para restaurar un backup generado con <code>mysqldump</code> se utiliza el cliente <code>mysql</code> redirigiendo el archivo SQL como entrada. Es importante que la base de datos destino exista antes de restaurar.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><code class="language-bash"># Restaurar una base de datos
+mysql -u root -p mi_bd < mi_bd_completo.sql
+
+# Restaurar un backup comprimido
+gunzip < mi_bd_2025-01-01.sql.gz | mysql -u root -p mi_bd
+
+# Restaurar un backup completo del servidor
+mysql -u root -p < todo.sql</code></pre>
+        </div>
+
+        <h2>Automación con cron</h2>
+        <p>En entornos Linux, las tareas de backup se pueden automatizar mediante <code>cron</code>. El siguiente script programa un backup diario a las 2:00 AM con compresión y rotación de archivos.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><code class="language-bash"># Editar crontab: crontab -e
+# Ejecutar backup cada día a las 2:00 AM
+0 2 * * * /usr/bin/mysqldump -u root -p'password' --all-databases --routines --triggers | gzip > /backups/mysql_$(date +\%Y\%m\%d).sql.gz
+
+# Eliminar backups de más de 30 días
+0 3 * * * find /backups -name "mysql_*.sql.gz" -mtime +30 -delete</code></pre>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Establece una política de backups con frecuencia definida según la criticidad de los datos. Para bases de producción se recomienda un backup completo diario y backups diferenciales cada pocas horas. Verifica periódicamente que los archivos de respaldo se puedan restaurar correctamente.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="usuarios-y-permisos.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="replicacion.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

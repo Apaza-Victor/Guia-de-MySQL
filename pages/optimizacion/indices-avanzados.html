@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Índices avanzados y covering index - Guía MySQL</title>
+  <meta name="description" content="Índices compuestos, covering index y estrategias avanzadas de indexación.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="optimizacion" data-page="indices-avanzados">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Optimización</a></li>
+      <li class="active">Índices avanzados</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Índices avanzados y covering index</h1>
+        <p>Más allá del índice simple de una columna, MySQL ofrece estrategias avanzadas como índices compuestos, covering indexes, índices funcionales e índices parciales. Usados correctamente, pueden eliminar por completo las lecturas a la tabla y reducir el tiempo de las consultas a microsegundos.</p>
+
+        <h2>Índices compuestos (multi-columna)</h2>
+        <p>Un índice compuesto abarca varias columnas. El orden de las columnas es crítico: MySQL puede usar el índice solo si las condiciones empiezan por la primera columna del índice (regla del prefijo más a la izquierda).</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Creación de índice compuesto</div>
+          <pre><code class="language-sql">CREATE INDEX idx_pais_ciudad ON clientes(pais, ciudad, activo);
+
+-- ✅ Usa el índice completamente (todas las columnas)
+SELECT * FROM clientes WHERE pais = 'MX' AND ciudad = 'CDMX' AND activo = 1;
+
+-- ✅ Usa el índice parcialmente (primeras 2 columnas)
+SELECT * FROM clientes WHERE pais = 'MX' AND ciudad = 'CDMX';
+
+-- ✅ Usa el índice parcialmente (solo primera columna)
+SELECT * FROM clientes WHERE pais = 'MX';
+
+-- ❌ No usa el índice (falta la primera columna)
+SELECT * FROM clientes WHERE ciudad = 'CDMX' AND activo = 1;</code></pre>
+        </div>
+
+        <h2>Covering Index (índice de cobertura)</h2>
+        <p>Un covering index contiene <strong>todas</strong> las columnas que necesita la consulta. MySQL puede resolverla enteramente desde el índice sin tocar la tabla (filas de datos). En EXPLAIN se ve como <code>Extra: Using index</code>.</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Creando un covering index</div>
+          <pre><code class="language-sql">-- Consulta que solo pide id, nombre y email
+EXPLAIN SELECT id, nombre, email FROM clientes WHERE pais = 'MX';
+-- Si el índice cubre estas 3 columnas → Extra: Using index
+
+-- Índice compuesto que cubre toda la consulta
+CREATE INDEX idx_covering ON clientes(pais, id, nombre, email);</code></pre>
+        </div>
+        <p>Cuando el índice cubre la consulta, MySQL evita la lectura de páginas de datos (clustered index), lo que reduce drásticamente las operaciones de I/O.</p>
+
+        <h2>Índices con funciones (MySQL 8.0.13+)</h2>
+        <p>MySQL 8.0.13+ permite indexar expresiones y funciones. Esto resuelve el problema de las consultas no sargables sin alterar la aplicación.</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Índice funcional</div>
+          <pre><code class="language-sql">-- Índice funcional sobre expresión LOWER
+CREATE INDEX idx_lower_email ON clientes((LOWER(email)));
+
+-- Ahora esta consulta puede usar el índice
+SELECT * FROM clientes WHERE LOWER(email) = 'usuario@example.com';</code></pre>
+        </div>
+
+        <h2>Índices parciales (column index prefix)</h2>
+        <p>Para columnas <code>VARCHAR</code> largas, puedes indexar solo los primeros N caracteres, ahorrando espacio y mejorando la velocidad de inserción.</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Índice parcial</div>
+          <pre><code class="language-sql">-- Índice solo sobre los primeros 10 caracteres
+CREATE INDEX idx_desc_corta ON productos(descripcion(10));
+
+-- Útil para LIKE con prefijo
+SELECT * FROM productos WHERE descripcion LIKE 'laptop%';</code></pre>
+        </div>
+
+        <h2>Estadísticas de índices</h2>
+        <p>MySQL usa estadísticas para decidir si usar un índice. Con el tiempo, las estadísticas se desactualizan. Puedes actualizarlas con <code>ANALYZE TABLE</code>.</p>
+        <div class="code-block">
+          <div class="code-label">SQL — Mantenimiento de estadísticas</div>
+          <pre><code class="language-sql">-- Ver estadísticas de índices
+SHOW INDEX FROM clientes;
+
+-- Actualizar estadísticas
+ANALYZE TABLE clientes;
+
+-- Ver tamaño y cardinalidad de índices
+SELECT TABLE_NAME, INDEX_NAME, CARDINALITY, SEQ_IN_INDEX
+FROM INFORMATION_SCHEMA.STATISTICS
+WHERE TABLE_SCHEMA = 'midb';</code></pre>
+        </div>
+
+        <h2>Comparativa: tipos de índice</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Tipo de índice</th><th>Cuándo usarlo</th><th>Ventaja principal</th></tr></thead>
+            <tbody>
+              <tr><td>Simple (1 columna)</td><td>Filtros por una sola columna</td><td>Bajo costo de mantenimiento</td></tr>
+              <tr><td>Compuesto</td><td>Consultas con varias columnas en WHERE / ORDER BY</td><td>Varias columnas en un solo índice</td></tr>
+              <tr><td>Covering</td><td>Consultas que solo leen columnas indexadas</td><td>Evita acceso a la tabla (0 I/O)</td></tr>
+              <tr><td>Funcional</td><td>Consultas con funciones sobre la columna</td><td>Hace sargable lo no sargable</td></tr>
+              <tr><td>Parcial (prefix)</td><td>Columnas VARCHAR largas</td><td>Ahorra espacio y acelera inserciones</td></tr>
+              <tr><td>FULLTEXT</td><td>Búsqueda de texto completo</td><td>Búsquedas por palabras y ranking</td></tr>
+              <tr><td>Spatial</td><td>Datos geográficos (POINT, POLYGON)</td><td>Consultas espaciales eficientes</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>En índices compuestos, coloca primero la columna con mayor cardinalidad (más valores distintos). Así MySQL reduce más rápido el conjunto de resultados. Ejemplo: en <code>INDEX(pais, genero, fecha)</code>, <code>pais</code> suele tener más valores distintos que <code>genero</code>.</p></div>
+        </div>
+
+        <div class="callout callout-important">
+          <div class="callout-icon"><i class="bi bi-info-circle"></i></div>
+          <div class="callout-content"><p>Cada índice adicional ralentiza <code>INSERT</code>, <code>UPDATE</code> y <code>DELETE</code> porque hay que mantenerlo sincronizado. No indexes todas las columnas "por si acaso". Usa EXPLAIN para identificar los índices que realmente necesitas y elimina los duplicados o infrautilizados.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="optimizacion-consultas.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="particionamiento.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

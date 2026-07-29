@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Búsqueda de texto completo - Guía MySQL</title>
+  <meta name="description" content="Implementa búsquedas avanzadas con FULLTEXT INDEX y MATCH...AGAINST.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="experto" data-page="full-text-search">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Nivel Experto</a></li>
+      <li class="active">Búsqueda de texto completo</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Búsqueda de texto completo</h1>
+        <p>La búsqueda de texto completo (Full-Text Search) permite localizar documentos que contengan palabras o frases específicas, con soporte para relevancia, exclusiones y comodines. Se basa en el índice FULLTEXT y la función <code>MATCH()...AGAINST()</code>.</p>
+
+        <h2>Qué es FULLTEXT INDEX</h2>
+        <p>Un índice FULLTEXT está diseñado para columnas de tipo <code>CHAR</code>, <code>VARCHAR</code> o <code>TEXT</code>. Construye una lista de palabras (tokens) ignorando las llamadas <em>stopwords</em> y permite buscar por relevancia en lugar de simples coincidencias.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Crear tabla con índice FULLTEXT
+CREATE TABLE articulos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,
+    contenido TEXT NOT NULL,
+    autor VARCHAR(100),
+    publicado DATE,
+    FULLTEXT INDEX ft_articulos (titulo, contenido)
+);
+
+-- También se puede agregar después
+-- CREATE FULLTEXT INDEX ft_articulos ON articulos(titulo, contenido);</code></pre>
+        </div>
+
+        <h2>MATCH...AGAINST en modo natural</h2>
+        <p>El modo natural (predeterminado) devuelve los resultados ordenados por relevancia. Cuantas más veces aparezca el término y cuanto menos frecuente sea en el conjunto de documentos, mayor será la puntuación.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Búsqueda en modo natural
+SELECT id, titulo, MATCH(titulo, contenido) AGAINST('índices rendimiento') AS relevancia
+FROM articulos
+WHERE MATCH(titulo, contenido) AGAINST('índices rendimiento')
+ORDER BY relevancia DESC;
+
+-- La columna relevancia es opcional; se puede usar solo el filtro
+SELECT id, titulo FROM articulos
+WHERE MATCH(titulo, contenido) AGAINST('optimización consultas');</code></pre>
+        </div>
+
+        <h2>Modo booleano</h2>
+        <p>El modo booleano ofrece operadores para afinar la búsqueda: <code>+</code> (obligatorio), <code>-</code> (excluir), <code>*</code> (comodín), <code>""</code> (frase exacta), entre otros.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Debe contener "MySQL" y no puede contener "Oracle"
+SELECT * FROM articulos
+WHERE MATCH(titulo, contenido) AGAINST('+MySQL -Oracle' IN BOOLEAN MODE);
+
+-- Frase exacta "alta disponibilidad"
+SELECT * FROM articulos
+WHERE MATCH(titulo, contenido) AGAINST('"alta disponibilidad"' IN BOOLEAN MODE);
+
+-- Comodín: palabras que empiecen con "optim"
+SELECT * FROM articulos
+WHERE MATCH(titulo, contenido) AGAINST('optim*' IN BOOLEAN MODE);
+
+-- Combinación de operadores
+SELECT * FROM articulos
+WHERE MATCH(titulo, contenido) AGAINST('+rendimiento -lento +"base de datos"' IN BOOLEAN MODE);</code></pre>
+        </div>
+
+        <h2>Query expansion</h2>
+        <p>La búsqueda con <em>query expansion</em> (WITH QUERY EXPANSION) realiza dos pasos: primero busca con el término original y luego agrega palabras relevantes de los documentos encontrados para la segunda ronda. Útil para refinar resultados cuando el término es muy específico.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Query expansion: encuentra documentos relacionados aunque no contengan el término exacto
+SELECT id, titulo FROM articulos
+WHERE MATCH(titulo, contenido) AGAINST('índices' WITH QUERY EXPANSION);</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id</th><th>titulo</th><th>relevancia</th></tr></thead>
+            <tbody>
+              <tr><td>3</td><td>Optimización de consultas con índices</td><td>8.4523</td></tr>
+              <tr><td>1</td><td>Índices en MySQL: guía completa</td><td>6.1247</td></tr>
+              <tr><td>5</td><td>Rendimiento de bases de datos</td><td>2.9801</td></tr>
+              <tr><td>7</td><td>Estrategias de tuning para MySQL</td><td>1.4503</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Límites y configuración</h2>
+        <p>MySQL ignora palabras demasiado cortas o demasiado frecuentes. Los umbrales se controlan con variables del sistema.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Ver longitud mínima de palabra para FULLTEXT (InnoDB: 3, MyISAM: 4)
+SHOW VARIABLES LIKE 'innodb_ft_min_token_size';
+SHOW VARIABLES LIKE 'ft_min_word_len';
+
+-- Lista de stopwords (palabras ignoradas)
+SHOW VARIABLES LIKE 'innodb_ft_server_stopword_table';
+
+-- Para modificar el tamaño mínimo (requiere reinicio)
+-- En my.cnf o my.ini agregar:
+-- [mysqld]
+-- innodb_ft_min_token_size=2
+-- ft_min_word_len=2</code></pre>
+        </div>
+
+        <h2>Ejemplo práctico: buscar artículos por contenido</h2>
+        <p>Supongamos un blog de tecnología con miles de artículos. Con FULLTEXT los lectores encuentran contenido relevante al instante.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Insertar datos de ejemplo
+INSERT INTO articulos (titulo, contenido, autor, publicado) VALUES
+('Introducción a MySQL', 'MySQL es un sistema de gestión de bases de datos relacional...', 'Ana López', '2025-01-15'),
+('Índices avanzados', 'Los índices B-tree y hash mejoran el rendimiento de las consultas...', 'Carlos Paz', '2025-02-20'),
+('Optimización de consultas', 'Usar EXPLAIN para analizar el plan de ejecución...', 'Ana López', '2025-03-10');
+
+-- Buscar artículos sobre índices que no hablen de hash
+SELECT titulo, autor, publicado
+FROM articulos
+WHERE MATCH(titulo, contenido) AGAINST('+índices -hash' IN BOOLEAN MODE);</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>titulo</th><th>autor</th><th>publicado</th></tr></thead>
+            <tbody>
+              <tr><td>Introducción a MySQL</td><td>Ana López</td><td>2025-01-15</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p><code>FULLTEXT</code> es radicalmente distinto a <code>LIKE '%texto%'</code>. LIKE escanea toda la tabla y no entiende de relevancia, sinónimos ni ranking. FULLTEXT usa un índice inverso, ordena por relevancia y es órdenes de magnitud más rápido en conjuntos grandes. Siempre que necesites búsqueda textual, usa FULLTEXT en lugar de LIKE.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="json-en-mysql.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="motores-de-almacenamiento.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SELECT - Consultas básicas - Guía MySQL</title>
+  <meta name="description" content="Aprende a usar SELECT para consultar datos en MySQL, proyectar columnas, usar alias, DISTINCT y expresiones aritméticas.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="consultas-basicas" data-page="select">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Básico</a></li>
+      <li class="active">SELECT</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>SELECT - Consultas básicas</h1>
+        <p>La sentencia <code>SELECT</code> es la instrucción más utilizada en SQL. Permite consultar datos almacenados en una o varias tablas, seleccionando columnas específicas y aplicando filtros, ordenamientos y agrupaciones. Es la puerta de entrada a la manipulación de información en MySQL y dominarla es esencial para cualquier persona que trabaje con bases de datos.</p>
+
+        <h2>Sintaxis básica de SELECT</h2>
+        <p>La forma más simple de <code>SELECT</code> permite recuperar una o más columnas de una tabla. Se especifican los nombres de las columnas separados por comas, seguidos de la cláusula <code>FROM</code> que indica la tabla de origen. Para este módulo usaremos la tabla <code>empleados</code> con la siguiente estructura y datos.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE empleados (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(50),
+  salario DECIMAL(10,2),
+  departamento VARCHAR(30)
+);
+
+INSERT INTO empleados VALUES
+(1, 'Ana López', 45000, 'Ventas'),
+(2, 'Carlos Ruiz', 52000, 'TI'),
+(3, 'María García', 48000, 'Ventas'),
+(4, 'José Pérez', 55000, 'TI'),
+(5, 'Laura Díaz', 41000, 'RH'),
+(6, 'Pedro Sánchez', 39000, 'Ventas');</code></pre>
+        </div>
+
+        <h2>Seleccionar columnas específicas</h2>
+        <p>Para obtener solo los nombres y salarios de todos los empleados, se listan las columnas deseadas después de <code>SELECT</code>. El orden en que se escriben determina el orden en que aparecen en el resultado. Esta proyección de columnas permite mostrar únicamente la información relevante para cada consulta.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, salario FROM empleados;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>salario</th></tr></thead>
+            <tbody>
+              <tr><td>Ana López</td><td>45000.00</td></tr>
+              <tr><td>Carlos Ruiz</td><td>52000.00</td></tr>
+              <tr><td>María García</td><td>48000.00</td></tr>
+              <tr><td>José Pérez</td><td>55000.00</td></tr>
+              <tr><td>Laura Díaz</td><td>41000.00</td></tr>
+              <tr><td>Pedro Sánchez</td><td>39000.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Seleccionar todas las columnas con *</h2>
+        <p>El asterisco <code>*</code> es un comodín que representa todas las columnas de la tabla. Aunque es práctico para explorar datos rápidamente, no se recomienda en producción porque puede devolver columnas innecesarias y afectar el rendimiento. Su uso está orientado principalmente a consultas ad-hoc durante el desarrollo.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT * FROM empleados;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id</th><th>nombre</th><th>salario</th><th>departamento</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Ana López</td><td>45000.00</td><td>Ventas</td></tr>
+              <tr><td>2</td><td>Carlos Ruiz</td><td>52000.00</td><td>TI</td></tr>
+              <tr><td>3</td><td>María García</td><td>48000.00</td><td>Ventas</td></tr>
+              <tr><td>4</td><td>José Pérez</td><td>55000.00</td><td>TI</td></tr>
+              <tr><td>5</td><td>Laura Díaz</td><td>41000.00</td><td>RH</td></tr>
+              <tr><td>6</td><td>Pedro Sánchez</td><td>39000.00</td><td>Ventas</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Alias con AS</h2>
+        <p>La cláusula <code>AS</code> permite asignar un nombre temporal o alias a una columna o tabla. Los alias son útiles para hacer los resultados más legibles, especialmente cuando se usan expresiones o funciones. La palabra clave <code>AS</code> es opcional; se puede omitir y escribir directamente el alias después de la columna.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre AS empleado, salario AS sueldo FROM empleados;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>empleado</th><th>sueldo</th></tr></thead>
+            <tbody>
+              <tr><td>Ana López</td><td>45000.00</td></tr>
+              <tr><td>Carlos Ruiz</td><td>52000.00</td></tr>
+              <tr><td>María García</td><td>48000.00</td></tr>
+              <tr><td>José Pérez</td><td>55000.00</td></tr>
+              <tr><td>Laura Díaz</td><td>41000.00</td></tr>
+              <tr><td>Pedro Sánchez</td><td>39000.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>DISTINCT para valores únicos</h2>
+        <p>La palabra clave <code>DISTINCT</code> elimina filas duplicadas del resultado, mostrando solo valores distintos para la columna o combinación de columnas seleccionada. Es especialmente útil para conocer los valores únicos presentes en una columna, como los departamentos de una empresa.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT DISTINCT departamento FROM empleados;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>departamento</th></tr></thead>
+            <tbody>
+              <tr><td>Ventas</td></tr>
+              <tr><td>TI</td></tr>
+              <tr><td>RH</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>SELECT con expresiones aritméticas</h2>
+        <p>SQL permite realizar operaciones aritméticas directamente dentro de la sentencia <code>SELECT</code> usando los operadores <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code> y <code>%</code>. Estas expresiones se evalúan para cada fila y el resultado puede mostrarse con un alias descriptivo. Esto es útil para cálculos como incrementos salariales, proyecciones o descuentos.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SELECT nombre, salario, salario * 1.10 AS con_aumento FROM empleados;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>nombre</th><th>salario</th><th>con_aumento</th></tr></thead>
+            <tbody>
+              <tr><td>Ana López</td><td>45000.00</td><td>49500.00</td></tr>
+              <tr><td>Carlos Ruiz</td><td>52000.00</td><td>57200.00</td></tr>
+              <tr><td>María García</td><td>48000.00</td><td>52800.00</td></tr>
+              <tr><td>José Pérez</td><td>55000.00</td><td>60500.00</td></tr>
+              <tr><td>Laura Díaz</td><td>41000.00</td><td>45100.00</td></tr>
+              <tr><td>Pedro Sánchez</td><td>39000.00</td><td>42900.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>Usa alias descriptivos con <code>AS</code> cuando trabajes con expresiones o funciones para que las columnas del resultado tengan nombres claros y legibles.</p></div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="callout-content"><p>Evita usar <code>SELECT *</code> en aplicaciones en producción. Siempre especifica las columnas que necesitas para mejorar el rendimiento y la claridad del código.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="#" class="nav-prev disabled"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="where.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bases de datos y tablas - Guía MySQL</title>
+  <meta name="description" content="Aprende a crear, modificar y eliminar bases de datos y tablas en MySQL con CREATE, ALTER, DROP y más.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="fundamentos" data-page="bases-de-datos-y-tablas">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Fundamentos</a></li>
+      <li class="active">Bases de datos y tablas</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Bases de datos y tablas</h1>
+        <p>En MySQL, una base de datos es un contenedor lógico que agrupa tablas, vistas, procedimientos almacenados y otros objetos. Las tablas son la estructura fundamental donde se almacenan los datos organizados en filas y columnas. En esta sección aprenderás a crear, modificar y eliminar tanto bases de datos como tablas utilizando los comandos DDL (Data Definition Language).</p>
+
+        <h2>CREATE DATABASE y USE</h2>
+        <p>Para crear una base de datos se usa el comando CREATE DATABASE, seguido del nombre. Es recomendable especificar el conjunto de caracteres (character set) y la collation para garantizar la correcta manipulación de texto en diferentes idiomas. El comando USE selecciona la base de datos activa para las operaciones siguientes.</p>
+
+        <h3>Crear y seleccionar una base de datos</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE DATABASE tienda
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+
+USE tienda;</code></pre>
+        </div>
+
+        <h2>CREATE TABLE</h2>
+        <p>El comando CREATE TABLE define la estructura de una tabla especificando el nombre, las columnas con sus tipos de datos y las restricciones (constraints) como PRIMARY KEY, FOREIGN KEY, UNIQUE, NOT NULL, DEFAULT y CHECK. Cada tabla debe tener una clave primaria que identifique de forma única cada fila.</p>
+
+        <h3>Crear tabla con constraints</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE estudiantes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    fecha_nacimiento DATE,
+    promedio DECIMAL(3,2) DEFAULT 0.00 CHECK (promedio >= 0 AND promedio <= 20),
+    activo BOOLEAN DEFAULT TRUE
+);</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id</th><th>nombre</th><th>email</th><th>fecha_nacimiento</th><th>promedio</th><th>activo</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Ana Torres</td><td>ana.torres@email.com</td><td>2002-05-12</td><td>17.50</td><td>1</td></tr>
+              <tr><td>2</td><td>Luis Mendoza</td><td>luis.mendoza@email.com</td><td>2001-11-28</td><td>14.30</td><td>1</td></tr>
+              <tr><td>3</td><td>Carmen Rivas</td><td>carmen.rivas@email.com</td><td>2003-03-07</td><td>19.20</td><td>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>ALTER TABLE</h2>
+        <p>ALTER TABLE permite modificar la estructura de una tabla existente sin perder los datos. Se puede agregar (ADD), modificar (MODIFY) o eliminar (DROP COLUMN) columnas, así como agregar o eliminar constraints. Es una operación muy útil durante el desarrollo cuando la estructura inicial necesita ajustes.</p>
+
+        <h3>Añadir y modificar columnas</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Agregar una nueva columna
+ALTER TABLE estudiantes
+ADD COLUMN telefono VARCHAR(15) AFTER email;
+
+-- Modificar el tipo de una columna existente
+ALTER TABLE estudiantes
+MODIFY COLUMN promedio DECIMAL(4,2);
+
+-- Eliminar una columna
+ALTER TABLE estudiantes
+DROP COLUMN telefono;</code></pre>
+        </div>
+
+        <h2>DROP TABLE vs TRUNCATE</h2>
+        <p>DROP TABLE elimina completamente la tabla y su estructura, liberando todo el espacio. TRUNCATE elimina todas las filas pero conserva la estructura, siendo más rápido que DELETE sin WHERE. Ambos comandos son operaciones DDL y no pueden revertirse con ROLLBACK (en la mayoría de motores).</p>
+
+        <h3>Diferencias entre DROP y TRUNCATE</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Elimina todas las filas pero conserva la estructura
+TRUNCATE TABLE estudiantes;
+
+-- Elimina toda la tabla incluyendo estructura
+DROP TABLE estudiantes;
+
+-- Elimina la base de datos completa
+DROP DATABASE tienda;</code></pre>
+        </div>
+
+        <h2>SHOW TABLES y DESC</h2>
+        <p>Los comandos SHOW TABLES y DESC (abreviatura de DESCRIBE) son esenciales para inspeccionar la estructura de una base de datos. SHOW TABLES lista todas las tablas en la base de datos activa, mientras que DESC muestra la estructura detallada de una tabla incluyendo tipo de datos, nulabilidad, valores por defecto y claves.</p>
+
+        <h3>Inspeccionar la base de datos</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SHOW TABLES;
+
+DESC estudiantes;</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>Siempre usa utf8mb4 como character set y utf8mb4_unicode_ci como collation para tus bases de datos. Esto garantiza compatibilidad con emojis, caracteres acentuados y prácticamente cualquier idioma del mundo.</p></div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="callout-content"><p>Ten mucho cuidado con DROP TABLE y DROP DATABASE en producción. Estos comandos eliminan los datos de forma permanente. Siempre haz un backup antes de ejecutarlos y verifica dos veces el nombre de la tabla o base de datos.</p></div>
+        </div>
+
+        <div class="callout callout-important">
+          <div class="callout-icon"><i class="bi bi-info-circle"></i></div>
+          <div class="callout-content"><p>Una buena práctica de diseño es incluir siempre una columna id con AUTO_INCREMENT como clave primaria y usar NOT NULL en columnas que son obligatorias para la lógica del negocio. También es recomendable definir valores DEFAULT adecuados en lugar de permitir NULL.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="tipos-de-datos.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="../../index.html" class="nav-next">Volver al inicio <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Replicación en MySQL - Guía MySQL</title>
+  <meta name="description" content="Conceptos básicos de replicación maestro-esclavo para alta disponibilidad.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="administracion" data-page="replicacion">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Administración</a></li>
+      <li class="active">Replicación en MySQL</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Replicación en MySQL</h1>
+        <p>La replicación permite copiar datos de un servidor MySQL maestro a uno o más servidores esclavos. Es la base para lograr alta disponibilidad, balanceo de lecturas y tolerancia a fallos en entornos de producción.</p>
+
+        <h2>¿Qué es la replicación maestro-esclavo?</h2>
+        <p>En el modelo maestro-esclavo, el servidor maestro registra todos los cambios en su <strong>binary log (binlog)</strong>. Los esclavos se conectan al maestro, leen el binlog y aplican los mismos cambios en sus propias bases de datos, manteniéndose así sincronizados con el maestro.</p>
+
+        <h2>Componentes de la replicación</h2>
+        <p>Cada replicación involucra varios elementos que trabajan en conjunto para garantizar la sincronización de datos:</p>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Componente</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr><td>Maestro</td><td>Servidor principal que acepta escrituras y registra cambios en el binlog</td></tr>
+              <tr><td>Esclavo</td><td>Servidor réplica que recibe y aplica los cambios del maestro</td></tr>
+              <tr><td>Binlog</td><td>Archivo binario donde se almacenan todas las modificaciones de datos</td></tr>
+              <tr><td>Relay log</td><td>Archivo en el esclavo que almacena los eventos recibidos del maestro antes de aplicarlos</td></tr>
+              <tr><td>IO thread</td><td>Hilo del esclavo que se conecta al maestro y descarga el binlog al relay log</td></tr>
+              <tr><td>SQL thread</td><td>Hilo del esclavo que lee el relay log y ejecuta las sentencias en la base local</td></tr>
+              <tr><td>CHANGE MASTER TO</td><td>Sentencia que configura la conexión del esclavo hacia el maestro</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Ventajas de la replicación</h2>
+        <p>Implementar replicación en un entorno MySQL ofrece múltiples beneficios que mejoran tanto el rendimiento como la disponibilidad del sistema:</p>
+        <ul>
+          <li><strong>Balanceo de lecturas:</strong> las consultas SELECT pueden dirigirse a los esclavos, reduciendo la carga del maestro.</li>
+          <li><strong>Alta disponibilidad:</strong> si el maestro falla, se puede promover un esclavo a maestro para minimizar el tiempo de inactividad.</li>
+          <li><strong>Backups sin interrupción:</strong> se pueden realizar copias de seguridad en un esclavo sin afectar al servidor principal.</li>
+          <li><strong>Distribución geográfica:</strong> los esclavos pueden ubicarse en distintas regiones para acercar los datos a los usuarios.</li>
+        </ul>
+
+        <h2>Configuración básica</h2>
+        <p>Para configurar la replicación es necesario modificar los archivos de configuración del maestro y del esclavo, y luego establecer la conexión con <code>CHANGE MASTER TO</code>.</p>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><code class="language-bash"># En el maestro: /etc/mysql/my.cnf
+[mysqld]
+server-id = 1
+log_bin = /var/log/mysql/mysql-bin.log
+binlog_do_db = mi_bd</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label">bash</div>
+          <pre><code class="language-bash"># En el esclavo: /etc/mysql/my.cnf
+[mysqld]
+server-id = 2
+relay-log = /var/log/mysql/mysql-relay-bin.log
+log_bin = /var/log/mysql/mysql-bin.log
+read_only = 1</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- En el maestro: crear usuario para replicación
+CREATE USER 'replicador'@'%' IDENTIFIED BY 'replica_pass';
+GRANT REPLICATION SLAVE ON *.* TO 'replicador'@'%';
+FLUSH PRIVILEGES;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- En el esclavo: configurar la conexión al maestro
+CHANGE MASTER TO
+  MASTER_HOST = '192.168.1.10',
+  MASTER_USER = 'replicador',
+  MASTER_PASSWORD = 'replica_pass',
+  MASTER_LOG_FILE = 'mysql-bin.000001',
+  MASTER_LOG_POS = 107;
+
+-- Iniciar la replicación
+START SLAVE;
+
+-- Verificar el estado
+SHOW SLAVE STATUS\G;</code></pre>
+        </div>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>La replicación en MySQL es asíncrona por defecto, lo que significa que el esclavo puede tener un ligero retraso respecto al maestro. Esto se conoce como consistencia eventual. Evalúa si tu aplicación puede tolerar lecturas ligeramente desactualizadas antes de implementar réplicas de solo lectura.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="backup-restauracion.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="seguridad.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

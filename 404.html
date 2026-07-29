@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página no encontrada - Guía MySQL</title>
+  <meta name="description" content="La página que buscas no existe.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="assets/css/variables.css" rel="stylesheet">
+  <link href="assets/css/base.css" rel="stylesheet">
+  <link href="assets/css/layout.css" rel="stylesheet">
+  <link href="assets/css/components.css" rel="stylesheet">
+  <link href="assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base=".">
+  <div id="header-placeholder"></div>
+  <main class="container" style="min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:3rem 1rem;">
+    <div>
+      <h1 style="font-size:clamp(4rem,10vw,6rem);color:var(--accent);margin-bottom:0;">404</h1>
+      <h2 style="margin-bottom:1rem;">Página no encontrada</h2>
+      <p style="max-width:450px;margin:0 auto 1.5rem;">La página que estás buscando no existe o ha sido movida. Revisa la navegación o vuelve al inicio.</p>
+      <a href="index.html" class="btn btn-primary"><i class="bi bi-house"></i> Volver al inicio</a>
+    </div>
+  </main>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="assets/js/theme-switcher.js"></script>
+  <script src="assets/js/include-partials.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

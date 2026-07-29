@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tipos de datos en MySQL - Guía MySQL</title>
+  <meta name="description" content="Guía completa de todos los tipos de datos en MySQL: numéricos, cadenas, fecha/hora, ENUM, JSON y espaciales con ejemplos.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="fundamentos" data-page="tipos-de-datos">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Fundamentos</a></li>
+      <li class="active">Tipos de datos en MySQL</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Tipos de datos en MySQL</h1>
+        <p>MySQL ofrece una amplia variedad de tipos de datos que permiten almacener información de forma eficiente y precisa. Elegir el tipo de dato correcto es fundamental para garantizar la integridad de los datos, optimizar el rendimiento de las consultas y minimizar el espacio de almacenamiento. Cada tipo tiene un rango específico de valores y un tamaño en bytes que debe considerarse al diseñar tablas.</p>
+
+        <h2>Tipos numéricos</h2>
+        <p>Los tipos numéricos se dividen en enteros (INT, TINYINT, SMALLINT, MEDIUMINT, BIGINT) y decimales (DECIMAL, FLOAT, DOUBLE). Los enteros almacenan números sin parte fraccionaria, mientras que DECIMAL es ideal para valores exactos como precios y cantidades monetarias. FLOAT y DOUBLE almacenan números de punto flotante con precisión aproximada.</p>
+
+        <h3>Ejemplo con tipos numéricos</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE productos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    precio DECIMAL(10,2),
+    stock SMALLINT DEFAULT 0,
+    peso_kg FLOAT
+);
+
+INSERT INTO productos (nombre, precio, stock, peso_kg)
+VALUES ('Laptop Gamer', 1299.99, 25, 2.5);</code></pre>
+        </div>
+
+        <h2>Tipos de cadena</h2>
+        <p>Para almacenar texto, MySQL ofrece CHAR (longitud fija), VARCHAR (longitud variable hasta 65535 caracteres), TEXT (hasta 65535 caracteres), MEDIUMTEXT y LONGTEXT. CHAR es más rápido para longitudes fijas como códigos, mientras que VARCHAR ahorra espacio en cadenas de longitud variable. BLOB se usa para datos binarios como imágenes o archivos.</p>
+
+        <h3>Ejemplo con tipos de cadena</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE empleados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    codigo CHAR(8) UNIQUE,
+    nombre_completo VARCHAR(150),
+    biografia TEXT,
+    foto_perfil BLOB
+);
+
+INSERT INTO empleados (codigo, nombre_completo, biografia)
+VALUES ('EMP-0001', 'María García López', 'Ingeniera de sistemas con 10 años de experiencia en bases de datos.');</code></pre>
+        </div>
+
+        <h2>Tipos de fecha y hora</h2>
+        <p>MySQL dispone de cinco tipos para fechas y horas: DATE (solo fecha, formato YYYY-MM-DD), TIME (solo hora), DATETIME (fecha y hora combinadas), TIMESTAMP (similar a DATETIME pero con zona horaria) y YEAR (solo el año). TIMESTAMP tiene un rango menor (1970-2038) pero ocupa menos espacio.</p>
+
+        <h3>Ejemplo con tipos de fecha</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE pedidos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_entrega DATE,
+    hora_estimada TIME,
+    anio_pedido YEAR
+);
+
+INSERT INTO pedidos (fecha_entrega, hora_estimada, anio_pedido)
+VALUES ('2026-08-15', '14:30:00', 2026);</code></pre>
+        </div>
+
+        <h2>Tipos especiales: ENUM, SET, JSON, GEOMETRY</h2>
+        <p>ENUM permite definir una columna con un conjunto fijo de valores posibles (como 'Activo', 'Inactivo'). SET es similar pero permite múltiples valores simultáneamente. JSON almacena documentos JSON de forma nativa con validación automática. GEOMETRY y sus subtipos (POINT, LINESTRING, POLYGON) almacenan datos espaciales para sistemas de información geográfica.</p>
+
+        <h3>Ejemplo con tipos especiales</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE clientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100),
+    estado ENUM('Activo', 'Inactivo', 'Suspendido') DEFAULT 'Activo',
+    intereses SET('Deportes', 'Tecnología', 'Moda', 'Viajes'),
+    metadata JSON,
+    ubicacion POINT
+);
+
+INSERT INTO clientes (nombre, estado, intereses, metadata)
+VALUES ('Carlos Ruiz', 'Activo', 'Tecnología,Viajes', '{"fidelidad": "oro", "visitas": 45}');</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Tipo</th><th>Categoría</th><th>Rango / Descripción</th><th>Almacenamiento</th></tr></thead>
+            <tbody>
+              <tr><td>TINYINT</td><td>Numérico entero</td><td>-128 a 127 (0 a 255 UNSIGNED)</td><td>1 byte</td></tr>
+              <tr><td>INT</td><td>Numérico entero</td><td>-2^31 a 2^31-1 (0 a 2^32-1 UNSIGNED)</td><td>4 bytes</td></tr>
+              <tr><td>BIGINT</td><td>Numérico entero</td><td>-2^63 a 2^63-1</td><td>8 bytes</td></tr>
+              <tr><td>DECIMAL(10,2)</td><td>Numérico exacto</td><td>Hasta 65 dígitos</td><td>Variable</td></tr>
+              <tr><td>FLOAT</td><td>Numérico aproximado</td><td>±1.17E-38 a ±3.40E+38</td><td>4 bytes</td></tr>
+              <tr><td>CHAR(n)</td><td>Cadena fija</td><td>0 a 255 caracteres</td><td>n bytes</td></tr>
+              <tr><td>VARCHAR(n)</td><td>Cadena variable</td><td>0 a 65535 caracteres</td><td>Longitud + 1-2 bytes</td></tr>
+              <tr><td>TEXT</td><td>Cadena larga</td><td>Hasta 65535 caracteres</td><td>Longitud + 2 bytes</td></tr>
+              <tr><td>DATE</td><td>Fecha</td><td>1000-01-01 a 9999-12-31</td><td>3 bytes</td></tr>
+              <tr><td>DATETIME</td><td>Fecha y hora</td><td>1000-01-01 00:00:00 a 9999-12-31 23:59:59</td><td>8 bytes</td></tr>
+              <tr><td>TIMESTAMP</td><td>Fecha y hora</td><td>1970-01-01 00:00:01 UTC a 2038-01-19 03:14:07 UTC</td><td>4 bytes</td></tr>
+              <tr><td>JSON</td><td>Documento</td><td>Documentos JSON válidos</td><td>Variable</td></tr>
+              <tr><td>ENUM</td><td>Especial</td><td>Hasta 65535 valores distintos</td><td>1-2 bytes</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>Usa DECIMAL para valores monetarios en lugar de FLOAT o DOUBLE, ya que estos últimos tienen errores de redondeo que pueden causar discrepancias en cálculos financieros.</p></div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div>
+          <div class="callout-content"><p>El tipo TIMESTAMP tiene un rango limitado hasta 2038. Para aplicaciones que necesiten fechas más allá de ese año, usa DATETIME que soporta hasta el año 9999.</p></div>
+        </div>
+
+        <div class="callout callout-important">
+          <div class="callout-icon"><i class="bi bi-info-circle"></i></div>
+          <div class="callout-content"><p>Siempre elige el tipo de dato más pequeño que pueda almacenar tus datos. Por ejemplo, usa TINYINT en lugar de INT si sabes que los valores no superarán 127. Esto reduce el espacio en disco y mejora el rendimiento de las consultas.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="clientes-mysql.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="bases-de-datos-y-tablas.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

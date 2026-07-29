@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyectos prácticos guiados - Guía MySQL</title>
+  <meta name="description" content="Proyectos completos para poner en práctica todo lo aprendido: tienda online, blog y gestión escolar.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="practica" data-page="proyectos-practicos">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Práctica</a></li>
+      <li class="active">Proyectos prácticos</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Proyectos prácticos guiados</h1>
+        <p>Estos proyectos integradores te permitirán aplicar todo lo aprendido en situaciones reales. Cada proyecto incluye el esquema completo de la base de datos, los scripts de creación, datos de ejemplo y un conjunto de consultas para resolver. Se recomienda empezar por el Proyecto 1 e ir avanzando progresivamente.</p>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Crea una base de datos independiente para cada proyecto. Así podrás experimentar sin afectar otros ejercicios y practicar también la administración de bases de datos.</p></div></div>
+
+        <h2>Proyecto 1: Sistema de Tienda Online</h2>
+        <p>Un sistema básico de tienda con productos categorizados, clientes que realizan pedidos con múltiples líneas de detalle. Este proyecto cubre relaciones de uno a muchos y muchos a muchos.</p>
+
+        <h3>Diagrama textual</h3>
+        <pre><code>categorías (1) ──── (N) productos (N) ──── (N) detalle_pedidos (N) ──── (1) pedidos (N) ──── (1) clientes</code></pre>
+
+        <div class="code-block">
+          <div class="code-label">SQL - Creación del esquema</div>
+          <pre><code class="language-sql">CREATE TABLE categorias (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(50) NOT NULL,
+  descripcion TEXT
+);
+
+CREATE TABLE productos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(100) NOT NULL,
+  precio DECIMAL(10,2) NOT NULL,
+  stock INT DEFAULT 0,
+  categoria_id INT,
+  FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+);
+
+CREATE TABLE clientes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(80) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  telefono VARCHAR(20),
+  ciudad VARCHAR(50)
+);
+
+CREATE TABLE pedidos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  cliente_id INT NOT NULL,
+  fecha DATE NOT NULL,
+  total DECIMAL(10,2) DEFAULT 0,
+  FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+);
+
+CREATE TABLE detalle_pedidos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  pedido_id INT NOT NULL,
+  producto_id INT NOT NULL,
+  cantidad INT NOT NULL,
+  precio_unitario DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (pedido_id) REFERENCES pedidos(id),
+  FOREIGN KEY (producto_id) REFERENCES productos(id)
+);</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-label">SQL - Datos de ejemplo</div>
+          <pre><code class="language-sql">INSERT INTO categorias (nombre, descripcion) VALUES
+('Electrónica', 'Dispositivos electrónicos y gadgets'),
+('Ropa', 'Prendas de vestir para toda la familia'),
+('Hogar', 'Artículos para el hogar y decoración');
+
+INSERT INTO productos (nombre, precio, stock, categoria_id) VALUES
+('Smartphone X', 8500.00, 25, 1),
+('Auriculares Bluetooth', 1200.00, 50, 1),
+('Camiseta Algodón', 350.00, 100, 2),
+('Chaqueta Impermeable', 1800.00, 30, 2),
+('Lámpara LED', 650.00, 40, 3),
+('Set de Sartenes', 2200.00, 15, 3);
+
+INSERT INTO clientes (nombre, email, telefono, ciudad) VALUES
+('Gabriela Méndez', 'gaby.m@email.com', '555-0101', 'Puebla'),
+('Fernando Ríos', 'fer.rios@email.com', '555-0102', 'Querétaro'),
+('Diana Soto', 'diana.soto@email.com', '555-0103', 'Ciudad de México');
+
+INSERT INTO pedidos (cliente_id, fecha, total) VALUES
+(1, '2024-05-10', 9700.00),
+(2, '2024-05-12', 4050.00),
+(1, '2024-05-20', 350.00);
+
+INSERT INTO detalle_pedidos (pedido_id, producto_id, cantidad, precio_unitario) VALUES
+(1, 1, 1, 8500.00),
+(1, 2, 1, 1200.00),
+(2, 4, 1, 1800.00),
+(2, 5, 1, 650.00),
+(2, 6, 1, 2200.00),
+(3, 3, 1, 350.00);</code></pre>
+        </div>
+
+        <h3>Consultas para resolver</h3>
+        <p><strong>1.</strong> Obtén el nombre del cliente, la fecha del pedido y el total de cada pedido, ordenado por fecha descendente.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT c.nombre, p.fecha, p.total
+FROM clientes c
+INNER JOIN pedidos p ON c.id = p.cliente_id
+ORDER BY p.fecha DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>fecha</th><th>total</th></tr></thead>
+              <tbody>
+                <tr><td>Gabriela Méndez</td><td>2024-05-20</td><td>350.00</td></tr>
+                <tr><td>Fernando Ríos</td><td>2024-05-12</td><td>4050.00</td></tr>
+                <tr><td>Gabriela Méndez</td><td>2024-05-10</td><td>9700.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <p><strong>2.</strong> Muestra el producto más vendido (nombre y cantidad total vendida) usando <code>SUM</code> y <code>GROUP BY</code>.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT pr.nombre, SUM(dp.cantidad) AS total_vendido
+FROM detalle_pedidos dp
+INNER JOIN productos pr ON dp.producto_id = pr.id
+GROUP BY pr.id, pr.nombre
+ORDER BY total_vendido DESC
+LIMIT 1;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>total_vendido</th></tr></thead>
+              <tbody>
+                <tr><td>Auriculares Bluetooth</td><td>1</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <p><strong>3.</strong> Lista los clientes que han gastado más de 1000 en total, mostrando su nombre y gasto total.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT c.nombre, SUM(p.total) AS gasto_total
+FROM clientes c
+INNER JOIN pedidos p ON c.id = p.cliente_id
+GROUP BY c.id, c.nombre
+HAVING gasto_total > 1000
+ORDER BY gasto_total DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>gasto_total</th></tr></thead>
+              <tbody>
+                <tr><td>Gabriela Méndez</td><td>10050.00</td></tr>
+                <tr><td>Fernando Ríos</td><td>4050.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <hr>
+
+        <h2>Proyecto 2: Blog</h2>
+        <p>Un sistema de blog donde los usuarios pueden escribir posts, categorizarlos y recibir comentarios. Este proyecto cubre relaciones de uno a muchos y consultas con múltiples JOINs.</p>
+
+        <h3>Diagrama textual</h3>
+        <pre><code>usuarios (1) ──── (N) posts (N) ──── (N) categorias
+  └── (1) ──── (N) comentarios ──── (1) posts</code></pre>
+
+        <div class="code-block">
+          <div class="code-label">SQL - Creación del esquema</div>
+          <pre><code class="language-sql">CREATE TABLE usuarios (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(60) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  fecha_registro DATE DEFAULT (CURDATE())
+);
+
+CREATE TABLE categorias (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE posts (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  titulo VARCHAR(150) NOT NULL,
+  contenido TEXT NOT NULL,
+  usuario_id INT NOT NULL,
+  categoria_id INT,
+  fecha_publicacion DATETIME DEFAULT NOW(),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+  FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+);
+
+CREATE TABLE comentarios (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  contenido TEXT NOT NULL,
+  usuario_id INT NOT NULL,
+  post_id INT NOT NULL,
+  fecha DATETIME DEFAULT NOW(),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
+  FOREIGN KEY (post_id) REFERENCES posts(id)
+);</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-label">SQL - Datos de ejemplo</div>
+          <pre><code class="language-sql">INSERT INTO usuarios (nombre, email) VALUES
+('Andrés Nava', 'andres.nava@email.com'),
+('Karla Jiménez', 'karla.j@email.com'),
+('Mario Delgado', 'mario.d@email.com');
+
+INSERT INTO categorias (nombre) VALUES
+('Tecnología'),
+('Ciencia'),
+('Tutoriales');
+
+INSERT INTO posts (titulo, contenido, usuario_id, categoria_id) VALUES
+('Introducción a Python', 'Python es un lenguaje versátil...', 1, 3),
+('Cómo funciona la IA', 'La inteligencia artificial...', 2, 1),
+('Tips para MySQL', 'Mejora tu rendimiento con estos tips...', 1, 1),
+('El método científico', 'Pasos del método científico...', 3, 2);
+
+INSERT INTO comentarios (contenido, usuario_id, post_id) VALUES
+('Muy buen artículo, gracias!', 2, 1),
+('Podrías profundizar en el tema?', 3, 1),
+('Excelente explicación!', 1, 2),
+('Justo lo que necesitaba.', 3, 3);</code></pre>
+        </div>
+
+        <h3>Consultas para resolver</h3>
+        <p><strong>1.</strong> Lista todos los posts con el nombre del autor y la categoría usando INNER JOIN.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT p.titulo, u.nombre AS autor, c.nombre AS categoria, p.fecha_publicacion
+FROM posts p
+INNER JOIN usuarios u ON p.usuario_id = u.id
+INNER JOIN categorias c ON p.categoria_id = c.id
+ORDER BY p.fecha_publicacion DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>titulo</th><th>autor</th><th>categoria</th><th>fecha_publicacion</th></tr></thead>
+              <tbody>
+                <tr><td>El método científico</td><td>Mario Delgado</td><td>Ciencia</td><td>2024-07-29 12:00:00</td></tr>
+                <tr><td>Tips para MySQL</td><td>Andrés Nava</td><td>Tecnología</td><td>2024-07-29 12:00:00</td></tr>
+                <tr><td>Cómo funciona la IA</td><td>Karla Jiménez</td><td>Tecnología</td><td>2024-07-29 12:00:00</td></tr>
+                <tr><td>Introducción a Python</td><td>Andrés Nava</td><td>Tutoriales</td><td>2024-07-29 12:00:00</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <p><strong>2.</strong> Muestra cada post con la cantidad de comentarios que tiene. Incluye posts sin comentarios usando LEFT JOIN.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT p.titulo, COUNT(c.id) AS num_comentarios
+FROM posts p
+LEFT JOIN comentarios c ON p.id = c.post_id
+GROUP BY p.id, p.titulo
+ORDER BY num_comentarios DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>titulo</th><th>num_comentarios</th></tr></thead>
+              <tbody>
+                <tr><td>Introducción a Python</td><td>2</td></tr>
+                <tr><td>Cómo funciona la IA</td><td>1</td></tr>
+                <tr><td>Tips para MySQL</td><td>1</td></tr>
+                <tr><td>El método científico</td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <p><strong>3.</strong> Encuentra el usuario que ha escrito más posts (nombre y cantidad).</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT u.nombre, COUNT(p.id) AS total_posts
+FROM usuarios u
+INNER JOIN posts p ON u.id = p.usuario_id
+GROUP BY u.id, u.nombre
+ORDER BY total_posts DESC
+LIMIT 1;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>total_posts</th></tr></thead>
+              <tbody>
+                <tr><td>Andrés Nava</td><td>2</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <hr>
+
+        <h2>Proyecto 3: Gestión Escolar</h2>
+        <p>Un sistema para gestionar estudiantes, cursos, profesores y matrículas. Este proyecto cubre relaciones muchos a muchos y consultas complejas con múltiples tablas.</p>
+
+        <h3>Diagrama textual</h3>
+        <pre><code>estudiantes (N) ──── (N) cursos (N) ──── (1) profesores
+       └── a través de matriculas ──┘</code></pre>
+
+        <div class="code-block">
+          <div class="code-label">SQL - Creación del esquema</div>
+          <pre><code class="language-sql">CREATE TABLE estudiantes (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(60) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  fecha_nacimiento DATE,
+  grado VARCHAR(20)
+);
+
+CREATE TABLE profesores (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(60) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  especialidad VARCHAR(50)
+);
+
+CREATE TABLE cursos (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  nombre VARCHAR(80) NOT NULL,
+  descripcion TEXT,
+  profesor_id INT,
+  FOREIGN KEY (profesor_id) REFERENCES profesores(id)
+);
+
+CREATE TABLE matriculas (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  estudiante_id INT NOT NULL,
+  curso_id INT NOT NULL,
+  fecha_matricula DATE DEFAULT (CURDATE()),
+  calificacion DECIMAL(4,2),
+  FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id),
+  FOREIGN KEY (curso_id) REFERENCES cursos(id)
+);</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-label">SQL - Datos de ejemplo</div>
+          <pre><code class="language-sql">INSERT INTO estudiantes (nombre, email, fecha_nacimiento, grado) VALUES
+('Luis Ávila', 'luis.avila@email.com', '2005-03-12', '10°'),
+('Mónica Reyes', 'monica.reyes@email.com', '2006-07-25', '9°'),
+('Iván Solís', 'ivan.solis@email.com', '2005-11-02', '10°'),
+('Nora Castillo', 'nora.castillo@email.com', '2007-01-18', '8°');
+
+INSERT INTO profesores (nombre, email, especialidad) VALUES
+('Prof. Laura Medina', 'laura.medina@email.com', 'Matemáticas'),
+('Prof. Ricardo Soto', 'ricardo.soto@email.com', 'Física'),
+('Prof. Elena Vargas', 'elena.vargas@email.com', 'Literatura');
+
+INSERT INTO cursos (nombre, descripcion, profesor_id) VALUES
+('Álgebra Básica', 'Fundamentos de álgebra', 1),
+('Física I', 'Introducción a la física clásica', 2),
+('Literatura Universal', 'Grandes obras literarias', 3),
+('Cálculo Diferencial', 'Cálculo diferencial e integral', 1);
+
+INSERT INTO matriculas (estudiante_id, curso_id, fecha_matricula, calificacion) VALUES
+(1, 1, '2024-01-15', 8.50),
+(1, 2, '2024-01-15', 9.00),
+(1, 4, '2024-01-15', 7.50),
+(2, 1, '2024-01-16', 9.50),
+(2, 3, '2024-01-16', 8.00),
+(3, 1, '2024-01-17', 6.50),
+(3, 2, '2024-01-17', 7.00),
+(3, 4, '2024-01-17', 8.00),
+(4, 2, '2024-01-18', 9.00),
+(4, 3, '2024-01-18', 9.50);</code></pre>
+        </div>
+
+        <h3>Consultas para resolver</h3>
+        <p><strong>1.</strong> Lista los estudiantes con los cursos en los que están matriculados, incluyendo el nombre del profesor que imparte cada curso.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT e.nombre AS estudiante, c.nombre AS curso, p.nombre AS profesor, m.calificacion
+FROM estudiantes e
+INNER JOIN matriculas m ON e.id = m.estudiante_id
+INNER JOIN cursos c ON m.curso_id = c.id
+INNER JOIN profesores p ON c.profesor_id = p.id
+ORDER BY e.nombre, c.nombre;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>estudiante</th><th>curso</th><th>profesor</th><th>calificacion</th></tr></thead>
+              <tbody>
+                <tr><td>Iván Solís</td><td>Álgebra Básica</td><td>Prof. Laura Medina</td><td>6.50</td></tr>
+                <tr><td>Iván Solís</td><td>Cálculo Diferencial</td><td>Prof. Laura Medina</td><td>8.00</td></tr>
+                <tr><td>Iván Solís</td><td>Física I</td><td>Prof. Ricardo Soto</td><td>7.00</td></tr>
+                <tr><td>Luis Ávila</td><td>Álgebra Básica</td><td>Prof. Laura Medina</td><td>8.50</td></tr>
+                <tr><td>Luis Ávila</td><td>Cálculo Diferencial</td><td>Prof. Laura Medina</td><td>7.50</td></tr>
+                <tr><td>Luis Ávila</td><td>Física I</td><td>Prof. Ricardo Soto</td><td>9.00</td></tr>
+                <tr><td>Mónica Reyes</td><td>Álgebra Básica</td><td>Prof. Laura Medina</td><td>9.50</td></tr>
+                <tr><td>Mónica Reyes</td><td>Literatura Universal</td><td>Prof. Elena Vargas</td><td>8.00</td></tr>
+                <tr><td>Nora Castillo</td><td>Física I</td><td>Prof. Ricardo Soto</td><td>9.00</td></tr>
+                <tr><td>Nora Castillo</td><td>Literatura Universal</td><td>Prof. Elena Vargas</td><td>9.50</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <p><strong>2.</strong> Calcula el promedio de calificaciones por cada curso, ordenado de mayor a menor promedio.</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT c.nombre AS curso, ROUND(AVG(m.calificacion), 2) AS promedio, COUNT(m.id) AS estudiantes
+FROM cursos c
+INNER JOIN matriculas m ON c.id = m.curso_id
+GROUP BY c.id, c.nombre
+ORDER BY promedio DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>curso</th><th>promedio</th><th>estudiantes</th></tr></thead>
+              <tbody>
+                <tr><td>Literatura Universal</td><td>8.75</td><td>2</td></tr>
+                <tr><td>Física I</td><td>8.33</td><td>3</td></tr>
+                <tr><td>Álgebra Básica</td><td>8.17</td><td>3</td></tr>
+                <tr><td>Cálculo Diferencial</td><td>7.75</td><td>2</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <p><strong>3.</strong> Encuentra los estudiantes que están cursando más de 2 cursos (nombre y cantidad de cursos).</p>
+        <details>
+          <summary>Ver solución</summary>
+          <div class="code-block">
+            <div class="code-label">SQL</div>
+            <pre><code class="language-sql">SELECT e.nombre, COUNT(m.curso_id) AS cantidad_cursos
+FROM estudiantes e
+INNER JOIN matriculas m ON e.id = m.estudiante_id
+GROUP BY e.id, e.nombre
+HAVING cantidad_cursos > 2
+ORDER BY cantidad_cursos DESC;</code></pre>
+          </div>
+          <div class="table-wrapper">
+            <table class="result-table">
+              <thead><tr><th>nombre</th><th>cantidad_cursos</th></tr></thead>
+              <tbody>
+                <tr><td>Luis Ávila</td><td>3</td></tr>
+                <tr><td>Iván Solís</td><td>3</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>Empieza con el Proyecto 1 (Tienda Online) ya que cubre los conceptos fundamentales. Una vez que lo domines, avanza al Blog y finalmente al de Gestión Escolar. Intenta resolver las consultas sin mirar la solución primero. Si te atas, repasa los módulos correspondientes de JOINs, GROUP BY y subconsultas.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="ejercicios-avanzados.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="../../index.html" class="nav-next">Inicio <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

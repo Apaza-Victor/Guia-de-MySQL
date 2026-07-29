@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Normalización de bases de datos - Guía MySQL</title>
+  <meta name="description" content="Guía completa de normalización: 1FN, 2FN, 3FN y BCNF con ejemplos prácticos.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="diseno-bd" data-page="normalizacion">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Diseño de BD</a></li>
+      <li class="active">Normalización</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Normalización de bases de datos</h1>
+        <p>La normalización es un proceso que elimina redundancias y anomalías en los datos mediante la aplicación de reglas llamadas <strong>formas normales (FN)</strong>. Cada forma normal tiene requisitos más estrictos que la anterior. Trabajaremos con un ejemplo de una tabla <code>pedidos</code> desnormalizada y la iremos transformando paso a paso.</p>
+
+        <h2>Tabla desnormalizada (0FN)</h2>
+        <p>Partimos de una tabla única que almacena pedidos, clientes y productos todo junto:</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_pedido</th><th>cliente</th><th>email</th><th>productos</th><th>precios</th><th>total</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Ana López</td><td>ana@mail.com</td><td>Laptop, Mouse</td><td>15000, 300</td><td>15300</td></tr>
+              <tr><td>2</td><td>Carlos Ruiz</td><td>carlos@mail.com</td><td>Teclado</td><td>800</td><td>800</td></tr>
+              <tr><td>3</td><td>Ana López</td><td>ana@mail.com</td><td>Monitor</td><td>4500</td><td>4500</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Problemas: valores multivaluados en <code>productos</code> y <code>precios</code>, redundancia de datos de cliente, dependencias funcionales no triviales.</p>
+
+        <h2>Primera forma normal (1FN)</h2>
+        <p>Una tabla está en 1FN si todos sus atributos contienen valores <strong>atómicos</strong> (indivisibles) y cada columna tiene un único valor por fila.</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_pedido</th><th>cliente</th><th>email</th><th>producto</th><th>precio</th><th>total</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Ana López</td><td>ana@mail.com</td><td>Laptop</td><td>15000</td><td>15300</td></tr>
+              <tr><td>1</td><td>Ana López</td><td>ana@mail.com</td><td>Mouse</td><td>300</td><td>15300</td></tr>
+              <tr><td>2</td><td>Carlos Ruiz</td><td>carlos@mail.com</td><td>Teclado</td><td>800</td><td>800</td></tr>
+              <tr><td>3</td><td>Ana López</td><td>ana@mail.com</td><td>Monitor</td><td>4500</td><td>4500</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>Aún hay redundancia: los datos del cliente (<code>cliente</code>, <code>email</code>) y el <code>total</code> se repiten para cada fila del mismo pedido.</p>
+
+        <h2>Segunda forma normal (2FN)</h2>
+        <p>Una tabla está en 2FN si está en 1FN y todos los atributos no clave dependen de la <strong>totalidad</strong> de la clave primaria (sin dependencias parciales). Nuestra clave compuesta es <code>(id_pedido, producto)</code>. <code>cliente</code> y <code>email</code> dependen solo de <code>id_pedido</code>, no de <code>producto</code>. Separamos:</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_pedido</th><th>cliente</th><th>email</th><th>total</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Ana López</td><td>ana@mail.com</td><td>15300</td></tr>
+              <tr><td>2</td><td>Carlos Ruiz</td><td>carlos@mail.com</td><td>800</td></tr>
+              <tr><td>3</td><td>Ana López</td><td>ana@mail.com</td><td>4500</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_pedido</th><th>producto</th><th>precio</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Laptop</td><td>15000</td></tr>
+              <tr><td>1</td><td>Mouse</td><td>300</td></tr>
+              <tr><td>2</td><td>Teclado</td><td>800</td></tr>
+              <tr><td>3</td><td>Monitor</td><td>4500</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Tercera forma normal (3FN)</h2>
+        <p>Una tabla está en 3FN si está en 2FN y no existen <strong>dependencias transitivas</strong> (un atributo no clave depende de otro atributo no clave). En la tabla <code>pedidos</code>, <code>email</code> depende de <code>cliente</code>, no directamente de <code>id_pedido</code>. Separamos cliente en su propia tabla:</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_cliente</th><th>nombre</th><th>email</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Ana López</td><td>ana@mail.com</td></tr>
+              <tr><td>2</td><td>Carlos Ruiz</td><td>carlos@mail.com</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id_pedido</th><th>id_cliente</th><th>total</th><th>fecha</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>1</td><td>15300</td><td>2025-01-15</td></tr>
+              <tr><td>2</td><td>2</td><td>800</td><td>2025-01-16</td></tr>
+              <tr><td>3</td><td>1</td><td>4500</td><td>2025-01-17</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Forma Normal de Boyce-Codd (BCNF)</h2>
+        <p>BCNF es una versión más estricta de 3FN: toda dependencia funcional <code>X → Y</code> debe tener a <code>X</code> como superclave. Nuestro diseño ya cumple BCNF si cada determinante es una clave candidata. En la tabla <code>detalle_pedido</code> la clave <code>(id_pedido, producto)</code> es superclave y no hay dependencias anómalas.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE cliente (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE pedido (
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    fecha DATE NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+);
+
+CREATE TABLE detalle_pedido (
+    id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+    id_pedido INT NOT NULL,
+    producto VARCHAR(100) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    cantidad INT DEFAULT 1,
+    FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido)
+);</code></pre>
+        </div>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>No siempre conviene normalizar al máximo. En sistemas con <strong>altas cargas de lectura</strong> (reportes, dashboards) una desnormalización controlada puede mejorar el rendimiento al evitar JOINs costosos. Evalúa el equilibrio entre integridad y velocidad según tu caso de uso.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="modelo-entidad-relacion.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="claves-primarias-foraneas.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

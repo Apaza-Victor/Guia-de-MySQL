@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>¿Qué es MySQL? - Guía MySQL</title>
+  <meta name="description" content="Aprende qué es MySQL, su historia, características principales y cómo se compara con otros gestores de bases de datos.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="fundamentos" data-page="que-es-mysql">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Fundamentos</a></li>
+      <li class="active">¿Qué es MySQL?</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>¿Qué es MySQL?</h1>
+        <p>MySQL es el sistema de gestión de bases de datos relacionales de código abierto más popular del mundo. Utiliza el lenguaje SQL para gestionar y organizar datos de forma estructurada, permitiendo desde pequeñas aplicaciones web hasta sistemas empresariales de gran escala. Su fiabilidad, rendimiento y facilidad de uso lo han convertido en la opción predilecta para desarrolladores y empresas por igual.</p>
+
+        <h2>Historia y creadores</h2>
+        <p>MySQL fue creado por el desarrollador sueco Michael "Monty" Widenius y la empresa MySQL AB en 1995. El nombre "MySQL" combina "My" (el nombre de la hija de Widenius) con "SQL" (Structured Query Language). En 2008, Sun Microsystems adquirió MySQL AB por aproximadamente 1000 millones de dólares, y posteriormente Oracle Corporation compró Sun Microsystems en 2010, convirtiéndose en el actual propietario. A pesar de pertenecer a Oracle, MySQL mantiene su licencia open source dual: GPL para uso comunitario y una licencia comercial para aplicaciones propietarias.</p>
+
+        <h2>Características principales</h2>
+        <p>MySQL ofrece un conjunto robusto de características que lo hacen destacar en el ecosistema de bases de datos. Es open source, lo que significa que su código está disponible para ser auditado y modificado. Es multiplataforma, funcionando en Windows, Linux, macOS y diversos sistemas UNIX. Soporta transacciones ACID (Atomicidad, Consistencia, Aislamiento, Durabilidad) cuando se usa con motores de almacenamiento como InnoDB. Ofrece escalabilidad horizontal mediante replicación y clustering, permitiendo manejar desde bases de datos pequeñas hasta petabytes de información.</p>
+
+        <h3>Conectarse a MySQL desde la línea de comandos</h3>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">mysql -u root -p</code></pre>
+        </div>
+
+        <h2>MySQL vs otros gestores de bases de datos</h2>
+        <p>Elegir el gestor de bases de datos adecuado depende de las necesidades específicas de cada proyecto. A continuación, una comparativa de MySQL frente a otros sistemas populares.</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Característica</th><th>MySQL</th><th>PostgreSQL</th><th>SQLite</th><th>SQL Server</th></tr></thead>
+            <tbody>
+              <tr><td>Tipo de licencia</td><td>Open Source (GPL)</td><td>Open Source</td><td>Open Source</td><td>Comercial</td></tr>
+              <tr><td>ACID completo</td><td>Sí (InnoDB)</td><td>Sí</td><td>Sí</td><td>Sí</td></tr>
+              <tr><td>Escalabilidad</td><td>Alta</td><td>Alta</td><td>Baja</td><td>Muy alta</td></tr>
+              <tr><td>Tipos de datos JSON</td><td>Sí</td><td>Sí</td><td>Sí (vía extensiones)</td><td>Sí</td></tr>
+              <tr><td>Rendimiento en lecturas</td><td>Excelente</td><td>Muy bueno</td><td>Bueno</td><td>Excelente</td></tr>
+              <tr><td>Popularidad web</td><td>Lidera (LAMP)</td><td>Creciente</td><td>Embebido</td><td>Empresarial</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>¿Para qué se usa MySQL en la industria?</h2>
+        <p>MySQL es el motor de base de datos detrás de aplicaciones y plataformas de gran escala como Facebook, Twitter, YouTube, Netflix y WordPress. Se utiliza extensamente en aplicaciones web (es la "M" del stack LAMP: Linux, Apache, MySQL, PHP/Python/Perl), sistemas de comercio electrónico, plataformas de aprendizaje en línea, aplicaciones financieras y sistemas de gestión de contenidos. Su versatilidad y robustez lo hacen ideal tanto para prototipos como para sistemas críticos que manejan millones de transacciones diarias.</p>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon"><i class="bi bi-lightbulb"></i></div>
+          <div class="callout-content"><p>MySQL es la base de datos más utilizada en el stack LAMP. Si planeas desarrollar aplicaciones web con PHP o Python, MySQL será tu aliado principal.</p></div>
+        </div>
+
+        <div class="callout callout-important">
+          <div class="callout-icon"><i class="bi bi-info-circle"></i></div>
+          <div class="callout-content"><p>Para proyectos nuevos, se recomienda usar InnoDB como motor de almacenamiento, ya que soporta transacciones ACID, claves foráneas y ofrece mejor rendimiento en cargas de trabajo concurrentes.</p></div>
+        </div>
+
+        <nav class="page-nav">
+          <a href="#" class="nav-prev disabled"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="instalacion.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

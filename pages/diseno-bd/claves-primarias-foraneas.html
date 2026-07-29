@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claves primarias y foráneas - Guía MySQL</title>
+  <meta name="description" content="Aprende a usar PRIMARY KEY, FOREIGN KEY, UNIQUE y AUTO_INCREMENT en MySQL.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="diseno-bd" data-page="claves-primarias-foraneas">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Diseño de BD</a></li>
+      <li class="active">Claves primarias y foráneas</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Claves primarias y foráneas</h1>
+        <p>Las <strong>claves</strong> son el mecanismo fundamental para identificar filas de forma única y establecer relaciones entre tablas. En MySQL contamos con varios tipos de restricciones de clave que garantizan la integridad de los datos.</p>
+
+        <h2>PRIMARY KEY</h2>
+        <p>La clave primaria identifica de forma única cada fila de una tabla. No puede contener NULL y solo puede existir una por tabla. Puede ser simple (una columna) o compuesta (varias columnas).</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Clave primaria simple
+CREATE TABLE departamento (
+    id_depto INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL
+);
+
+-- Clave primaria compuesta
+CREATE TABLE detalle_pedido (
+    id_pedido INT,
+    id_producto INT,
+    cantidad INT NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    PRIMARY KEY (id_pedido, id_producto)
+);</code></pre>
+        </div>
+
+        <h2>AUTO_INCREMENT</h2>
+        <p>Genera valores numéricos secuenciales automáticamente. Se usa normalmente con PRIMARY KEY para crear identificadores únicos. Por defecto empieza en 1 y se incrementa en 1.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE usuario (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(30) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- Insertar sin especificar el id
+INSERT INTO usuario (username, email) VALUES
+    ('jperez', 'jperez@mail.com'),
+    ('mlopez', 'mlopez@mail.com');
+
+-- MySQL asigna id_usuario = 1, 2 automáticamente</code></pre>
+        </div>
+
+        <h2>UNIQUE</h2>
+        <p>Asegura que todos los valores en una columna (o combinación de columnas) sean distintos. A diferencia de PRIMARY KEY, permite múltiples restricciones UNIQUE por tabla y acepta valores NULL (un NULL no se considera igual a otro NULL).</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE empleado (
+    id_empleado INT AUTO_INCREMENT PRIMARY KEY,
+    codigo_empleado VARCHAR(10) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    nombre VARCHAR(50) NOT NULL
+);</code></pre>
+        </div>
+
+        <h2>FOREIGN KEY</h2>
+        <p>Una clave foránea vincula una columna de una tabla con la PRIMARY KEY de otra tabla, estableciendo una relación y garantizando la <strong>integridad referencial</strong>. Las acciones referenciales definen qué sucede al borrar o actualizar la fila padre:</p>
+
+        <ul>
+          <li><strong>ON DELETE CASCADE:</strong> Borra en cascada las filas hijas cuando se borra la fila padre.</li>
+          <li><strong>ON DELETE RESTRICT:</strong> Impide borrar la fila padre si existen filas hijas (por defecto).</li>
+          <li><strong>ON DELETE SET NULL:</strong> Establece la FK a NULL cuando se borra la fila padre.</li>
+          <li><strong>ON UPDATE CASCADE:</strong> Propaga cambios en la clave padre a las filas hijas.</li>
+        </ul>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE categoria (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE producto (
+    id_producto INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    id_categoria INT,
+    FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+);
+
+-- Ejemplo con ON DELETE CASCADE
+CREATE TABLE factura (
+    id_factura INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATE NOT NULL
+);
+
+CREATE TABLE linea_factura (
+    id_linea INT AUTO_INCREMENT PRIMARY KEY,
+    id_factura INT NOT NULL,
+    producto VARCHAR(100) NOT NULL,
+    cantidad INT NOT NULL,
+    FOREIGN KEY (id_factura) REFERENCES factura(id_factura)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);</code></pre>
+        </div>
+
+        <h2>Agregar y eliminar claves sobre tablas existentes</h2>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Agregar PRIMARY KEY
+ALTER TABLE tabla ADD PRIMARY KEY (columna);
+
+-- Agregar FOREIGN KEY
+ALTER TABLE tabla ADD CONSTRAINT fk_nombre
+    FOREIGN KEY (columna) REFERENCES otra_tabla(columna);
+
+-- Agregar UNIQUE
+ALTER TABLE tabla ADD CONSTRAINT uq_nombre UNIQUE (columna);
+
+-- Eliminar restricciones
+ALTER TABLE tabla DROP PRIMARY KEY;
+ALTER TABLE tabla DROP FOREIGN KEY fk_nombre;
+ALTER TABLE tabla DROP INDEX uq_nombre;</code></pre>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Usa nombres descriptivos para tus constraints: <code>fk_producto_categoria</code>, <code>uq_usuario_email</code>. Así será más fácil identificarlos cuando necesites eliminarlos o depurar errores.</p></div></div>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>Error común: "<em>Cannot add or update a child row: a foreign key constraint fails</em>". Ocurre cuando intentas insertar un valor en la FK que no existe en la tabla padre. Siempre verifica que los datos referenciados existan antes de insertar.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="normalizacion.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="relaciones.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

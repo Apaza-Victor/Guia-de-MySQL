@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escalabilidad y alta disponibilidad - Guía MySQL</title>
+  <meta name="description" content="Estrategias de escalabilidad: sharding, balanceo de carga, clustering y alta disponibilidad.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="experto" data-page="escalabilidad">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Nivel Experto</a></li>
+      <li class="active">Escalabilidad y alta disponibilidad</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Escalabilidad y alta disponibilidad</h1>
+        <p>A medida que una aplicación crece, la base de datos suele convertirse en el cuello de botella. Diseñar para escalabilidad y alta disponibilidad desde el principio evita costosas reestructuraciones y garantiza que el servicio se mantenga operativo ante picos de tráfico o fallos.</p>
+
+        <h2>Escalabilidad vertical vs horizontal</h2>
+        <p>La <strong>escalabilidad vertical</strong> (scale up) consiste en añadir más recursos al mismo servidor: más RAM, CPU o almacenamiento. Es sencilla pero tiene un límite físico y suele ser costosa. La <strong>escalabilidad horizontal</strong> (scale out) distribuye la carga entre múltiples servidores más pequeños, lo que ofrece mayor capacidad teórica y tolerancia a fallos.</p>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Característica</th><th>Vertical (Scale Up)</th><th>Horizontal (Scale Out)</th></tr></thead>
+            <tbody>
+              <tr><td>Implementación</td><td>Simple: más recursos al mismo equipo</td><td>Compleja: requiere balanceador, replicación, sharding</td></tr>
+              <tr><td>Límite</td><td>Capacidad máxima del hardware</td><td>Teóricamente ilimitado (agregando nodos)</td></tr>
+              <tr><td>Tolerancia a fallos</td><td>Punto único de fallo</td><td>Alta: si un nodo cae, los demás continúan</td></tr>
+              <tr><td>Costo incremental</td><td>Creciente (hardware high-end es caro)</td><td>Lineal (servidores estándar económicos)</td></tr>
+              <tr><td>Complejidad operativa</td><td>Baja</td><td>Alta: monitoreo, sincronización, rebalanceo</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Sharding</h2>
+        <p>Sharding (fragmentación) divide los datos horizontalmente en fragmentos independientes llamados <em>shards</em>. Cada shard contiene un subconjunto de los datos y se ejecuta en un servidor distinto. Las estrategias comunes son:</p>
+        <div class="code-block">
+          <div class="code-label">SQL (conceptual)</div>
+          <pre><code class="language-sql">-- Sharding por rango: usuarios 1-10000 en shard A, 10001-20000 en shard B
+-- La aplicación decide a qué shard consultar según el id
+
+-- Sharding por hash: función hash sobre el id para distribuir uniformemente
+-- shard = HASH(id) % N (donde N es el número de shards)
+
+-- Sharding por lista: agrupa por región geográfica
+-- Tabla usuarios_américa, usuarios_europa, usuarios_asia
+
+-- Ejemplo conceptual con particionamiento en MySQL
+CREATE TABLE usuarios (
+    id INT NOT NULL,
+    nombre VARCHAR(100),
+    region VARCHAR(20) NOT NULL
+)
+PARTITION BY LIST COLUMNS(region) (
+    PARTITION p_america VALUES IN ('Norteamérica', 'Sudamérica'),
+    PARTITION p_europa VALUES IN ('Europa', 'África'),
+    PARTITION p_asia VALUES IN ('Asia', 'Oceanía')
+);</code></pre>
+        </div>
+
+        <h2>Balanceo de carga</h2>
+        <p>Un balanceador de carga de base de datos distribuye las conexiones entre varios servidores MySQL para repartir la carga de lectura y proporcionar tolerancia a fallos.</p>
+        <div class="code-block">
+          <div class="code-label">Configuración (ProxySQL)</div>
+          <pre><code class="language-sql">-- ProxySQL: proxy de alto rendimiento para MySQL
+-- Configurar servidores backend
+INSERT INTO mysql_servers (hostgroup_id, hostname, port) VALUES
+(0, '192.168.1.10', 3306),  -- Escritura principal
+(1, '192.168.1.11', 3306),  -- Réplica de lectura 1
+(1, '192.168.1.12', 3306);  -- Réplica de lectura 2
+
+-- Reglas de enrutamiento: escrituras al hostgroup 0, lecturas al 1
+INSERT INTO mysql_query_rules (active, match_pattern, destination_hostgroup)
+VALUES (1, '^SELECT', 1),   -- Lecturas a réplicas
+       (1, '.*', 0);        -- Todo lo demás al primario
+
+-- MySQL Router (oficial de Oracle)
+-- mysqlrouter --bootstrap root@192.168.1.10:3306 --user=mysqlrouter</code></pre>
+        </div>
+
+        <h2>Clustering</h2>
+        <p>MySQL ofrece Group Replication para crear clústeres con consistencia fuerte. InnoDB Cluster simplifica la configuración mediante MySQL Shell y MySQL Router.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Group Replication: configuración en cada nodo
+-- Nodo 1 (primario)
+SET GLOBAL group_replication_bootstrap_group=ON;
+START GROUP_REPLICATION;
+SET GLOBAL group_replication_bootstrap_group=OFF;
+
+-- Nodos 2 y 3 (secundarios)
+START GROUP_REPLICATION;
+
+-- Ver miembros del grupo
+SELECT * FROM performance_schema.replication_group_members;
+
+-- InnoDB Cluster vía MySQL Shell
+-- js> var cluster = dba.createCluster('miCluster');
+-- js> cluster.addInstance('root@192.168.1.11:3306');
+-- js> cluster.addInstance('root@192.168.1.12:3306');</code></pre>
+        </div>
+
+        <h2>Alta disponibilidad (HA)</h2>
+        <p>La alta disponibilidad garantiza que el servicio de base de datos continúe funcionando incluso si un servidor falla. Las estrategias incluyen failover automático, monitoreo de latidos y direcciones IP virtuales.</p>
+        <div class="code-block">
+          <div class="code-label">Keepalived (Linux)</div>
+          <pre><code class="language-text"># Configuración de keepalived para IP virtual MySQL
+vrrp_instance VI_1 {
+    state MASTER
+    interface eth0
+    virtual_router_id 51
+    priority 100
+    virtual_ipaddress {
+        192.168.1.100/24  # IP virtual que flota entre nodos
+    }
+    track_script {
+        chk_mysql
+    }
+}</code></pre>
+        </div>
+
+        <h2>Tabla comparativa de estrategias</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Estrategia</th><th>Objetivo</th><th>Complejidad</th><th>Consistencia</th><th>Caso de uso típico</th></tr></thead>
+            <tbody>
+              <tr><td>Replicación asíncrona</td><td>Alta disponibilidad + escalar lecturas</td><td>Media</td><td>Eventual</td><td>Aplicaciones web, blogs</td></tr>
+              <tr><td>Group Replication</td><td>Alta disponibilidad + consistencia fuerte</td><td>Alta</td><td>Inmediata</td><td>Transacciones críticas, fintech</td></tr>
+              <tr><td>Sharding</td><td>Escalar escrituras horizontalmente</td><td>Muy alta</td><td>Variable</td><td>SaaS multi-tenant, redes sociales</td></tr>
+              <tr><td>InnoDB Cluster</td><td>HA + orquestación simplificada</td><td>Media</td><td>Inmediata</td><td>Entornos corporativos con MySQL 8</td></tr>
+              <tr><td>ProxySQL / Router</td><td>Balanceo de carga + enrutamiento</td><td>Baja</td><td>N/A</td><td>Complemento de cualquier estrategia</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>El sharding añade una complejidad operativa significativa: las consultas entre shards son lentas o imposibles, el rebalanceo requiere planificación y las transacciones distribuidas son costosas. Antes de fragmentar, agota todas las opciones de optimización vertical, índices, caching y replicación.</p></div></div>
+
+        <h2>Ejemplo: arquitectura escalable completa</h2>
+        <p>Una arquitectura típica para alta disponibilidad y escalabilidad combina varias técnicas:</p>
+        <div class="code-block">
+          <div class="code-label">Arquitectura</div>
+          <pre><code class="language-text">Clientes
+    |
+    v
+ProxySQL / MySQL Router  (balanceo de carga, enrutamiento R/W)
+    |
+    +---> MySQL Primario  (escrituras)
+    |         |
+    |         +---> Réplica 1 (lectura asíncrona)
+    |         +---> Réplica 2 (lectura asíncrona)
+    |
+    +---> Shard A (usuarios 1-50000)
+    +---> Shard B (usuarios 50001-100000)
+    
+    Cada nodo del clúster con:
+    - Keepalived para IP virtual
+    - Monitoreo con PMM (Percona Monitoring and Management)
+    - Backup automático con mysqldump o XtraBackup</code></pre>
+        </div>
+
+        <nav class="page-nav">
+          <a href="mysql-y-orm.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="buenas-practicas.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

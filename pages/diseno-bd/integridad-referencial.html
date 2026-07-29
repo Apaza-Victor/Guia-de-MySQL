@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Integridad referencial y restricciones - Guía MySQL</title>
+  <meta name="description" content="Aprende a mantener la integridad de datos con constraints CHECK, DEFAULT y reglas de integridad referencial.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="diseno-bd" data-page="integridad-referencial">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Diseño de BD</a></li>
+      <li class="active">Integridad referencial</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Integridad referencial y restricciones</h1>
+        <p>La <strong>integridad de datos</strong> se refiere a la exactitud, consistencia y confiabilidad de los datos almacenados. MySQL proporciona diversos mecanismos para garantizar la integridad a nivel de base de datos mediante <strong>constraints</strong> (restricciones).</p>
+
+        <h2>Integridad de entidad</h2>
+        <p>Asegura que cada fila de una tabla sea única e identificable. Se logra mediante la <strong>PRIMARY KEY</strong> y la restricción <strong>UNIQUE</strong>. Garantiza que no existan filas duplicadas y que cada registro tenga un identificador inequívoco.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE cliente (
+    id_cliente INT AUTO_INCREMENT PRIMARY KEY,  -- Integridad de entidad
+    codigo VARCHAR(10) UNIQUE NOT NULL,          -- Otra clave candidata
+    nombre VARCHAR(100) NOT NULL
+);</code></pre>
+        </div>
+
+        <h2>Integridad referencial</h2>
+        <p>Garantiza que las relaciones entre tablas se mantengan consistentes. Se implementa mediante <strong>FOREIGN KEY</strong>. Una FK asegura que un valor en una columna hija siempre exista en la columna padre. Si intentas violar esta regla, MySQL rechaza la operación.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE pedido (
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATE NOT NULL,
+    id_cliente INT NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+);
+
+-- Esto funciona si el cliente 1 existe
+INSERT INTO pedido (fecha, id_cliente) VALUES ('2025-03-01', 1);
+
+-- Esto falla: "Cannot add or update a child row: a foreign key constraint fails"
+INSERT INTO pedido (fecha, id_cliente) VALUES ('2025-03-01', 999);</code></pre>
+        </div>
+
+        <h2>Restricción CHECK</h2>
+        <p>Valida que los valores de una columna cumplan una condición booleana. MySQL 8.0+ soporta CHECK constraints completamente. Antes se parseaban pero no se ejecutaban.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE empleado (
+    id_empleado INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    salario DECIMAL(10,2) CHECK (salario > 0),
+    edad INT CHECK (edad >= 18 AND edad <= 70),
+    tipo ENUM('tiempo_completo', 'medio_tiempo', 'freelance') DEFAULT 'tiempo_completo'
+);
+
+-- CHECK también puede tener nombre
+CREATE TABLE producto (
+    id_producto INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    stock INT NOT NULL,
+    CONSTRAINT chk_precio_positivo CHECK (precio > 0),
+    CONSTRAINT chk_stock_no_negativo CHECK (stock >= 0)
+);</code></pre>
+        </div>
+
+        <h2>Restricción DEFAULT</h2>
+        <p>Asigna un valor por defecto a una columna cuando no se especifica un valor en el INSERT. Mejora la consistencia al asegurar que ciertas columnas siempre tengan un valor predecible.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE tarea (
+    id_tarea INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    completada BOOLEAN DEFAULT FALSE,
+    fecha_creacion DATE DEFAULT (CURRENT_DATE),
+    prioridad ENUM('baja', 'media', 'alta') DEFAULT 'media'
+);
+
+INSERT INTO tarea (titulo, descripcion) 
+VALUES ('Comprar insumos', 'Comprar papel y tinta');
+
+-- Resultado: completada = FALSE, fecha_creacion = 2025-07-29, prioridad = 'media'</code></pre>
+        </div>
+
+        <h2>Restricción NOT NULL</h2>
+        <p>Obliga a que una columna siempre tenga un valor. Es la restricción más básica pero una de las más importantes. Sin NOT NULL, una columna acepta NULL por defecto.</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE articulo (
+    id_articulo INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,       -- No puede ser NULL
+    contenido TEXT NOT NULL,             -- No puede ser NULL
+    resumen TEXT,                        -- Puede ser NULL
+    fecha_publicacion DATE
+);
+
+-- Error: "Column 'titulo' cannot be null"
+INSERT INTO articulo (titulo, contenido) VALUES (NULL, 'Contenido');</code></pre>
+        </div>
+
+        <h2>Verificar constraints existentes</h2>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Ver constraints de una tabla
+SELECT TABLE_NAME, CONSTRAINT_NAME, CONSTRAINT_TYPE
+FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+WHERE TABLE_SCHEMA = 'mi_bd' AND TABLE_NAME = 'empleado';
+
+-- Ver CHECK constraints específicamente
+SELECT CONSTRAINT_NAME, CHECK_CLAUSE
+FROM INFORMATION_SCHEMA.CHECK_CONSTRAINTS
+WHERE CONSTRAINT_SCHEMA = 'mi_bd';</code></pre>
+        </div>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>Planifica todas las restricciones (PK, FK, CHECK, DEFAULT, NOT NULL) <strong>antes de insertar datos masivos</strong>. Agregar constraints sobre tablas con millones de filas puede ser muy lento y bloquear la tabla durante la validación. Diseña primero, implementa después.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="relaciones.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="../../index.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

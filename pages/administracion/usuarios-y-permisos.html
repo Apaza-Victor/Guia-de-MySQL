@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de usuarios y permisos - Guía MySQL</title>
+  <meta name="description" content="Aprende a crear usuarios, asignar permisos y gestionar la seguridad con GRANT y REVOKE.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="administracion" data-page="usuarios-y-permisos">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Administración</a></li>
+      <li class="active">Gestión de usuarios y permisos</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Gestión de usuarios y permisos</h1>
+        <p>La administración de usuarios y permisos es fundamental para mantener la seguridad de una base de datos MySQL. MySQL ofrece un sistema granular de privilegios que permite controlar qué acciones puede realizar cada usuario sobre cada objeto de la base de datos.</p>
+
+        <h2>Creación y eliminación de usuarios</h2>
+        <p>Para crear un usuario se utiliza la sentencia <code>CREATE USER</code>, que define el nombre y el host desde el cual puede conectarse. Para eliminarlo se usa <code>DROP USER</code>.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE USER 'admin'@'localhost' IDENTIFIED BY 'contraseña_segura';
+CREATE USER 'lector'@'%' IDENTIFIED BY 'lector2024';
+
+DROP USER 'usuario_obsoleto'@'localhost';</code></pre>
+        </div>
+
+        <h2>Asignación de privilegios con GRANT</h2>
+        <p>Una vez creado el usuario, se le otorgan permisos mediante <code>GRANT</code>. Se pueden asignar privilegios a nivel global, de base de datos, de tabla o de columna.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Privilegios a nivel de base de datos
+GRANT SELECT, INSERT, UPDATE, DELETE ON mi_bd.* TO 'admin'@'localhost';
+
+-- Todos los privilegios sobre una base de datos
+GRANT ALL PRIVILEGES ON mi_bd.* TO 'superuser'@'localhost';
+
+-- Privilegios solo sobre columnas específicas
+GRANT SELECT (nombre, email) ON mi_bd.clientes TO 'lector'@'%';
+
+-- Acceso de solo lectura a todas las bases de datos
+GRANT SELECT ON *.* TO 'reportes'@'localhost';</code></pre>
+        </div>
+
+        <h2>Privilegios comunes en MySQL</h2>
+        <p>MySQL dispone de una amplia variedad de privilegios que se adaptan a distintos niveles de acceso. La siguiente tabla resume los más utilizados:</p>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Privilegio</th><th>Nivel</th><th>Descripción</th></tr></thead>
+            <tbody>
+              <tr><td>ALL PRIVILEGES</td><td>Global / BD / Tabla</td><td>Otorga todos los privilegios excepto GRANT OPTION</td></tr>
+              <tr><td>SELECT</td><td>Tabla / Columna</td><td>Permite consultar registros</td></tr>
+              <tr><td>INSERT</td><td>Tabla / Columna</td><td>Permite insertar nuevos registros</td></tr>
+              <tr><td>UPDATE</td><td>Tabla / Columna</td><td>Permite modificar registros existentes</td></tr>
+              <tr><td>DELETE</td><td>Tabla</td><td>Permite eliminar registros</td></tr>
+              <tr><td>CREATE</td><td>BD / Tabla</td><td>Permite crear bases de datos y tablas</td></tr>
+              <tr><td>DROP</td><td>BD / Tabla</td><td>Permite eliminar bases de datos y tablas</td></tr>
+              <tr><td>ALTER</td><td>Tabla</td><td>Permite modificar la estructura de tablas</td></tr>
+              <tr><td>INDEX</td><td>Tabla</td><td>Permite crear y eliminar índices</td></tr>
+              <tr><td>GRANT OPTION</td><td>Global / BD / Tabla</td><td>Permite otorgar privilegios a otros usuarios</td></tr>
+              <tr><td>PROCESS</td><td>Global</td><td>Permite ver todos los procesos activos</td></tr>
+              <tr><td>SHOW DATABASES</td><td>Global</td><td>Permite ver todas las bases de datos del servidor</td></tr>
+              <tr><td>LOCK TABLES</td><td>BD</td><td>Permite bloquear tablas explícitamente</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Revocación de privilegios con REVOKE</h2>
+        <p>Para retirar permisos previamente otorgados se utiliza <code>REVOKE</code>. La sintaxis es similar a <code>GRANT</code>.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Revocar un permiso específico
+REVOKE DELETE ON mi_bd.* FROM 'admin'@'localhost';
+
+-- Revocar todos los permisos de un usuario
+REVOKE ALL PRIVILEGES ON *.* FROM 'usuario_externo'@'%';</code></pre>
+        </div>
+
+        <h2>Visualización de privilegios</h2>
+        <p>Para ver los privilegios asignados a un usuario se usa <code>SHOW GRANTS</code>. Esto resulta útil para auditar permisos o depurar problemas de acceso.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">SHOW GRANTS FOR 'admin'@'localhost';
+
+-- Ver privilegios del usuario actual
+SHOW GRANTS FOR CURRENT_USER();</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Grants for admin@localhost</th></tr></thead>
+            <tbody>
+              <tr><td>GRANT USAGE ON *.* TO `admin`@`localhost`</td></tr>
+              <tr><td>GRANT SELECT, INSERT, UPDATE, DELETE ON `mi_bd`.* TO `admin`@`localhost`</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>FLUSH PRIVILEGES</h2>
+        <p>Después de modificar los privilegios con <code>GRANT</code> o <code>REVOKE</code>, MySQL recarga automáticamente las tablas de permisos. Sin embargo, si se editan directamente las tablas del sistema (<code>mysql.user</code>, <code>mysql.db</code>, etc.), es necesario ejecutar <code>FLUSH PRIVILEGES</code> para que los cambios surtan efecto.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">FLUSH PRIVILEGES;</code></pre>
+        </div>
+
+        <h2>Roles en MySQL 8</h2>
+        <p>A partir de MySQL 8.0 se introdujeron los roles, que permiten agrupar un conjunto de privilegios y asignarlos fácilmente a múltiples usuarios. Los roles simplifican la administración cuando se manejan muchos usuarios con perfiles similares.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Crear un rol
+CREATE ROLE 'lector_rol';
+
+-- Asignar privilegios al rol
+GRANT SELECT ON mi_bd.* TO 'lector_rol';
+
+-- Asignar el rol a un usuario
+GRANT 'lector_rol' TO 'juan'@'localhost';
+
+-- Activar el rol por defecto al iniciar sesión
+SET DEFAULT ROLE 'lector_rol' TO 'juan'@'localhost';</code></pre>
+        </div>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>Siempre aplica el principio de mínimo privilegio: asigna únicamente los permisos necesarios para que cada usuario realice su trabajo. Evita usar <code>ALL PRIVILEGES</code> en usuarios de producción y revisa periódicamente los permisos con <code>SHOW GRANTS</code>.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="#" class="nav-prev disabled"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="backup-restauracion.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

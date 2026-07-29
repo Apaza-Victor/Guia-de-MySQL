@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vistas (VIEW) - Guía MySQL</title>
+  <meta name="description" content="Crea y usa vistas en MySQL para simplificar consultas complejas.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="consultas-intermedias" data-page="vistas">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Intermedio</a></li>
+      <li class="active">Vistas</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Vistas (VIEW)</h1>
+        <p>Una vista es una tabla virtual cuyo contenido está definido por una consulta SELECT almacenada. Las vistas no almacenan datos físicamente (excepto las vistas materializadas, que MySQL no soporta nativamente), sino que muestran datos de las tablas subyacentes cada vez que se consultan. Son ideales para simplificar consultas complejas y mejorar la seguridad.</p>
+
+        <h2>Crear una vista con CREATE VIEW</h2>
+        <p>La sintaxis básica para crear una vista es <code>CREATE VIEW nombre_vista AS consulta_select</code>.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Vista de resumen de clientes con sus pedidos
+CREATE VIEW resumen_clientes AS
+SELECT
+  c.id,
+  c.nombre,
+  c.ciudad,
+  COUNT(p.id) AS total_pedidos,
+  COALESCE(SUM(p.total), 0) AS gasto_total,
+  COALESCE(ROUND(AVG(p.total), 2), 0) AS ticket_promedio
+FROM clientes c
+LEFT JOIN pedidos p ON c.id = p.cliente_id
+GROUP BY c.id, c.nombre, c.ciudad;</code></pre>
+        </div>
+
+        <h2>Consultar una vista</h2>
+        <p>Una vez creada, la vista se usa como cualquier tabla en una consulta SELECT. Puedes aplicar WHERE, ORDER BY, GROUP BY y hasta hacer JOIN con otras tablas o vistas.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Consultar la vista directamente
+SELECT * FROM resumen_clientes;
+
+-- Filtrar sobre la vista
+SELECT * FROM resumen_clientes
+WHERE gasto_total > 0
+ORDER BY gasto_total DESC;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>id</th><th>nombre</th><th>ciudad</th><th>total_pedidos</th><th>gasto_total</th><th>ticket_promedio</th></tr></thead>
+            <tbody><tr><td>3</td><td>Elena Gómez</td><td>Valencia</td><td>1</td><td>920.00</td><td>920.00</td></tr><tr><td>1</td><td>Ana López</td><td>Madrid</td><td>2</td><td>730.00</td><td>365.00</td></tr><tr><td>2</td><td>Carlos Ruiz</td><td>Barcelona</td><td>1</td><td>150.00</td><td>150.00</td></tr><tr><td>4</td><td>David Mora</td><td>Sevilla</td><td>0</td><td>0</td><td>0</td></tr></tbody>
+          </table>
+        </div>
+
+        <h2>Modificar una vista con ALTER VIEW</h2>
+        <p>Para cambiar la definición de una vista existente sin eliminarla, usa <code>ALTER VIEW</code>. También puedes usar <code>CREATE OR REPLACE VIEW</code>, que crea la vista si no existe o la reemplaza si ya existe.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Añadir la fecha del último pedido a la vista
+CREATE OR REPLACE VIEW resumen_clientes AS
+SELECT
+  c.id,
+  c.nombre,
+  c.ciudad,
+  COUNT(p.id) AS total_pedidos,
+  COALESCE(SUM(p.total), 0) AS gasto_total,
+  MAX(p.fecha) AS ultimo_pedido
+FROM clientes c
+LEFT JOIN pedidos p ON c.id = p.cliente_id
+GROUP BY c.id, c.nombre, c.ciudad;</code></pre>
+        </div>
+
+        <h2>Eliminar una vista con DROP VIEW</h2>
+        <p>Para eliminar una vista de la base de datos, usa <code>DROP VIEW</code>. Puedes eliminar varias vistas en una sola sentencia separándolas con comas.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DROP VIEW IF EXISTS resumen_clientes;
+-- DROP VIEW IF EXISTS vista1, vista2, vista3;</code></pre>
+        </div>
+
+        <h2>WITH CHECK OPTION</h2>
+        <p>Cuando creas una vista actualizable (que permite INSERT, UPDATE, DELETE), <code>WITH CHECK OPTION</code> evita que se realicen cambios que hagan que la fila desaparezca de la vista. Es una capa adicional de integridad.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Vista de solo clientes de Madrid con protección
+CREATE VIEW clientes_madrid AS
+SELECT id, nombre, ciudad
+FROM clientes
+WHERE ciudad = 'Madrid'
+WITH CHECK OPTION;
+
+-- Esto funcionará
+UPDATE clientes_madrid SET nombre = 'Ana García' WHERE id = 1;
+
+-- Esto fallará por WITH CHECK OPTION
+UPDATE clientes_madrid SET ciudad = 'Barcelona' WHERE id = 1;</code></pre>
+        </div>
+
+        <h2>Ventajas de las vistas</h2>
+        <p>Las vistas ofrecen tres beneficios principales: <strong>seguridad</strong> al ocultar columnas sensibles, <strong>simplicidad</strong> al encapsular consultas complejas y <strong>consistencia</strong> al proporcionar una interfaz estable aunque cambien las tablas subyacentes. También facilitan el mantenimiento del código en aplicaciones.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Vista que oculta datos sensibles
+CREATE VIEW clientes_publico AS
+SELECT id, nombre, ciudad
+FROM clientes;
+-- La columna 'telefono' o 'email' no se expone
+
+-- Vista que simplifica un reporte mensual
+CREATE VIEW reporte_mensual AS
+SELECT
+  DATE_FORMAT(fecha, '%Y-%m') AS mes,
+  COUNT(*) AS pedidos,
+  SUM(total) AS ingresos,
+  ROUND(AVG(total), 2) AS ticket_medio
+FROM pedidos
+GROUP BY DATE_FORMAT(fecha, '%Y-%m')
+ORDER BY mes;</code></pre>
+        </div>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>mes</th><th>pedidos</th><th>ingresos</th><th>ticket_medio</th></tr></thead>
+            <tbody><tr><td>2024-03</td><td>3</td><td>880.00</td><td>293.33</td></tr><tr><td>2024-04</td><td>2</td><td>1220.00</td><td>610.00</td></tr></tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p><strong>¿Cuándo usar vistas?</strong> Úsalas cuando una consulta se repite en múltiples reportes o aplicaciones, cuando necesitas restringir el acceso a columnas sensibles sin crear tablas adicionales, o para crear una capa de abstracción entre el esquema físico y las aplicaciones. Evita crear vistas que consulten otras vistas en cadena, ya que puede degradar el rendimiento.</p></div></div>
+        <nav class="page-nav">
+          <a href="subconsultas.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="../../index.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

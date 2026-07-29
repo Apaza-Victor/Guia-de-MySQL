@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Motores de almacenamiento - Guía MySQL</title>
+  <meta name="description" content="Comparativa de InnoDB, MyISAM, Memory y otros motores en MySQL.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="experto" data-page="motores-de-almacenamiento">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">Nivel Experto</a></li>
+      <li class="active">Motores de almacenamiento</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Motores de almacenamiento</h1>
+        <p>MySQL ofrece distintos motores de almacenamiento (<em>storage engines</em>) que determinan cómo se almacenan los datos, cómo se gestionan las transacciones y qué funcionalidades están disponibles. Elegir el motor correcto es clave para el rendimiento y la integridad de la aplicación.</p>
+
+        <h2>InnoDB</h2>
+        <p>InnoDB es el motor predeterminado desde MySQL 5.5 y el más utilizado en entornos de producción. Ofrece soporte completo de transacciones ACID, claves foráneas y bloqueo a nivel de fila.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- InnoDB se usa por defecto
+CREATE TABLE clientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE
+) ENGINE=InnoDB;
+
+-- Soporta transacciones
+START TRANSACTION;
+UPDATE cuentas SET saldo = saldo - 500 WHERE id = 1;
+UPDATE cuentas SET saldo = saldo + 500 WHERE id = 2;
+COMMIT;
+
+-- Soporta claves foráneas
+CREATE TABLE pedidos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id INT,
+    total DECIMAL(10,2),
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+) ENGINE=InnoDB;</code></pre>
+        </div>
+        <p>Características destacadas:</p>
+        <ul>
+          <li><strong>ACID</strong>: Atomicidad, Consistencia, Aislamiento y Durabilidad.</li>
+          <li><strong>Row-level locking</strong>: Permite alta concurrencia en escrituras.</li>
+          <li><strong>MVCC</strong>: Control de concurrencia multiversión para lecturas consistentes.</li>
+          <li><strong>Clustering index</strong>: Los datos se almacenan en el propio índice primario.</li>
+          <li><strong>Buffer Pool</strong>: Caché de datos e índices en memoria.</li>
+        </ul>
+
+        <h2>MyISAM</h2>
+        <p>MyISAM fue el motor predeterminado antes de MySQL 5.5. Es más simple, rápido en lecturas secuenciales pero carece de transacciones y bloquea a nivel de tabla.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    accion VARCHAR(50),
+    fecha TIMESTAMP
+) ENGINE=MyISAM;
+
+-- MyISAM soporta FULLTEXT sin dependencias adicionales
+CREATE FULLTEXT INDEX ft_logs ON logs(accion);
+
+-- Bloqueo a nivel de tabla: una escritura bloquea toda la tabla
+INSERT INTO logs (accion) VALUES ('login'); -- Bloquea la tabla hasta completar</code></pre>
+        </div>
+
+        <h2>Memory</h2>
+        <p>El motor Memory almacena todos los datos en RAM, lo que lo hace extremadamente rápido pero volátil: los datos se pierden al reiniciar el servidor.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE sesiones (
+    id VARCHAR(32) PRIMARY KEY,
+    datos TEXT,
+    ultima_actividad TIMESTAMP
+) ENGINE=Memory;
+
+-- Ideal para tablas temporales, cachés y sesiones
+-- Los datos desaparecen al reiniciar MySQL</code></pre>
+        </div>
+
+        <h2>CSV y ARCHIVE</h2>
+        <p>El motor CSV almacena datos en archivos de texto separados por comas, útil para intercambio de datos. ARCHIVE comprime los datos al insertar y solo permite lecturas con full scan, ideal para datos históricos.</p>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">CREATE TABLE datos_exportados (
+    id INT,
+    nombre VARCHAR(100),
+    email VARCHAR(100)
+) ENGINE=CSV;
+-- Cada fila es una línea en el archivo .csv
+
+CREATE TABLE historico_auditoria (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    accion TEXT,
+    fecha TIMESTAMP
+) ENGINE=ARCHIVE;
+-- Solo soporta INSERT y SELECT (sin DELETE ni UPDATE)</code></pre>
+        </div>
+
+        <h2>Tabla comparativa de motores</h2>
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Característica</th><th>InnoDB</th><th>MyISAM</th><th>Memory</th><th>CSV</th><th>ARCHIVE</th></tr></thead>
+            <tbody>
+              <tr><td>Transacciones ACID</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td></tr>
+              <tr><td>Bloqueo</td><td>Fila (Row)</td><td>Tabla (Table)</td><td>Tabla (Table)</td><td>Tabla (Table)</td><td>Tabla (Table)</td></tr>
+              <tr><td>Claves foráneas</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td></tr>
+              <tr><td>FULLTEXT INDEX</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td></tr>
+              <tr><td>MVCC</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td></tr>
+              <tr><td>Persistencia en disco</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td></tr>
+              <tr><td>Compresión de datos</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td></tr>
+              <tr><td>Velocidad lecturas</td><td>Alta</td><td>Muy alta</td><td>Máxima</td><td>Baja</td><td>Media</td></tr>
+              <tr><td>Velocidad escrituras</td><td>Alta</td><td>Alta</td><td>Máxima</td><td>Media</td><td>Alta (comprimido)</td></tr>
+              <tr><td>Recuperación ante fallos</td><td><i class="bi bi-check-lg" style="color:var(--success)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td><td><i class="bi bi-x-lg" style="color:var(--danger)"></i></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Cómo elegir el motor</h2>
+        <p>La elección depende del caso de uso:</p>
+        <ul>
+          <li><strong>InnoDB</strong>: Aplicaciones transaccionales, sistemas bancarios, e-commerce, cualquier entorno donde la integridad de los datos sea crítica.</li>
+          <li><strong>MyISAM</strong>: Tablas de solo lectura, almacenes de datos analíticos, logs históricos donde no importe la integridad transaccional.</li>
+          <li><strong>Memory</strong>: Tablas temporales, cachés, sesiones de usuario, datos que puedan reconstruirse fácilmente.</li>
+          <li><strong>CSV</strong>: Exportación directa a hojas de cálculo, integración con herramientas externas que procesan CSV.</li>
+          <li><strong>ARCHIVE</strong>: Auditoría, logs de larga retención, datos que se escriben una vez y se leen raramente.</li>
+        </ul>
+
+        <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>InnoDB es el motor predeterminado y recomendado para la gran mayoría de aplicaciones. Solo considera otros motores cuando tengas necesidades muy específicas que InnoDB no cubra, como tablas en RAM (Memory) o datos de solo lectura masivos (MyISAM).</p></div></div>
+
+        <h2>Ver el motor de una tabla</h2>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Ver motores disponibles
+SHOW ENGINES;
+
+-- Ver el motor de una tabla específica
+SHOW TABLE STATUS WHERE Name = 'clientes';
+
+-- Cambiar el motor de una tabla existente
+ALTER TABLE clientes ENGINE=InnoDB;</code></pre>
+        </div>
+
+        <nav class="page-nav">
+          <a href="full-text-search.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="mysql-y-orm.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>

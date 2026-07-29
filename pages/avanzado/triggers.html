@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Triggers en MySQL - Guía MySQL</title>
+  <meta name="description" content="Automatiza acciones con triggers BEFORE/AFTER INSERT, UPDATE y DELETE.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+  <link href="../../assets/css/variables.css" rel="stylesheet">
+  <link href="../../assets/css/base.css" rel="stylesheet">
+  <link href="../../assets/css/layout.css" rel="stylesheet">
+  <link href="../../assets/css/components.css" rel="stylesheet">
+  <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <script>
+    (function() {
+      var theme = localStorage.getItem('mysql-guide-theme');
+      if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body data-base="../.." data-module="avanzado" data-page="triggers">
+  <div id="header-placeholder"></div>
+  <div class="container">
+    <ul class="breadcrumb">
+      <li><a href="../../index.html">Inicio</a></li>
+      <li><a href="#">SQL Avanzado</a></li>
+      <li class="active">Triggers en MySQL</li>
+    </ul>
+    <div class="content-layout">
+      <aside class="sidebar" id="sidebar-placeholder"></aside>
+      <main class="content-area">
+        <h1>Triggers en MySQL</h1>
+        <p>Un trigger (desencadenador) es un bloque de código SQL que se ejecuta automáticamente en respuesta a un evento en una tabla: <code>INSERT</code>, <code>UPDATE</code> o <code>DELETE</code>. Los triggers son útiles para auditoría, validación de datos, sincronización entre tablas y aplicación de reglas de negocio a nivel de base de datos.</p>
+
+        <h2>CREATE TRIGGER</h2>
+        <p>La sintaxis para crear un trigger especifica el momento (<code>BEFORE</code> o <code>AFTER</code>), el evento (<code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>), la tabla asociada y el cuerpo del trigger:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DELIMITER $$
+
+CREATE TRIGGER before_empleado_insert
+BEFORE INSERT ON empleados
+FOR EACH ROW
+BEGIN
+    -- Asignar fecha de creación automática
+    SET NEW.fecha_creacion = NOW();
+
+    -- Validar salario mínimo
+    IF NEW.salario < 1000 THEN
+        SET NEW.salario = 1000;
+    END IF;
+END$$
+
+DELIMITER ;</code></pre>
+        </div>
+
+        <h2>BEFORE vs AFTER y OLD vs NEW</h2>
+        <p>Los triggers <code>BEFORE</code> se ejecutan antes de que la operación afecte la tabla; son ideales para validaciones y modificaciones previas. Los triggers <code>AFTER</code> se ejecutan después y son adecuados para auditoría y sincronización.</p>
+
+        <p>MySQL expone los valores de la fila afectada mediante los alias <code>OLD</code> (valor antes del cambio) y <code>NEW</code> (valor después del cambio):</p>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Evento</th><th>OLD</th><th>NEW</th></tr></thead>
+            <tbody>
+              <tr><td>INSERT</td><td>No existe (todos NULL)</td><td>Valores insertados</td></tr>
+              <tr><td>UPDATE</td><td>Valores antes de la modificación</td><td>Valores después de la modificación</td></tr>
+              <tr><td>DELETE</td><td>Valores eliminados</td><td>No existe (todos NULL)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Ejemplo: trigger de auditoría</h2>
+        <p>Registramos cada cambio salarial en una tabla <code>auditoria_salarios</code>:</p>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Tabla de auditoría
+CREATE TABLE auditoria_salarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    empleado_id INT NOT NULL,
+    salario_anterior DECIMAL(10,2),
+    salario_nuevo DECIMAL(10,2),
+    modificado_por VARCHAR(100),
+    fecha_modificacion DATETIME DEFAULT NOW(),
+    accion VARCHAR(20)
+);
+
+-- Trigger AFTER UPDATE
+DELIMITER $$
+
+CREATE TRIGGER after_empleado_update_salario
+AFTER UPDATE ON empleados
+FOR EACH ROW
+BEGIN
+    -- Solo registrar si el salario cambió
+    IF OLD.salario != NEW.salario THEN
+        INSERT INTO auditoria_salarios(
+            empleado_id, salario_anterior, salario_nuevo,
+            modificado_por, accion
+        ) VALUES (
+            NEW.id, OLD.salario, NEW.salario,
+            USER(), 'UPDATE'
+        );
+    END IF;
+END$$
+
+DELIMITER ;</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Trigger AFTER DELETE
+DELIMITER $$
+
+CREATE TRIGGER after_empleado_delete
+AFTER DELETE ON empleados
+FOR EACH ROW
+BEGIN
+    INSERT INTO auditoria_salarios(
+        empleado_id, salario_anterior, salario_nuevo,
+        modificado_por, accion
+    ) VALUES (
+        OLD.id, OLD.salario, NULL,
+        USER(), 'DELETE'
+    );
+END$$
+
+DELIMITER ;</code></pre>
+        </div>
+
+        <h2>Trigger BEFORE INSERT con validación</h2>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">DELIMITER $$
+
+CREATE TRIGGER before_pedido_insert
+BEFORE INSERT ON pedidos
+FOR EACH ROW
+BEGIN
+    DECLARE stock_actual INT;
+
+    -- Verificar stock disponible
+    SELECT stock INTO stock_actual
+    FROM productos
+    WHERE id = NEW.producto_id;
+
+    IF stock_actual < NEW.cantidad THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Stock insuficiente para realizar el pedido';
+    END IF;
+
+    -- Calcular precio total
+    SET NEW.total = NEW.cantidad * NEW.precio_unitario;
+    SET NEW.fecha_pedido = NOW();
+END$$
+
+DELIMITER ;</code></pre>
+        </div>
+
+        <h2>Ver y eliminar triggers</h2>
+        <div class="code-block">
+          <div class="code-label">SQL</div>
+          <pre><code class="language-sql">-- Ver triggers de la base de datos
+SHOW TRIGGERS;
+
+-- Ver definición de un trigger específico
+SHOW CREATE TRIGGER after_empleado_update_salario;
+
+-- Eliminar un trigger
+DROP TRIGGER IF EXISTS after_empleado_update_salario;</code></pre>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="result-table">
+            <thead><tr><th>Trigger</th><th>Evento</th><th>Tabla</th><th>Timing</th></tr></thead>
+            <tbody>
+              <tr><td>before_empleado_insert</td><td>INSERT</td><td>empleados</td><td>BEFORE</td></tr>
+              <tr><td>after_empleado_update_salario</td><td>UPDATE</td><td>empleados</td><td>AFTER</td></tr>
+              <tr><td>after_empleado_delete</td><td>DELETE</td><td>empleados</td><td>AFTER</td></tr>
+              <tr><td>before_pedido_insert</td><td>INSERT</td><td>pedidos</td><td>BEFORE</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-tip"><div class="callout-icon"><i class="bi bi-lightbulb"></i></div><div class="callout-content"><p>Usa <code>SIGNAL SQLSTATE '45000'</code> para lanzar errores personalizados dentro de un trigger. Esto permite rechazar operaciones que no cumplan las reglas de negocio, como saldos negativos o stock insuficiente.</p></div></div>
+
+        <div class="callout callout-warning"><div class="callout-icon"><i class="bi bi-exclamation-triangle"></i></div><div class="callout-content"><p>Abusar de los triggers puede hacer que la depuración sea muy difícil. Como los triggers se ejecutan de forma invisible para la aplicación, un error dentro de un trigger puede hacer fallar una operación sin que el desarrollador lo anticipé. Además, los triggers pueden generar efectos en cascada (un trigger que modifica otra tabla donde hay otro trigger). Usa triggers con moderación y documenta cada uno claramente.</p></div></div>
+
+        <nav class="page-nav">
+          <a href="funciones-personalizadas.html" class="nav-prev"><i class="bi bi-arrow-left"></i> Anterior</a>
+          <a href="eventos.html" class="nav-next">Siguiente <i class="bi bi-arrow-right"></i></a>
+        </nav>
+      </main>
+    </div>
+  </div>
+  <div id="footer-placeholder"></div>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+  <script src="../../assets/js/theme-switcher.js"></script>
+  <script src="../../assets/js/include-partials.js"></script>
+  <script src="../../assets/js/navbar.js"></script>
+  <script src="../../assets/js/copy-code.js"></script>
+  <script src="../../assets/js/search.js"></script>
+  <script src="../../assets/js/main.js"></script>
+</body>
+</html>
