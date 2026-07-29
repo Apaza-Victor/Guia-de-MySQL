@@ -60,7 +60,7 @@
     grid-template-columns: repeat(4, 1fr);
   }
 
-  .hero-decor span { font-size: 1.1rem; }
+  .hero-decor i { font-size: 2.5rem; }
 }
 
 /* lg >= 992px */

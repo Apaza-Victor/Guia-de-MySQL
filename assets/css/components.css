@@ -395,22 +395,24 @@ tr:hover td {
   z-index: 0;
 }
 
-.hero-decor span {
+.hero-decor i {
   position: absolute;
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 1.8rem;
   color: var(--accent);
-  opacity: 0.08;
-  font-weight: 700;
-  animation: floatShape 15s ease-in-out infinite;
+  opacity: 0.07;
+  animation: floatShape 18s ease-in-out infinite;
 }
 
-.hero-decor span:nth-child(1) { top: 10%; left: 5%; font-size: 1rem; animation-delay: 0s; }
-.hero-decor span:nth-child(2) { top: 20%; right: 8%; font-size: 1.2rem; animation-delay: 2s; }
-.hero-decor span:nth-child(3) { bottom: 25%; left: 10%; font-size: 0.9rem; animation-delay: 4s; }
-.hero-decor span:nth-child(4) { top: 60%; right: 5%; font-size: 1.1rem; animation-delay: 6s; }
-.hero-decor span:nth-child(5) { bottom: 10%; right: 20%; font-size: 1rem; animation-delay: 1s; }
-.hero-decor span:nth-child(6) { top: 5%; left: 45%; font-size: 0.85rem; animation-delay: 3s; }
+.hero-decor i:nth-child(1) { top: 8%; left: 4%; font-size: 2.2rem; animation-delay: 0s; }
+.hero-decor i:nth-child(2) { top: 15%; right: 6%; font-size: 2.8rem; animation-delay: 2s; }
+.hero-decor i:nth-child(3) { bottom: 20%; left: 8%; font-size: 2rem; animation-delay: 4s; }
+.hero-decor i:nth-child(4) { top: 55%; right: 3%; font-size: 2.5rem; animation-delay: 6s; }
+.hero-decor i:nth-child(5) { bottom: 8%; right: 18%; font-size: 2.8rem; animation-delay: 1s; }
+.hero-decor i:nth-child(6) { top: 3%; left: 40%; font-size: 1.8rem; animation-delay: 3s; }
+.hero-decor i:nth-child(7) { top: 40%; left: 2%; font-size: 2rem; animation-delay: 5s; }
+.hero-decor i:nth-child(8) { bottom: 35%; right: 4%; font-size: 2.2rem; animation-delay: 7s; }
+.hero-decor i:nth-child(9) { top: 70%; left: 12%; font-size: 1.6rem; animation-delay: 2.5s; }
+.hero-decor i:nth-child(10) { bottom: 5%; left: 30%; font-size: 2rem; animation-delay: 4.5s; }
 
 .hero::after {
   content: '';
