@@ -61,4 +61,4 @@ https://tu-usuario.github.io/Guia-de-MySQL/
 
 ## Licencia
 
-Este proyecto está bajo la licencia MIT.
+Todos los derechos reservados. Este código está publicado únicamente con fines educativos y de visualización. No se permite la copia, modificación o distribución de este proyecto sin autorización previa.
