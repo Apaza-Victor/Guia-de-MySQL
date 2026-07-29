@@ -17,6 +17,11 @@
   max-width: 1400px;
   margin: 0 auto;
   gap: 0.5rem;
+  justify-content: center;
+}
+
+.navbar-brand {
+  margin-right: auto;
 }
 
 .navbar-brand {
