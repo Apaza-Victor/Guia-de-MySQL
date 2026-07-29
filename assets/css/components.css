@@ -380,6 +380,7 @@ tr:hover td {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 0;
   background:
     radial-gradient(circle at 20% 50%, var(--accent-light) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(79, 124, 255, 0.08) 0%, transparent 40%),
@@ -399,19 +400,21 @@ tr:hover td {
   position: absolute;
   font-size: 1.8rem;
   color: var(--accent);
-  opacity: 0.1;
+  opacity: 0.18;
+  filter: drop-shadow(0 0 8px var(--accent));
+  transition: opacity 0.5s;
 }
 
-.hero-decor i:nth-child(1) { top: 8%; left: 4%; font-size: 2.2rem; animation: floatA 14s ease-in-out infinite; }
-.hero-decor i:nth-child(2) { top: 15%; right: 6%; font-size: 2.8rem; animation: floatB 16s ease-in-out infinite; animation-delay: 1s; }
-.hero-decor i:nth-child(3) { bottom: 20%; left: 8%; font-size: 2rem; animation: floatC 18s ease-in-out infinite; animation-delay: 2s; }
-.hero-decor i:nth-child(4) { top: 55%; right: 3%; font-size: 2.5rem; animation: floatA 15s ease-in-out infinite; animation-delay: 0.5s; }
-.hero-decor i:nth-child(5) { bottom: 8%; right: 18%; font-size: 2.8rem; animation: floatB 13s ease-in-out infinite; animation-delay: 3s; }
-.hero-decor i:nth-child(6) { top: 3%; left: 40%; font-size: 1.8rem; animation: floatC 17s ease-in-out infinite; animation-delay: 1.5s; }
-.hero-decor i:nth-child(7) { top: 40%; left: 2%; font-size: 2rem; animation: floatA 19s ease-in-out infinite; animation-delay: 2.5s; }
-.hero-decor i:nth-child(8) { bottom: 35%; right: 4%; font-size: 2.2rem; animation: floatB 14s ease-in-out infinite; animation-delay: 0.8s; }
-.hero-decor i:nth-child(9) { top: 70%; left: 12%; font-size: 1.6rem; animation: floatC 16s ease-in-out infinite; animation-delay: 3.5s; }
-.hero-decor i:nth-child(10) { bottom: 5%; left: 30%; font-size: 2rem; animation: floatA 18s ease-in-out infinite; animation-delay: 2s; }
+.hero-decor i:nth-child(1) { top: 8%; left: 4%; font-size: 2.8rem; animation: floatA 14s ease-in-out infinite; }
+.hero-decor i:nth-child(2) { top: 15%; right: 6%; font-size: 3.2rem; animation: floatB 16s ease-in-out infinite; animation-delay: 1s; }
+.hero-decor i:nth-child(3) { bottom: 20%; left: 8%; font-size: 2.5rem; animation: floatC 18s ease-in-out infinite; animation-delay: 2s; }
+.hero-decor i:nth-child(4) { top: 55%; right: 3%; font-size: 3rem; animation: floatA 15s ease-in-out infinite; animation-delay: 0.5s; }
+.hero-decor i:nth-child(5) { bottom: 8%; right: 18%; font-size: 3.5rem; animation: floatB 13s ease-in-out infinite; animation-delay: 3s; }
+.hero-decor i:nth-child(6) { top: 3%; left: 40%; font-size: 2.2rem; animation: floatC 17s ease-in-out infinite; animation-delay: 1.5s; }
+.hero-decor i:nth-child(7) { top: 40%; left: 2%; font-size: 2.5rem; animation: floatA 19s ease-in-out infinite; animation-delay: 2.5s; }
+.hero-decor i:nth-child(8) { bottom: 35%; right: 4%; font-size: 2.8rem; animation: floatB 14s ease-in-out infinite; animation-delay: 0.8s; }
+.hero-decor i:nth-child(9) { top: 70%; left: 12%; font-size: 2rem; animation: floatC 16s ease-in-out infinite; animation-delay: 3.5s; }
+.hero-decor i:nth-child(10) { bottom: 5%; left: 30%; font-size: 2.5rem; animation: floatA 18s ease-in-out infinite; animation-delay: 2s; }
 
 @keyframes floatA {
   0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -446,7 +449,7 @@ tr:hover td {
   animation: floatB 14s ease-in-out infinite;
 }
 
-.hero > * {
+.hero > :not(.hero-decor) {
   position: relative;
   z-index: 1;
 }
