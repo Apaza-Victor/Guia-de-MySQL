@@ -399,20 +399,39 @@ tr:hover td {
   position: absolute;
   font-size: 1.8rem;
   color: var(--accent);
-  opacity: 0.07;
-  animation: floatShape 18s ease-in-out infinite;
+  opacity: 0.1;
 }
 
-.hero-decor i:nth-child(1) { top: 8%; left: 4%; font-size: 2.2rem; animation-delay: 0s; }
-.hero-decor i:nth-child(2) { top: 15%; right: 6%; font-size: 2.8rem; animation-delay: 2s; }
-.hero-decor i:nth-child(3) { bottom: 20%; left: 8%; font-size: 2rem; animation-delay: 4s; }
-.hero-decor i:nth-child(4) { top: 55%; right: 3%; font-size: 2.5rem; animation-delay: 6s; }
-.hero-decor i:nth-child(5) { bottom: 8%; right: 18%; font-size: 2.8rem; animation-delay: 1s; }
-.hero-decor i:nth-child(6) { top: 3%; left: 40%; font-size: 1.8rem; animation-delay: 3s; }
-.hero-decor i:nth-child(7) { top: 40%; left: 2%; font-size: 2rem; animation-delay: 5s; }
-.hero-decor i:nth-child(8) { bottom: 35%; right: 4%; font-size: 2.2rem; animation-delay: 7s; }
-.hero-decor i:nth-child(9) { top: 70%; left: 12%; font-size: 1.6rem; animation-delay: 2.5s; }
-.hero-decor i:nth-child(10) { bottom: 5%; left: 30%; font-size: 2rem; animation-delay: 4.5s; }
+.hero-decor i:nth-child(1) { top: 8%; left: 4%; font-size: 2.2rem; animation: floatA 14s ease-in-out infinite; }
+.hero-decor i:nth-child(2) { top: 15%; right: 6%; font-size: 2.8rem; animation: floatB 16s ease-in-out infinite; animation-delay: 1s; }
+.hero-decor i:nth-child(3) { bottom: 20%; left: 8%; font-size: 2rem; animation: floatC 18s ease-in-out infinite; animation-delay: 2s; }
+.hero-decor i:nth-child(4) { top: 55%; right: 3%; font-size: 2.5rem; animation: floatA 15s ease-in-out infinite; animation-delay: 0.5s; }
+.hero-decor i:nth-child(5) { bottom: 8%; right: 18%; font-size: 2.8rem; animation: floatB 13s ease-in-out infinite; animation-delay: 3s; }
+.hero-decor i:nth-child(6) { top: 3%; left: 40%; font-size: 1.8rem; animation: floatC 17s ease-in-out infinite; animation-delay: 1.5s; }
+.hero-decor i:nth-child(7) { top: 40%; left: 2%; font-size: 2rem; animation: floatA 19s ease-in-out infinite; animation-delay: 2.5s; }
+.hero-decor i:nth-child(8) { bottom: 35%; right: 4%; font-size: 2.2rem; animation: floatB 14s ease-in-out infinite; animation-delay: 0.8s; }
+.hero-decor i:nth-child(9) { top: 70%; left: 12%; font-size: 1.6rem; animation: floatC 16s ease-in-out infinite; animation-delay: 3.5s; }
+.hero-decor i:nth-child(10) { bottom: 5%; left: 30%; font-size: 2rem; animation: floatA 18s ease-in-out infinite; animation-delay: 2s; }
+
+@keyframes floatA {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-25px) rotate(5deg); }
+  50% { transform: translateY(-10px) rotate(-3deg); }
+  75% { transform: translateY(-20px) rotate(4deg); }
+}
+
+@keyframes floatB {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(15px, -20px) scale(1.1); }
+  66% { transform: translate(-10px, -10px) scale(0.95); }
+}
+
+@keyframes floatC {
+  0%, 100% { transform: translateX(0) rotateY(0deg); }
+  25% { transform: translateX(20px) rotateY(10deg); }
+  50% { transform: translateX(-15px) rotateY(-5deg); }
+  75% { transform: translateX(10px) rotateY(8deg); }
+}
 
 .hero::after {
   content: '';
@@ -424,7 +443,7 @@ tr:hover td {
   opacity: 0.03;
   top: -80px;
   right: -80px;
-  animation: floatShape 12s ease-in-out infinite;
+  animation: floatB 14s ease-in-out infinite;
 }
 
 .hero > * {
@@ -481,12 +500,6 @@ tr:hover td {
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
   100% { background-position: 100% 50%; }
-}
-
-@keyframes floatShape {
-  0%, 100% { transform: translate(0, 0); }
-  33% { transform: translate(-30px, 30px); }
-  66% { transform: translate(20px, -20px); }
 }
 
 .btn {
