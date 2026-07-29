@@ -2,6 +2,8 @@
 
 Sitio web estático y responsive para aprender MySQL desde cero a nivel experto. Incluye 9 módulos con teoría, ejemplos de código SQL, ejercicios prácticos, glosario y recursos externos.
 
+**🌐 Sitio en vivo:** [apaza-victor.github.io/Guia-de-MySQL](https://apaza-victor.github.io/Guia-de-MySQL/)
+
 ## Stack
 
 - HTML5 + CSS3 (Variables CSS, diseño mobile-first)
@@ -52,6 +54,10 @@ El sitio está desplegado en GitHub Pages. Para desplegar tu propia copia:
 2. Ve a Settings > Pages > Source > Deploy from branch
 3. Selecciona `main` y carpeta `/ (root)`
 4. Guarda y espera unos minutos
+
+```
+https://tu-usuario.github.io/Guia-de-MySQL/
+```
 
 ## Licencia
 
