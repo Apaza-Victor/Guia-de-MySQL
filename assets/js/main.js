@@ -70,4 +70,10 @@
       });
     }
   }
+
+  document.addEventListener('partials-loaded', function () {
+    if (typeof AOS !== 'undefined') {
+      AOS.refresh();
+    }
+  });
 })();
