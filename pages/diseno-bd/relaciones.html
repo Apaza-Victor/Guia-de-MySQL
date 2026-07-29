@@ -6,7 +6,7 @@
   <title>Tipos de relaciones en BD - Guía MySQL</title>
   <meta name="description" content="Aprende sobre relaciones 1:1, 1:N y N:M en bases de datos relacionales.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
   <link href="../../assets/css/variables.css" rel="stylesheet">
@@ -21,6 +21,8 @@
       document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default', themeVariables: { primaryColor: '#4f7cff', primaryTextColor: '#fff', primaryBorderColor: '#3a63e0', lineColor: '#4f7cff', secondaryColor: '#e8eeff', tertiaryColor: '#f4f6fa' } });</script>
 </head>
 <body data-base="../.." data-module="diseno-bd" data-page="relaciones">
   <div id="header-placeholder"></div>
@@ -35,6 +37,29 @@
       <main class="content-area">
         <h1>Tipos de relaciones en BD</h1>
         <p>En las bases de datos relacionales, las <strong>relaciones</strong> definen cómo se asocian las tablas entre sí. Los tres tipos fundamentales son 1:1 (uno a uno), 1:N (uno a muchos) y N:M (muchos a muchos). Cada una se implementa de forma distinta usando claves foráneas.</p>
+
+<div class="mermaid" style="margin: 1.5rem 0;">
+flowchart TD
+    subgraph "1:1 Uno a uno"
+        A1[Usuario] -- "1" --- B1[Perfil]
+    end
+    subgraph "1:N Uno a muchos"
+        A2[Categoría] -- "1" --- B2[Producto]
+        A2 --- C2[Producto]
+    end
+    subgraph "N:M Muchos a muchos"
+        A3[Estudiante] --- D3[Inscripción]
+        B3[Curso] --- D3
+    end
+    style A1 fill:#e8eeff,stroke:#4f7cff
+    style B1 fill:#e8eeff,stroke:#4f7cff
+    style A2 fill:#dcfce7,stroke:#22c55e
+    style B2 fill:#dcfce7,stroke:#22c55e
+    style C2 fill:#dcfce7,stroke:#22c55e
+    style A3 fill:#fef3c7,stroke:#f59e0b
+    style B3 fill:#fef3c7,stroke:#f59e0b
+    style D3 fill:#fef3c7,stroke:#f59e0b
+</div>
 
         <h2>Relación 1:1 (Uno a uno)</h2>
         <p>Cada fila de la tabla A se relaciona con exactamente una fila de la tabla B, y viceversa. Se implementa colocando una FK única en una de las tablas. Ejemplo: un usuario tiene un perfil, y un perfil pertenece a un solo usuario.</p>

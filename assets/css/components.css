@@ -1,3 +1,70 @@
+/* === KEYFRAMES === */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--code-bg) 25%, rgba(255,255,255,0.05) 50%, var(--code-bg) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.animate-slide-in {
+  animation: slideInLeft 0.5s ease forwards;
+}
+
+.result-table {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.hero h1 {
+  animation: fadeInUp 0.7s ease forwards;
+}
+
+.hero p {
+  animation: fadeInUp 0.7s ease forwards;
+  animation-delay: 0.15s;
+}
+
+.hero-cta {
+  animation: fadeInUp 0.7s ease forwards;
+  animation-delay: 0.3s;
+}
+
+/* === MERMAID DIAGRAMS === */
+.mermaid {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+  animation: fadeInUp 0.6s ease forwards;
+}
+
 /* === CARDS === */
 .card {
   background: var(--card-bg);

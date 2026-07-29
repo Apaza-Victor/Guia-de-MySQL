@@ -6,7 +6,7 @@
   <title>Normalización de bases de datos - Guía MySQL</title>
   <meta name="description" content="Guía completa de normalización: 1FN, 2FN, 3FN y BCNF con ejemplos prácticos.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
   <link href="../../assets/css/variables.css" rel="stylesheet">
@@ -21,6 +21,8 @@
       document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default', themeVariables: { primaryColor: '#4f7cff', primaryTextColor: '#fff', primaryBorderColor: '#3a63e0', lineColor: '#4f7cff', secondaryColor: '#e8eeff', tertiaryColor: '#f4f6fa' } });</script>
 </head>
 <body data-base="../.." data-module="diseno-bd" data-page="normalizacion">
   <div id="header-placeholder"></div>
@@ -147,6 +149,19 @@ CREATE TABLE detalle_pedido (
     FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido)
 );</code></pre>
         </div>
+
+<div class="mermaid" style="margin: 1.5rem 0;">
+flowchart LR
+    A["0FN<br/>Tabla única"] --> B["1FN<br/>Valores atómicos"]
+    B --> C["2FN<br/>Sin dependencias parciales"]
+    C --> D["3FN<br/>Sin dependencias transitivas"]
+    D --> E["BCNF<br/>Todo determinante es clave"]
+    style A fill:#fef3c7,stroke:#f59e0b
+    style B fill:#dcfce7,stroke:#22c55e
+    style C fill:#dcfce7,stroke:#22c55e
+    style D fill:#dcfce7,stroke:#22c55e
+    style E fill:#e8eeff,stroke:#4f7cff
+</div>
 
         <div class="callout callout-important"><div class="callout-icon"><i class="bi bi-info-circle"></i></div><div class="callout-content"><p>No siempre conviene normalizar al máximo. En sistemas con <strong>altas cargas de lectura</strong> (reportes, dashboards) una desnormalización controlada puede mejorar el rendimiento al evitar JOINs costosos. Evalúa el equilibrio entre integridad y velocidad según tu caso de uso.</p></div></div>
 

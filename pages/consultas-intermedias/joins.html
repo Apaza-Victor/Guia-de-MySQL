@@ -6,7 +6,7 @@
   <title>JOINs en MySQL - Guía MySQL</title>
   <meta name="description" content="Aprende a combinar tablas con INNER JOIN, LEFT JOIN, RIGHT JOIN y más.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
   <link href="../../assets/css/variables.css" rel="stylesheet">
@@ -21,6 +21,8 @@
       document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default', themeVariables: { primaryColor: '#4f7cff', primaryTextColor: '#fff', primaryBorderColor: '#3a63e0', lineColor: '#4f7cff', secondaryColor: '#e8eeff', tertiaryColor: '#f4f6fa' } });</script>
 </head>
 <body data-base="../.." data-module="consultas-intermedias" data-page="joins">
   <div id="header-placeholder"></div>
@@ -35,6 +37,30 @@
       <main class="content-area">
         <h1>JOINs en MySQL</h1>
         <p>Los JOINs permiten combinar filas de dos o más tablas basándose en una columna relacionada entre ellas. Son fundamentales para trabajar con bases de datos relacionales y obtener datos que están distribuidos en múltiples tablas.</p>
+
+<div class="mermaid" style="margin: 1.5rem 0;">
+flowchart TD
+    subgraph "INNER JOIN"
+        I1[Clientes] --- I2[A ∩ B]
+        I3[Pedidos] --- I2
+    end
+    subgraph "LEFT JOIN"
+        L1[Clientes] --- L2[A]
+        L4[Pedidos] --- L2
+    end
+    subgraph "RIGHT JOIN"
+        R1[Clientes] --- R2[B]
+        R3[Pedidos] --- R2
+    end
+    subgraph "CROSS JOIN"
+        C1[Clientes] --- C2[A × B]
+        C3[Pedidos] --- C2
+    end
+    style I2 fill:#e8eeff,stroke:#4f7cff,stroke-width:2px
+    style L2 fill:#e8eeff,stroke:#4f7cff,stroke-width:2px
+    style R2 fill:#e8eeff,stroke:#4f7cff,stroke-width:2px
+    style C2 fill:#e8eeff,stroke:#4f7cff,stroke-width:2px
+</div>
 
         <h2>Tablas de ejemplo</h2>
         <p>Usaremos las tablas <code>clientes</code> y <code>pedidos</code> para los ejemplos.</p>

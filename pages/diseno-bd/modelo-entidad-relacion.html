@@ -6,7 +6,7 @@
   <title>Modelo Entidad-Relación (ER) - Guía MySQL</title>
   <meta name="description" content="Aprende a diseñar bases de datos con diagramas entidad-relación.">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
   <link href="../../assets/css/variables.css" rel="stylesheet">
@@ -21,6 +21,8 @@
       document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, theme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'default', themeVariables: { primaryColor: '#4f7cff', primaryTextColor: '#fff', primaryBorderColor: '#3a63e0', lineColor: '#4f7cff', secondaryColor: '#e8eeff', tertiaryColor: '#f4f6fa' } });</script>
 </head>
 <body data-base="../.." data-module="diseno-bd" data-page="modelo-entidad-relacion">
   <div id="header-placeholder"></div>
@@ -65,6 +67,38 @@
 
         <h2>Ejemplo: Sistema de Biblioteca</h2>
         <p>Modelamos un sistema de biblioteca con las entidades <code>Libro</code>, <code>Autor</code>, <code>Socio</code> y <code>Préstamo</code>. La relación <code>escribe</code> vincula Autor con Libro (1:N). La relación <code>realiza</code> vincula Socio con Préstamo (1:N). La relación <code>incluye</code> vincula Préstamo con Libro (1:N).</p>
+
+<div class="mermaid" style="margin: 1.5rem 0;">
+erDiagram
+    AUTOR {
+        int id_autor PK
+        string nombre
+        string apellido
+        string nacionalidad
+    }
+    LIBRO {
+        string isbn PK
+        string titulo
+        year anio_publicacion
+        string genero
+    }
+    SOCIO {
+        int id_socio PK
+        string nombre
+        string direccion
+        string telefono
+        string email
+    }
+    PRESTAMO {
+        int id_prestamo PK
+        date fecha_inicio
+        date fecha_devolucion
+        string estado
+    }
+    AUTOR ||--o{ LIBRO : escribe
+    SOCIO ||--o{ PRESTAMO : realiza
+    LIBRO ||--o{ PRESTAMO : incluye
+</div>
 
         <div class="code-block">
           <div class="code-label">SQL</div>
