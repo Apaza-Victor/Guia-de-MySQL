@@ -60,9 +60,7 @@
     grid-template-columns: repeat(4, 1fr);
   }
 
-  .hero {
-    padding: 4rem 2rem;
-  }
+  .hero-decor span { font-size: 1.1rem; }
 }
 
 /* lg >= 992px */
@@ -84,10 +82,6 @@
 
   .module-grid {
     grid-template-columns: repeat(3, 1fr);
-  }
-
-  .hero {
-    padding: 5rem 2rem;
   }
 }
 
