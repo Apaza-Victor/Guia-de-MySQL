@@ -16,7 +16,7 @@
   const theme = getPreferredTheme();
   setTheme(theme);
 
-  document.addEventListener('DOMContentLoaded', function () {
+  function initToggle() {
     const toggle = document.getElementById('themeToggle');
     if (!toggle) return;
 
@@ -36,5 +36,8 @@
       setTheme(next);
       updateIcon();
     });
-  });
+  }
+
+  document.addEventListener('DOMContentLoaded', initToggle);
+  document.addEventListener('partials-loaded', initToggle);
 })();
