@@ -1,0 +1,885 @@
+[
+  {
+    "url": "404.html",
+    "title": "Página no encontrada - Guía MySQL",
+    "description": "La página que buscas no existe.",
+    "h1": "404",
+    "headings": [
+      "Página no encontrada"
+    ],
+    "text": ""
+  },
+  {
+    "url": "index.html",
+    "title": "Guía de MySQL - Aprende MySQL desde Cero a Experto",
+    "description": "Guía completa y gratuita para aprender MySQL paso a paso. Desde fundamentos hasta nivel experto con ejemplos prácticos de SQL.",
+    "h1": "Aprende MySQL desde Cero a Experto",
+    "headings": [
+      "¿Qué aprenderás?",
+      "1. Fundamentos",
+      "2. SQL Básico",
+      "3. SQL Intermedio",
+      "4. Diseño de BD",
+      "5. SQL Avanzado",
+      "6. Optimización",
+      "7. Administración",
+      "8. Nivel Experto",
+      "9. Práctica",
+      "¿Por qué aprender MySQL?"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/administracion/backup-restauracion.html",
+    "title": "Backup y restauración - Guía MySQL",
+    "description": "Aprende a realizar copias de seguridad y restaurar bases de datos MySQL con mysqldump.",
+    "h1": "Backup y restauración",
+    "headings": [
+      "Tipos de backup con mysqldump",
+      "Backup con rutinas y disparadores",
+      "Restauración de una base de datos",
+      "Automación con cron"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/administracion/replicacion.html",
+    "title": "Replicación en MySQL - Guía MySQL",
+    "description": "Conceptos básicos de replicación maestro-esclavo para alta disponibilidad.",
+    "h1": "Replicación en MySQL",
+    "headings": [
+      "¿Qué es la replicación maestro-esclavo?",
+      "Componentes de la replicación",
+      "Ventajas de la replicación",
+      "Configuración básica"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/administracion/seguridad.html",
+    "title": "Seguridad en MySQL - Guía MySQL",
+    "description": "Protege tu base de datos contra inyección SQL, accesos no autorizados y más.",
+    "h1": "Seguridad en MySQL",
+    "headings": [
+      "Inyección SQL",
+      "Prevención con prepared statements",
+      "Cifrado de datos",
+      "Buenas prácticas de configuración",
+      "mysql_secure_installation"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/administracion/usuarios-y-permisos.html",
+    "title": "Gestión de usuarios y permisos - Guía MySQL",
+    "description": "Aprende a crear usuarios, asignar permisos y gestionar la seguridad con GRANT y REVOKE.",
+    "h1": "Gestión de usuarios y permisos",
+    "headings": [
+      "Creación y eliminación de usuarios",
+      "Asignación de privilegios con GRANT",
+      "Privilegios comunes en MySQL",
+      "Revocación de privilegios con REVOKE",
+      "Visualización de privilegios",
+      "FLUSH PRIVILEGES",
+      "Roles en MySQL 8"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/avanzado/eventos.html",
+    "title": "Eventos programados - Guía MySQL",
+    "description": "Programa tareas automáticas en MySQL con el Event Scheduler.",
+    "h1": "Eventos programados",
+    "headings": [
+      "Verificar el Event Scheduler",
+      "CREATE EVENT",
+      "Programación avanzada con EVERY, STARTS y ENDS",
+      "Ejemplo: limpiar logs viejos cada semana",
+      "Gestión de eventos"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/avanzado/funciones-personalizadas.html",
+    "title": "Funciones personalizadas - Guía MySQL",
+    "description": "Crea funciones reutilizables en MySQL con CREATE FUNCTION.",
+    "h1": "Funciones personalizadas",
+    "headings": [
+      "CREATE FUNCTION",
+      "Diferencias entre funciones y procedimientos",
+      "Ejemplos de funciones escalares",
+      "Manejo de NULLs en funciones",
+      "Eliminar y ver funciones"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/avanzado/indices.html",
+    "title": "Índices en MySQL - Guía MySQL",
+    "description": "Aprende qué son los índices, cómo mejoran el rendimiento y los tipos disponibles en MySQL.",
+    "h1": "Índices en MySQL",
+    "headings": [
+      "Qué son los índices",
+      "CREATE INDEX",
+      "Tipos de índices en MySQL",
+      "Índices simples y compuestos",
+      "Ejemplo práctico: consulta con y sin índice",
+      "Cuándo usar índices",
+      "Cuándo evitarlos"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/avanzado/procedimientos-almacenados.html",
+    "title": "Procedimientos almacenados - Guía MySQL",
+    "description": "Aprende a crear y usar procedimientos almacenados con CREATE PROCEDURE.",
+    "h1": "Procedimientos almacenados",
+    "headings": [
+      "CREATE PROCEDURE",
+      "Parámetros IN, OUT, INOUT",
+      "Variables y estructuras de control",
+      "WHILE y bucles",
+      "Ejemplo completo: empleados por departamento"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/avanzado/transacciones.html",
+    "title": "Transacciones en MySQL - Guía MySQL",
+    "description": "Domina las transacciones: COMMIT, ROLLBACK, SAVEPOINT y propiedades ACID.",
+    "h1": "Transacciones en MySQL",
+    "headings": [
+      "START TRANSACTION, COMMIT y ROLLBACK",
+      "Propiedades ACID",
+      "SAVEPOINT y ROLLBACK TO SAVEPOINT",
+      "Ejemplo completo: transferencia bancaria"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/avanzado/triggers.html",
+    "title": "Triggers en MySQL - Guía MySQL",
+    "description": "Automatiza acciones con triggers BEFORE/AFTER INSERT, UPDATE y DELETE.",
+    "h1": "Triggers en MySQL",
+    "headings": [
+      "CREATE TRIGGER",
+      "BEFORE vs AFTER y OLD vs NEW",
+      "Ejemplo: trigger de auditoría",
+      "Trigger BEFORE INSERT con validación",
+      "Ver y eliminar triggers"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/avanzado/vistas-avanzadas.html",
+    "title": "Vistas avanzadas - Guía MySQL",
+    "description": "Vistas actualizables, WITH CHECK OPTION y vistas materializadas simuladas.",
+    "h1": "Vistas avanzadas",
+    "headings": [
+      "Vistas actualizables",
+      "WITH CHECK OPTION",
+      "Limitaciones de las vistas en MySQL",
+      "Simular vistas materializadas"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/consultas-basicas/insert-update-delete.html",
+    "title": "INSERT, UPDATE y DELETE - Guía MySQL",
+    "description": "Aprende a insertar, actualizar y eliminar datos en MySQL con INSERT INTO, UPDATE y DELETE.",
+    "h1": "INSERT, UPDATE y DELETE",
+    "headings": [
+      "Datos de ejemplo: estudiantes",
+      "INSERT INTO con valores",
+      "INSERT múltiples filas",
+      "INSERT SELECT",
+      "UPDATE para modificar registros",
+      "DELETE para eliminar registros"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/consultas-basicas/operadores.html",
+    "title": "Operadores en SQL - Guía MySQL",
+    "description": "Guía de referencia de todos los operadores en SQL: aritméticos, comparación, lógicos y de cadena.",
+    "h1": "Operadores en SQL",
+    "headings": [
+      "Operadores aritméticos",
+      "Operadores de comparación",
+      "Operadores lógicos",
+      "Operadores especiales",
+      "Operador de concatenación: CONCAT()"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/consultas-basicas/order-by-limit.html",
+    "title": "ORDER BY y LIMIT - Guía MySQL",
+    "description": "Aprende a ordenar resultados con ORDER BY y limitar filas con LIMIT y OFFSET para paginación en MySQL.",
+    "h1": "ORDER BY y LIMIT",
+    "headings": [
+      "Datos de ejemplo: productos",
+      "ORDER BY ASC y DESC",
+      "ORDER BY con múltiples columnas",
+      "LIMIT para restringir resultados",
+      "LIMIT con OFFSET para paginación",
+      "Combinación con WHERE"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/consultas-basicas/select.html",
+    "title": "SELECT - Consultas básicas - Guía MySQL",
+    "description": "Aprende a usar SELECT para consultar datos en MySQL, proyectar columnas, usar alias, DISTINCT y expresiones aritméticas.",
+    "h1": "SELECT - Consultas básicas",
+    "headings": [
+      "Sintaxis básica de SELECT",
+      "Seleccionar columnas específicas",
+      "Seleccionar todas las columnas con *",
+      "Alias con AS",
+      "DISTINCT para valores únicos",
+      "SELECT con expresiones aritméticas"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/consultas-basicas/where.html",
+    "title": "WHERE - Filtrando resultados - Guía MySQL",
+    "description": "Aprende a filtrar registros con WHERE usando operadores de comparación, BETWEEN, IN, LIKE, IS NULL y operadores lógicos AND, OR, NOT.",
+    "h1": "WHERE - Filtrando resultados",
+    "headings": [
+      "Operadores de comparación",
+      "BETWEEN",
+      "IN",
+      "LIKE y patrones de búsqueda",
+      "IS NULL",
+      "AND, OR y NOT"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/consultas-intermedias/funciones-agregadas.html",
+    "title": "Funciones agregadas (COUNT, SUM, AVG, MIN, MAX) - Guía MySQL",
+    "description": "Aprende a usar funciones agregadas en MySQL para resumir datos.",
+    "h1": "Funciones agregadas (COUNT, SUM, AVG, MIN, MAX)",
+    "headings": [
+      "Tabla de ejemplo: ventas",
+      "COUNT",
+      "SUM",
+      "AVG",
+      "MIN y MAX"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/consultas-intermedias/group-by-having.html",
+    "title": "GROUP BY y HAVING - Guía MySQL",
+    "description": "Agrupa datos con GROUP BY y filtra grupos con HAVING.",
+    "h1": "GROUP BY y HAVING",
+    "headings": [
+      "GROUP BY con una columna",
+      "GROUP BY con varias columnas",
+      "HAVING vs WHERE",
+      "Orden de ejecución en SQL"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/consultas-intermedias/joins.html",
+    "title": "JOINs en MySQL - Guía MySQL",
+    "description": "Aprende a combinar tablas con INNER JOIN, LEFT JOIN, RIGHT JOIN y más.",
+    "h1": "JOINs en MySQL",
+    "headings": [
+      "Tablas de ejemplo",
+      "INNER JOIN",
+      "LEFT JOIN",
+      "RIGHT JOIN",
+      "CROSS JOIN",
+      "Self JOIN"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/consultas-intermedias/subconsultas.html",
+    "title": "Subconsultas (subqueries) - Guía MySQL",
+    "description": "Domina las subconsultas en MySQL: en WHERE, FROM y SELECT.",
+    "h1": "Subconsultas (subqueries)",
+    "headings": [
+      "Subconsulta escalar en WHERE",
+      "Subconsulta de múltiples filas con IN",
+      "ANY y ALL",
+      "Subconsultas correlacionadas",
+      "Subconsultas en FROM (tablas derivadas)",
+      "Subconsulta en SELECT"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/consultas-intermedias/vistas.html",
+    "title": "Vistas (VIEW) - Guía MySQL",
+    "description": "Crea y usa vistas en MySQL para simplificar consultas complejas.",
+    "h1": "Vistas (VIEW)",
+    "headings": [
+      "Crear una vista con CREATE VIEW",
+      "Consultar una vista",
+      "Modificar una vista con ALTER VIEW",
+      "Eliminar una vista con DROP VIEW",
+      "WITH CHECK OPTION",
+      "Ventajas de las vistas"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/diseno-bd/claves-primarias-foraneas.html",
+    "title": "Claves primarias y foráneas - Guía MySQL",
+    "description": "Aprende a usar PRIMARY KEY, FOREIGN KEY, UNIQUE y AUTO_INCREMENT en MySQL.",
+    "h1": "Claves primarias y foráneas",
+    "headings": [
+      "PRIMARY KEY",
+      "AUTO_INCREMENT",
+      "UNIQUE",
+      "FOREIGN KEY",
+      "Agregar y eliminar claves sobre tablas existentes"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/diseno-bd/integridad-referencial.html",
+    "title": "Integridad referencial y restricciones - Guía MySQL",
+    "description": "Aprende a mantener la integridad de datos con constraints CHECK, DEFAULT y reglas de integridad referencial.",
+    "h1": "Integridad referencial y restricciones",
+    "headings": [
+      "Integridad de entidad",
+      "Integridad referencial",
+      "Restricción CHECK",
+      "Restricción DEFAULT",
+      "Restricción NOT NULL",
+      "Verificar constraints existentes"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/diseno-bd/modelo-entidad-relacion.html",
+    "title": "Modelo Entidad-Relación (ER) - Guía MySQL",
+    "description": "Aprende a diseñar bases de datos con diagramas entidad-relación.",
+    "h1": "Modelo Entidad-Relación (ER)",
+    "headings": [
+      "¿Qué es una entidad?",
+      "Atributos",
+      "Relaciones y cardinalidad",
+      "Ejemplo: Sistema de Biblioteca"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/diseno-bd/normalizacion.html",
+    "title": "Normalización de bases de datos - Guía MySQL",
+    "description": "Guía completa de normalización: 1FN, 2FN, 3FN y BCNF con ejemplos prácticos.",
+    "h1": "Normalización de bases de datos",
+    "headings": [
+      "Tabla desnormalizada (0FN)",
+      "Primera forma normal (1FN)",
+      "Segunda forma normal (2FN)",
+      "Tercera forma normal (3FN)",
+      "Forma Normal de Boyce-Codd (BCNF)"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/diseno-bd/relaciones.html",
+    "title": "Tipos de relaciones en BD - Guía MySQL",
+    "description": "Aprende sobre relaciones 1:1, 1:N y N:M en bases de datos relacionales.",
+    "h1": "Tipos de relaciones en BD",
+    "headings": [
+      "Relación 1:1 (Uno a uno)",
+      "Relación 1:N (Uno a muchos)",
+      "Relación N:M (Muchos a muchos)"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/experto/buenas-practicas.html",
+    "title": "Buenas prácticas profesionales - Guía MySQL",
+    "description": "Checklist de buenas prácticas para DBA y desarrolladores MySQL.",
+    "h1": "Buenas prácticas profesionales",
+    "headings": [
+      "Nombrado de bases de datos, tablas y columnas",
+      "Elegir tipos de datos correctos",
+      "Siempre usar NOT NULL cuando corresponda",
+      "Índices estratégicos",
+      "Normalizar sin exagerar",
+      "Usar transacciones",
+      "Prepared statements",
+      "Backups automáticos",
+      "Monitoreo: Slow Query Log y Performance Schema",
+      "Documentar el esquema",
+      "Checklist final de buenas prácticas"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/experto/escalabilidad.html",
+    "title": "Escalabilidad y alta disponibilidad - Guía MySQL",
+    "description": "Estrategias de escalabilidad: sharding, balanceo de carga, clustering y alta disponibilidad.",
+    "h1": "Escalabilidad y alta disponibilidad",
+    "headings": [
+      "Escalabilidad vertical vs horizontal",
+      "Sharding",
+      "Balanceo de carga",
+      "Clustering",
+      "Alta disponibilidad (HA)",
+      "Tabla comparativa de estrategias",
+      "Ejemplo: arquitectura escalable completa"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/experto/full-text-search.html",
+    "title": "Búsqueda de texto completo - Guía MySQL",
+    "description": "Implementa búsquedas avanzadas con FULLTEXT INDEX y MATCH...AGAINST.",
+    "h1": "Búsqueda de texto completo",
+    "headings": [
+      "Qué es FULLTEXT INDEX",
+      "MATCH...AGAINST en modo natural",
+      "Modo booleano",
+      "Query expansion",
+      "Límites y configuración",
+      "Ejemplo práctico: buscar artículos por contenido"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/experto/json-en-mysql.html",
+    "title": "JSON en MySQL - Guía MySQL",
+    "description": "Aprende a usar el tipo de dato JSON en MySQL con funciones como JSON_EXTRACT, JSON_ARRAY y más.",
+    "h1": "JSON en MySQL",
+    "headings": [
+      "Columnas JSON",
+      "Funciones de creación",
+      "Funciones de consulta",
+      "Funciones de modificación",
+      "Índices en columnas JSON",
+      "Ejemplo completo: metadatos flexibles de productos"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/experto/motores-de-almacenamiento.html",
+    "title": "Motores de almacenamiento - Guía MySQL",
+    "description": "Comparativa de InnoDB, MyISAM, Memory y otros motores en MySQL.",
+    "h1": "Motores de almacenamiento",
+    "headings": [
+      "InnoDB",
+      "MyISAM",
+      "Memory",
+      "CSV y ARCHIVE",
+      "Tabla comparativa de motores",
+      "Cómo elegir el motor",
+      "Ver el motor de una tabla"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/experto/mysql-y-orm.html",
+    "title": "MySQL con ORMs - Guía MySQL",
+    "description": "Conceptos de uso de MySQL con ORMs como Sequelize, Eloquent y TypeORM.",
+    "h1": "MySQL con ORMs",
+    "headings": [
+      "Qué es un ORM",
+      "Ventajas y desventajas",
+      "Ejemplos conceptuales por ORM",
+      "Sequelize (Node.js)",
+      "Eloquent (Laravel - PHP)",
+      "TypeORM (TypeScript)",
+      "Problema N+1",
+      "Migraciones",
+      "Tabla comparativa de ORMs populares"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/fundamentos/bases-de-datos-y-tablas.html",
+    "title": "Bases de datos y tablas - Guía MySQL",
+    "description": "Aprende a crear, modificar y eliminar bases de datos y tablas en MySQL con CREATE, ALTER, DROP y más.",
+    "h1": "Bases de datos y tablas",
+    "headings": [
+      "CREATE DATABASE y USE",
+      "Crear y seleccionar una base de datos",
+      "CREATE TABLE",
+      "Crear tabla con constraints",
+      "ALTER TABLE",
+      "Añadir y modificar columnas",
+      "DROP TABLE vs TRUNCATE",
+      "Diferencias entre DROP y TRUNCATE",
+      "SHOW TABLES y DESC",
+      "Inspeccionar la base de datos"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/fundamentos/clientes-mysql.html",
+    "title": "Clientes para MySQL - Guía MySQL",
+    "description": "Conoce las principales herramientas para conectarte y administrar MySQL: línea de comandos, MySQL Workbench, phpMyAdmin y DBeaver.",
+    "h1": "Clientes para MySQL",
+    "headings": [
+      "Cliente de línea de comandos mysql",
+      "Ejemplo básico con el cliente mysql",
+      "MySQL Workbench",
+      "phpMyAdmin",
+      "DBeaver Community",
+      "Cómo elegir la herramienta adecuada"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/fundamentos/instalacion.html",
+    "title": "Instalación y configuración de MySQL - Guía MySQL",
+    "description": "Guía paso a paso para instalar MySQL en Windows, Linux y macOS usando XAMPP, WAMP y el instalador oficial.",
+    "h1": "Instalación y configuración de MySQL",
+    "headings": [
+      "Instalación en Windows",
+      "Verificar la instalación",
+      "Instalación en Linux",
+      "Instalar MySQL en Ubuntu",
+      "Instalación en macOS",
+      "Instalar MySQL con Homebrew",
+      "Primeros pasos: conectar a MySQL",
+      "Conectar al servidor MySQL"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/fundamentos/que-es-mysql.html",
+    "title": "¿Qué es MySQL? - Guía MySQL",
+    "description": "Aprende qué es MySQL, su historia, características principales y cómo se compara con otros gestores de bases de datos.",
+    "h1": "¿Qué es MySQL?",
+    "headings": [
+      "Historia y creadores",
+      "Características principales",
+      "Conectarse a MySQL desde la línea de comandos",
+      "MySQL vs otros gestores de bases de datos",
+      "¿Para qué se usa MySQL en la industria?"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/fundamentos/tipos-de-datos.html",
+    "title": "Tipos de datos en MySQL - Guía MySQL",
+    "description": "Guía completa de todos los tipos de datos en MySQL: numéricos, cadenas, fecha/hora, ENUM, JSON y espaciales con ejemplos.",
+    "h1": "Tipos de datos en MySQL",
+    "headings": [
+      "Tipos numéricos",
+      "Ejemplo con tipos numéricos",
+      "Tipos de cadena",
+      "Ejemplo con tipos de cadena",
+      "Tipos de fecha y hora",
+      "Ejemplo con tipos de fecha",
+      "Tipos especiales: ENUM, SET, JSON, GEOMETRY",
+      "Ejemplo con tipos especiales"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/glosario/glosario.html",
+    "title": "Glosario de términos SQL/MySQL - Guía MySQL",
+    "description": "Diccionario de términos y conceptos de SQL y MySQL ordenados alfabéticamente. Más de 100 definiciones claras y concisas.",
+    "h1": "Glosario de términos SQL / MySQL",
+    "headings": [
+      "A",
+      "ACID",
+      "Aggregate functions",
+      "Alias",
+      "ALTER",
+      "AUTO_INCREMENT",
+      "B",
+      "B-tree",
+      "BACKUP",
+      "BETWEEN",
+      "BLOB",
+      "BOOLEAN",
+      "C",
+      "CASCADE",
+      "CHAR",
+      "CHECK",
+      "Clave foránea (FOREIGN KEY)",
+      "Clave primaria (PRIMARY KEY)",
+      "COMMIT",
+      "CONSTRAINT",
+      "CREATE",
+      "CROSS JOIN",
+      "D",
+      "DATABASE",
+      "DATE",
+      "DATETIME",
+      "DECIMAL",
+      "DEFAULT",
+      "DELETE",
+      "DISTINCT",
+      "DROP",
+      "E",
+      "ENUM",
+      "Entity (Entidad)",
+      "ER diagram (Diagrama ER)",
+      "EVENT",
+      "EXPLAIN",
+      "F",
+      "FLOAT",
+      "FOREIGN KEY",
+      "FULLTEXT",
+      "FUNCTION",
+      "G",
+      "GET_FORMAT",
+      "GRANT",
+      "GROUP BY",
+      "H",
+      "HASH index",
+      "HAVING",
+      "I",
+      "IF",
+      "IN",
+      "INDEX",
+      "INNER JOIN",
+      "INSERT",
+      "INT",
+      "Integridad referencial",
+      "IS NULL",
+      "J",
+      "JOIN",
+      "JSON",
+      "K",
+      "KEY",
+      "KEY_BLOCK_SIZE",
+      "L",
+      "LEFT JOIN",
+      "LIKE",
+      "LIMIT",
+      "LOG",
+      "M",
+      "InnoDB",
+      "MATCH...AGAINST",
+      "Memory",
+      "MyISAM",
+      "mysqldump",
+      "N",
+      "Normalización 1FN, 2FN, 3FN",
+      "NOT NULL",
+      "O",
+      "OFFSET",
+      "ON DELETE CASCADE",
+      "OR",
+      "ORDER BY",
+      "P",
+      "PARTITION",
+      "Prepared statements",
+      "PRIMARY KEY",
+      "PROCEDURE",
+      "Q",
+      "Query",
+      "R",
+      "REGEXP",
+      "REPLACE",
+      "REVOKE",
+      "RIGHT JOIN",
+      "ROLLBACK",
+      "S",
+      "SAVEPOINT",
+      "SELECT",
+      "SET",
+      "SHOW",
+      "SSL",
+      "SUBQUERY",
+      "SUM",
+      "T",
+      "TABLE",
+      "TEXT",
+      "TIMESTAMP",
+      "TRANSACTION",
+      "TRIGGER",
+      "TRUNCATE",
+      "Types (data)",
+      "U",
+      "UNION",
+      "UNIQUE",
+      "UPDATE",
+      "USER",
+      "USING",
+      "V",
+      "VALUES",
+      "VARCHAR",
+      "VIEW",
+      "W",
+      "WHERE",
+      "WITH",
+      "WORK",
+      "X",
+      "XA transactions",
+      "Y",
+      "YEAR",
+      "Z",
+      "ZEROFILL"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/optimizacion/explain.html",
+    "title": "EXPLAIN - Analizando planes de ejecución - Guía MySQL",
+    "description": "Aprende a usar EXPLAIN para analizar y optimizar consultas SQL en MySQL.",
+    "h1": "EXPLAIN — Analizando planes de ejecución",
+    "headings": [
+      "Sintaxis básica",
+      "Columnas del plan de ejecución",
+      "Tipos de acceso (type)",
+      "Ejemplo práctico: consulta lenta vs. optimizada",
+      "EXPLAIN EXTENDED y FORMAT"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/optimizacion/indices-avanzados.html",
+    "title": "Índices avanzados y covering index - Guía MySQL",
+    "description": "Índices compuestos, covering index y estrategias avanzadas de indexación.",
+    "h1": "Índices avanzados y covering index",
+    "headings": [
+      "Índices compuestos (multi-columna)",
+      "Covering Index (índice de cobertura)",
+      "Índices con funciones (MySQL 8.0.13+)",
+      "Índices parciales (column index prefix)",
+      "Estadísticas de índices",
+      "Comparativa: tipos de índice"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/optimizacion/optimizacion-consultas.html",
+    "title": "Optimización de consultas SQL - Guía MySQL",
+    "description": "Técnicas para optimizar consultas MySQL: evitar SELECT *, índices correctos, y más.",
+    "h1": "Optimización de consultas SQL",
+    "headings": [
+      "1. Evita SELECT *",
+      "2. EXISTS vs. IN",
+      "3. LIKE con prefijo fijo",
+      "4. No apliques funciones a columnas indexadas",
+      "5. JOINs óptimos",
+      "6. LIMIT con subconsultas para paginación",
+      "Comparativa rápida: lento vs. rápido"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/optimizacion/particionamiento.html",
+    "title": "Particionamiento de tablas - Guía MySQL",
+    "description": "Divide tablas grandes en partes manejables con particionamiento en MySQL.",
+    "h1": "Particionamiento de tablas",
+    "headings": [
+      "Tipos de particionamiento",
+      "PARTITION BY RANGE",
+      "PARTITION BY LIST",
+      "PARTITION BY HASH",
+      "PARTITION BY KEY",
+      "Cuándo particionar",
+      "Ventajas del particionamiento",
+      "Limitaciones importantes",
+      "ALTER TABLE con particiones"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/practica/ejercicios-avanzados.html",
+    "title": "Ejercicios avanzados de SQL - Guía MySQL",
+    "description": "Practica procedimientos almacenados, triggers, índices y optimización de consultas en MySQL.",
+    "h1": "Ejercicios avanzados de SQL",
+    "headings": [
+      "Tabla de ejemplo: empleados (ampliada)",
+      "Ejercicio 1: Procedimiento almacenado",
+      "Ejercicio 2: Trigger de auditoría",
+      "Ejercicio 3: Índice compuesto y EXPLAIN",
+      "Ejercicio 4: Consulta optimizada vs versión lenta"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/practica/ejercicios-basicos.html",
+    "title": "Ejercicios básicos de SQL - Guía MySQL",
+    "description": "Practica SELECT, WHERE, ORDER BY, LIMIT, INSERT, UPDATE y DELETE con ejercicios guiados.",
+    "h1": "Ejercicios básicos de SQL",
+    "headings": [
+      "Tabla de ejemplo: empleados",
+      "Ejercicio 1: Filtrar empleados por departamento",
+      "Ejercicio 2: ORDER BY y LIMIT",
+      "Ejercicio 3: INSERT de nuevo empleado",
+      "Ejercicio 4: UPDATE de salario",
+      "Ejercicio 5: DELETE de empleados antiguos"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/practica/ejercicios-intermedios.html",
+    "title": "Ejercicios intermedios de SQL - Guía MySQL",
+    "description": "Practica JOINs, GROUP BY, HAVING, funciones agregadas y subconsultas con ejercicios guiados.",
+    "h1": "Ejercicios intermedios de SQL",
+    "headings": [
+      "Tablas de ejemplo",
+      "Ejercicio 1: INNER JOIN clientes-pedidos",
+      "Ejercicio 2: LEFT JOIN con clientes sin pedidos",
+      "Ejercicio 3: GROUP BY con SUM total por cliente",
+      "Ejercicio 4: HAVING para filtrar clientes con gasto alto",
+      "Ejercicio 5: Subconsulta para producto más caro"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/practica/proyectos-practicos.html",
+    "title": "Proyectos prácticos guiados - Guía MySQL",
+    "description": "Proyectos completos para poner en práctica todo lo aprendido: tienda online, blog y gestión escolar.",
+    "h1": "Proyectos prácticos guiados",
+    "headings": [
+      "Proyecto 1: Sistema de Tienda Online",
+      "Diagrama textual",
+      "Consultas para resolver",
+      "Proyecto 2: Blog",
+      "Diagrama textual",
+      "Consultas para resolver",
+      "Proyecto 3: Gestión Escolar",
+      "Diagrama textual",
+      "Consultas para resolver"
+    ],
+    "text": ""
+  },
+  {
+    "url": "pages/recursos/recursos.html",
+    "title": "Recursos para aprender MySQL - Guía MySQL",
+    "description": "Recopilación de recursos gratuitos para aprender MySQL: documentación oficial, cursos, plataformas de práctica y herramientas.",
+    "h1": "Recursos para aprender MySQL",
+    "headings": [
+      "Documentación oficial",
+      "MySQL Reference Manual",
+      "W3Schools MySQL",
+      "MDN Databases",
+      "Cursos gratuitos",
+      "freeCodeCamp",
+      "Codecademy \"Learn SQL\"",
+      "Khan Academy Intro to SQL",
+      "SoloLearn SQL",
+      "YouTube - HolaMundo",
+      "YouTube - Fazt",
+      "Plataformas de práctica",
+      "SQLZoo",
+      "HackerRank SQL",
+      "LeetCode Database",
+      "DB Fiddle",
+      "SQLBolt",
+      "Programiz SQL Compiler",
+      "Herramientas",
+      "MySQL Workbench",
+      "phpMyAdmin",
+      "DBeaver Community",
+      "XAMPP / WAMP / MAMP",
+      "draw.io / dbdiagram.io",
+      "Comunidades",
+      "Stack Overflow (mysql)",
+      "Reddit r/SQL",
+      "Foros del Web"
+    ],
+    "text": ""
+  }
+]
