@@ -1,12 +1,26 @@
 (function () {
+  var containersCreated = false;
+
   function initSearch(inputId, resultsClass) {
     var searchInput = document.getElementById(inputId);
     if (!searchInput) return;
 
-    var allLinks = [];
+    var parent = searchInput.parentNode;
 
-    function collectLinks() {
-      allLinks = [];
+    if (!containersCreated) {
+      var resultsContainer = document.createElement('div');
+      resultsContainer.className = resultsClass || 'search-results-header';
+      resultsContainer.style.cssText =
+        'position:absolute;top:100%;right:0;min-width:280px;max-height:320px;overflow-y:auto;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);display:none;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.12);margin-top:4px;';
+      parent.style.position = 'relative';
+      parent.appendChild(resultsContainer);
+    }
+
+    var resultsContainer = parent.querySelector('.' + resultsClass.replace(' ', '.'));
+    if (!resultsContainer) return;
+
+    searchInput.addEventListener('input', function () {
+      var allLinks = [];
       document.querySelectorAll('.sidebar-nav a, .navbar-menu a').forEach(function (a) {
         var href = a.getAttribute('href');
         var text = a.textContent.trim().toLowerCase();
@@ -14,18 +28,7 @@
           allLinks.push({ el: a, text: text, href: href });
         }
       });
-    }
 
-    collectLinks();
-
-    var resultsContainer = document.createElement('div');
-    resultsContainer.className = resultsClass || 'search-results-header';
-    resultsContainer.style.cssText =
-      'position:absolute;top:100%;right:0;min-width:280px;max-height:320px;overflow-y:auto;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--radius-md);display:none;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,0.12);margin-top:4px;';
-    searchInput.parentNode.style.position = 'relative';
-    searchInput.parentNode.appendChild(resultsContainer);
-
-    searchInput.addEventListener('input', function () {
       var query = this.value.trim().toLowerCase();
       if (query.length < 2) {
         resultsContainer.style.display = 'none';
@@ -48,7 +51,7 @@
           return (
             '<a href="' +
             m.href +
-            '">' +
+            '" style="display:block;padding:0.5rem 1rem;color:var(--text-primary);text-decoration:none;font-size:0.85rem;border-bottom:1px solid var(--border-color);transition:background var(--transition);">' +
             m.el.textContent.trim() +
             '</a>'
           );
@@ -74,6 +77,7 @@
   function init() {
     initSearch('searchInputHeader', 'search-results-header');
     initSearch('searchInput', 'search-results');
+    containersCreated = true;
   }
 
   document.addEventListener('DOMContentLoaded', init);

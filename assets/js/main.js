@@ -4,7 +4,14 @@
     initBackToTop();
     initTabs();
     initAOS();
+    initFixedHeaderFix();
   });
+
+  function initFixedHeaderFix() {
+    window.addEventListener('scroll', function () {
+      document.body.style.top = 0;
+    });
+  }
 
   function initScrollProgress() {
     var bar = document.createElement('div');
