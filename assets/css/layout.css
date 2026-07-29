@@ -8,6 +8,8 @@
   width: 100%;
   z-index: 1000;
   transition: background var(--transition);
+  opacity: 0;
+  animation: pageFadeIn 0.5s ease-out 0.05s forwards;
 }
 
 .navbar {
@@ -492,6 +494,13 @@
   display: none;
 }
 
+@media (min-width: 992px) {
+  .sidebar {
+    opacity: 0;
+    animation: pageFadeIn 0.5s ease-out 0.15s forwards;
+  }
+}
+
 .sidebar-inner {
   position: sticky;
   top: 5rem;
@@ -553,6 +562,8 @@
   color: var(--footer-text);
   padding: 2rem 0;
   margin-top: 3rem;
+  opacity: 0;
+  animation: pageFadeIn 0.5s ease-out 0.25s forwards;
 }
 
 .footer-grid {
