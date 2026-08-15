@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 (function () {
   var canvas = document.getElementById('hero-canvas');
@@ -46,41 +48,6 @@ import * as THREE from 'three';
   var group = new THREE.Group();
   scene.add(group);
 
-  /* Cilindro central (servidor de base de datos) */
-  var serverMat = new THREE.MeshStandardMaterial({
-    color: accent,
-    metalness: 0.35,
-    roughness: 0.35,
-    emissive: accent,
-    emissiveIntensity: 0.18
-  });
-
-  var cyl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.1, 48), serverMat);
-  cyl.position.y = 0.35;
-  group.add(cyl);
-
-  var cap = new THREE.Mesh(new THREE.SphereGeometry(0.24, 32, 32), serverMat);
-  cap.position.y = 1.12;
-  group.add(cap);
-
-  /* Anillos tipo "platter" */
-  var ringMat = new THREE.MeshStandardMaterial({
-    color: accent,
-    metalness: 0.7,
-    roughness: 0.25,
-    transparent: true,
-    opacity: 0.8,
-    emissive: accent,
-    emissiveIntensity: 0.25
-  });
-  var torusGeo = new THREE.TorusGeometry(1.0, 0.035, 16, 64);
-  [0.1, 0.62].forEach(function (y) {
-    var ring = new THREE.Mesh(torusGeo, ringMat);
-    ring.rotation.x = Math.PI / 2.1;
-    ring.position.y = y;
-    group.add(ring);
-  });
-
   /* Nodos orbitantes */
   var nodeMat = new THREE.MeshStandardMaterial({
     color: accent,
@@ -109,6 +76,97 @@ import * as THREE from 'three';
   shell.position.y = 0.35;
   group.add(shell);
 
+  /* Constelación de datos: líneas entre nodos */
+  var connections = [];
+  for (var c = 0; c < COUNT; c++) {
+    connections.push([c, (c + 1) % COUNT]);
+    connections.push([c, (c + 2) % COUNT]);
+    connections.push([c, (c + 3) % COUNT]);
+  }
+  var lineGeo = new THREE.BufferGeometry();
+  lineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(connections.length * 6), 3));
+  var lineMat = new THREE.LineBasicMaterial({
+    color: accent,
+    transparent: true,
+    opacity: 0.3,
+    blending: THREE.AdditiveBlending
+  });
+  var lines = new THREE.LineSegments(lineGeo, lineMat);
+  scene.add(lines);
+
+  /* Paquetes de datos viajando por las conexiones */
+  var packetGeo = new THREE.SphereGeometry(0.045, 12, 12);
+  var packets = [];
+  var PACKET_COUNT = 7;
+  for (var p = 0; p < PACKET_COUNT; p++) {
+    var conn = connections[(p * 5) % connections.length];
+    var mesh = new THREE.Mesh(packetGeo, new THREE.MeshBasicMaterial({
+      color: accent,
+      transparent: true,
+      opacity: 0.9
+    }));
+    scene.add(mesh);
+    packets.push({ mesh: mesh, a: conn[0], b: conn[1], t: p / PACKET_COUNT, speed: 0.28 + (p % 4) * 0.08 });
+  }
+
+  /* Campo de partículas flotantes */
+  var PARTICLE_COUNT = 420;
+  var particlePositions = new Float32Array(PARTICLE_COUNT * 3);
+  var pSpeeds = new Float32Array(PARTICLE_COUNT);
+  for (var i = 0; i < PARTICLE_COUNT; i++) {
+    var radius = 2 + Math.random() * 3.6;
+    var theta = Math.random() * Math.PI * 2;
+    particlePositions[i * 3] = Math.cos(theta) * radius;
+    particlePositions[i * 3 + 1] = Math.random() * 2.8 - 0.4;
+    particlePositions[i * 3 + 2] = Math.sin(theta) * radius;
+    pSpeeds[i] = 0.02 + Math.random() * 0.07;
+  }
+  var particleGeo = new THREE.BufferGeometry();
+  particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+  var particleMat = new THREE.PointsMaterial({
+    color: accent,
+    size: 0.045,
+    transparent: true,
+    opacity: 0.5,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  var particles = new THREE.Points(particleGeo, particleMat);
+  scene.add(particles);
+
+  /* Texto 3D "MySQL" */
+  var textGroup = new THREE.Group();
+  scene.add(textGroup);
+  var textMesh = null;
+  var fontLoader = new FontLoader();
+  fontLoader.load(
+    'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/fonts/helvetiker_bold.typeface.json',
+    function (font) {
+      var geo = new TextGeometry('MySQL', {
+        font: font,
+        size: 0.3,
+        height: 0.08,
+        curveSegments: 8,
+        bevelEnabled: true,
+        bevelThickness: 0.012,
+        bevelSize: 0.012,
+        bevelSegments: 2
+      });
+      geo.center();
+      textMesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
+        color: accent,
+        metalness: 0.5,
+        roughness: 0.3,
+        emissive: accent,
+        emissiveIntensity: 0.3
+      }));
+      textMesh.position.y = 1.2;
+      textGroup.add(textMesh);
+    }
+  );
+
+
+
   /* Rejilla de suelo */
   var grid = new THREE.GridHelper(8, 16, accent, color(mutedHex));
   grid.material.transparent = true;
@@ -130,16 +188,21 @@ import * as THREE from 'three';
     accentHex = cssVar('--accent', '#4f7cff');
     mutedHex = cssVar('--text-muted', '#7a7a94');
     accent = color(accentHex);
-    serverMat.color = accent;
-    serverMat.emissive = accent;
-    ringMat.color = accent;
-    ringMat.emissive = accent;
     nodes.forEach(function (n) {
       n.mesh.material.color = accent;
       n.mesh.material.emissive = accent;
     });
     shell.material.color = accent;
     pointLight.color = accent;
+    lineMat.color = accent;
+    packets.forEach(function (pkt) {
+      pkt.mesh.material.color = accent;
+    });
+    particleMat.color = accent;
+    if (textMesh) {
+      textMesh.material.color = accent;
+      textMesh.material.emissive = accent;
+    }
     grid.geometry.dispose();
     grid.material.dispose();
     scene.remove(grid);
@@ -171,10 +234,15 @@ import * as THREE from 'three';
 
   /* Bucle de render */
   var clock = new THREE.Clock();
+  var elapsed = 0;
+  var vA = new THREE.Vector3();
+  var vB = new THREE.Vector3();
 
   function animate() {
     if (!reduced) {
-      var t = clock.getElapsedTime();
+      var delta = clock.getDelta();
+      elapsed += delta;
+      var t = elapsed;
 
       group.rotation.y = t * 0.12;
 
@@ -184,6 +252,41 @@ import * as THREE from 'three';
 
       shell.rotation.x = t * 0.03;
       shell.rotation.y = t * 0.05;
+
+      /* Líneas de la constelación: siguen a los nodos en coordenadas del mundo */
+      var posArr = lineGeo.attributes.position.array;
+      var li = 0;
+      connections.forEach(function (conn) {
+        nodes[conn[0]].mesh.getWorldPosition(vA);
+        nodes[conn[1]].mesh.getWorldPosition(vB);
+        posArr[li++] = vA.x; posArr[li++] = vA.y; posArr[li++] = vA.z;
+        posArr[li++] = vB.x; posArr[li++] = vB.y; posArr[li++] = vB.z;
+      });
+      lineGeo.attributes.position.needsUpdate = true;
+
+      /* Paquetes de datos viajando */
+      packets.forEach(function (pkt) {
+        pkt.t += delta * pkt.speed;
+        if (pkt.t >= 1) pkt.t -= 1;
+        nodes[pkt.a].mesh.getWorldPosition(vA);
+        nodes[pkt.b].mesh.getWorldPosition(vB);
+        pkt.mesh.position.lerpVectors(vA, vB, pkt.t);
+      });
+
+      /* Partículas flotando hacia arriba */
+      var pArr = particleGeo.attributes.position.array;
+      for (var i = 0; i < PARTICLE_COUNT; i++) {
+        pArr[i * 3 + 1] += pSpeeds[i] * delta * 3;
+        if (pArr[i * 3 + 1] > 2.4) pArr[i * 3 + 1] = -0.4;
+      }
+      particleGeo.attributes.position.needsUpdate = true;
+      particles.rotation.y += delta * 0.02;
+
+      /* Texto 3D girando suavemente */
+      if (textMesh) {
+        textGroup.rotation.y += delta * 0.35;
+        textMesh.position.y = 1.2 + Math.sin(t * 0.5) * 0.04;
+      }
 
       /* Parallax suave de cámara */
       camera.position.x += (targetX * 0.6 - camera.position.x) * 0.04;
