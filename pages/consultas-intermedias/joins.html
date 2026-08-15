@@ -51,6 +51,7 @@
   <link href="../../assets/css/layout.css" rel="stylesheet">
   <link href="../../assets/css/components.css" rel="stylesheet">
   <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <link href="../../assets/css/3d.css" rel="stylesheet">
   <script>
     (function() {
       var theme = localStorage.getItem('mysql-guide-theme');
@@ -99,6 +100,38 @@ flowchart TD
     style R2 fill:#e8eeff,stroke:#4f7cff,stroke-width:2px
     style C2 fill:#e8eeff,stroke:#4f7cff,stroke-width:2px
 </div>
+
+        <h2>Visualiza cada tipo de JOIN</h2>
+        <p>Usa el visualizador interactivo: elige un tipo de JOIN y observa en el diagrama de Venn qué filas participan y cuál es el resultado. Los datos son los mismos de los ejemplos de esta página.</p>
+
+        <div class="join-visualizer" id="join-visualizer">
+          <svg class="join-venn" id="join-venn" viewBox="0 0 560 300" data-join="inner" role="img" aria-label="Diagrama de Venn de los conjuntos clientes y pedidos según el JOIN seleccionado">
+            <circle class="jv-circle jv-circle-a" cx="200" cy="150" r="115"></circle>
+            <circle class="jv-circle jv-circle-b" cx="360" cy="150" r="115"></circle>
+            <circle class="jv-overlay-a" cx="200" cy="150" r="115"></circle>
+            <circle class="jv-overlay-b" cx="360" cy="150" r="115"></circle>
+            <text class="jv-tag" x="200" y="22">clientes (A)</text>
+            <text class="jv-tag" x="360" y="22">pedidos (B)</text>
+            <text class="jv-region" x="135" y="148">Solo clientes</text>
+            <text class="jv-region-sub" x="135" y="164">David Mora</text>
+            <text class="jv-region" x="280" y="148">Ambas tablas</text>
+            <text class="jv-region-sub" x="280" y="164">Ana · Carlos · Elena</text>
+            <text class="jv-region" x="425" y="148">Solo pedidos</text>
+            <text class="jv-region-sub" x="425" y="164">Pedido 105</text>
+            <text class="jv-region-sub" x="280" y="283">INNER = centro · LEFT = todo A · RIGHT = todo B · CROSS = todo</text>
+          </svg>
+          <div class="join-caption" id="join-caption"></div>
+          <div class="join-controls" role="tablist" aria-label="Elige un tipo de JOIN">
+            <button class="join-btn is-active" type="button" role="tab" aria-selected="true" data-join="inner">INNER JOIN</button>
+            <button class="join-btn" type="button" role="tab" aria-selected="false" data-join="left">LEFT JOIN</button>
+            <button class="join-btn" type="button" role="tab" aria-selected="false" data-join="right">RIGHT JOIN</button>
+            <button class="join-btn" type="button" role="tab" aria-selected="false" data-join="cross">CROSS JOIN</button>
+          </div>
+          <div class="join-result">
+            <h4>Resultado del JOIN</h4>
+            <div class="join-rows" id="join-rows"></div>
+          </div>
+        </div>
 
         <h2>Tablas de ejemplo</h2>
         <p>Usaremos las tablas <code>clientes</code> y <code>pedidos</code> para los ejemplos.</p>
@@ -242,6 +275,7 @@ LEFT JOIN empleados j ON e.jefe_id = j.id;</code></pre>
   <script defer src="../../assets/js/main.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
   <script defer src="../../assets/js/anime-init.js"></script>
+  <script defer src="../../assets/js/join-visualizer.js"></script>
 
   <script>
 if ('serviceWorker' in navigator) {
