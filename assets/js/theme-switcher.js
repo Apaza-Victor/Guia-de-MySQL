@@ -11,6 +11,7 @@
   function setTheme(theme) {
     document.documentElement.setAttribute(attr, theme);
     localStorage.setItem(storageKey, theme);
+    document.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: theme } }));
   }
 
   const theme = getPreferredTheme();

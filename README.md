@@ -7,10 +7,13 @@ Sitio web estático y responsive para aprender MySQL desde cero a nivel experto.
 ## Stack
 
 - HTML5 + CSS3 (Variables CSS, diseño mobile-first)
-- JavaScript vanilla (ES6+)
+- JavaScript vanilla (ES6+) + ES Modules
 - Bootstrap Icons, Google Fonts (Poppins + Fira Code)
 - AOS (animaciones al scroll)
 - Prism.js (resaltado de código SQL)
+- Three.js (hero 3D y gráficas 3D de consultas)
+- Babylon.js (diagrama entidad-relación 3D interactivo)
+- anime.js (animaciones en toda la web)
 
 ## Estructura
 
@@ -18,8 +21,8 @@ Sitio web estático y responsive para aprender MySQL desde cero a nivel experto.
 index.html                  → Página de inicio
 404.html                    → Página 404 personalizada
 assets/
-  css/                      → variables, base, layout, components, responsive
-  js/                       → navbar, theme-switcher, search, copy-code, include-partials, main
+  css/                      → variables, base, layout, components, responsive, 3d
+  js/                       → navbar, theme-switcher, search, copy-code, include-partials, main, anime-init, three-hero, three-charts, babylon-er
   partials/                 → header, footer, sidebar
 pages/
   fundamentos/              → Módulo 1
@@ -45,6 +48,10 @@ pages/
 - Callouts (tip, warning, important)
 - Buscador de temas
 - Navegación anterior/siguiente entre temas
+- Hero 3D animado en la portada (Three.js) con contadores de estadísticas
+- Diagrama entidad-relación 3D interactivo (Babylon.js): rotar, zoom y mover la escena
+- Gráficas de barras 3D de consultas SQL (Three.js) en temas como SELECT, GROUP BY y funciones agregadas
+- Animaciones de entrada, scroll y micro-interacciones con anime.js (respetan `prefers-reduced-motion`)
 
 ## Despliegue
 

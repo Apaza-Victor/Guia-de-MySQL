@@ -51,6 +51,17 @@
   <link href="../../assets/css/layout.css" rel="stylesheet">
   <link href="../../assets/css/components.css" rel="stylesheet">
   <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <link href="../../assets/css/3d.css" rel="stylesheet">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
   <script>
     (function() {
       var theme = localStorage.getItem('mysql-guide-theme');
@@ -93,6 +104,9 @@ GROUP BY categoria;</code></pre>
             <tbody><tr><td>Electrónica</td><td>4</td><td>20</td><td>5137.50</td><td>69500.00</td></tr><tr><td>Papelería</td><td>2</td><td>70</td><td>22.50</td><td>1200.00</td></tr><tr><td>Muebles</td><td>2</td><td>5</td><td>2500.00</td><td>13200.00</td></tr></tbody>
           </table>
         </div>
+
+        <p>Visualización 3D del ingreso total por categoría: <strong>arrastra</strong> para rotar, usa la <strong>rueda del mouse</strong> para acercar o alejar.</p>
+        <div class="chart-3d anime-reveal" data-chart3d='{"title":"Ingreso total por categoría","bars":[{"label":"Electrónica","value":69500},{"label":"Muebles","value":13200},{"label":"Papelería","value":1200}]}'></div>
 
         <h2>GROUP BY con varias columnas</h2>
         <p>Puedes agrupar por múltiples columnas para obtener desgloses más detallados. El orden de las columnas en GROUP BY afecta la forma en que se presentan los resultados.</p>
@@ -175,6 +189,9 @@ ORDER BY total DESC;     -- 5. ORDER BY</code></pre>
   <script defer src="../../assets/js/copy-code.js"></script>
   <script defer src="../../assets/js/search.js"></script>
   <script defer src="../../assets/js/main.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <script defer src="../../assets/js/anime-init.js"></script>
+  <script type="module" src="../../assets/js/three-charts.js"></script>
 
   <script>
 if ('serviceWorker' in navigator) {

@@ -55,6 +55,16 @@
   <link href="assets/css/layout.css" rel="stylesheet">
   <link href="assets/css/components.css" rel="stylesheet">
   <link href="assets/css/responsive.css" rel="stylesheet">
+  <link href="assets/css/3d.css" rel="stylesheet">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
 
   <script>
     (function() {
@@ -72,6 +82,7 @@
 
   <main>
     <section class="hero">
+      <canvas id="hero-canvas" class="hero-canvas" aria-hidden="true"></canvas>
       <div class="hero-decor">
         <i class="bi bi-database"></i>
         <i class="bi bi-server"></i>
@@ -173,6 +184,24 @@
           <div class="animate-fade-in" style="text-align:center;padding:1rem;animation-delay:0.3s;"><strong style="font-size:1.5rem;color:var(--accent);">Demanda laboral</strong><br><span style="font-size:0.85rem;color:var(--text-muted);">Altamente solicitado</span></div>
           <div class="animate-fade-in" style="text-align:center;padding:1rem;animation-delay:0.45s;"><strong style="font-size:1.5rem;color:var(--accent);">Comunidad grande</strong><br><span style="font-size:0.85rem;color:var(--text-muted);">Soporte y recursos</span></div>
         </div>
+        <div class="stats-bar anime-reveal">
+          <div class="stat-item">
+            <span class="stat-num js-counter" data-count-to="50" data-suffix="+">0</span>
+            <span class="stat-label">Temas</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num js-counter" data-count-to="9" data-suffix=" módulos">0</span>
+            <span class="stat-label">Cero a experto</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num js-counter" data-count-to="40" data-suffix="+">0</span>
+            <span class="stat-label">Ejemplos SQL</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-num js-counter" data-count-to="100" data-suffix="%">0</span>
+            <span class="stat-label">Gratuito</span>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -186,6 +215,9 @@
   <script defer src="assets/js/copy-code.js"></script>
   <script defer src="assets/js/search.js"></script>
   <script defer src="assets/js/main.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <script defer src="assets/js/anime-init.js"></script>
+  <script type="module" src="assets/js/three-hero.js"></script>
 
   <script>
 if ('serviceWorker' in navigator) {

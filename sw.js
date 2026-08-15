@@ -1,4 +1,4 @@
-var CACHE_NAME = 'mysql-guide-v1';
+var CACHE_NAME = 'mysql-guide-v2';
 var urlsToCache = [
   '/Guia-de-MySQL/',
   '/Guia-de-MySQL/index.html',
@@ -8,12 +8,17 @@ var urlsToCache = [
   '/Guia-de-MySQL/assets/css/layout.css',
   '/Guia-de-MySQL/assets/css/components.css',
   '/Guia-de-MySQL/assets/css/responsive.css',
+  '/Guia-de-MySQL/assets/css/3d.css',
   '/Guia-de-MySQL/assets/js/theme-switcher.js',
   '/Guia-de-MySQL/assets/js/include-partials.js',
   '/Guia-de-MySQL/assets/js/navbar.js',
   '/Guia-de-MySQL/assets/js/copy-code.js',
   '/Guia-de-MySQL/assets/js/search.js',
   '/Guia-de-MySQL/assets/js/main.js',
+  '/Guia-de-MySQL/assets/js/anime-init.js',
+  '/Guia-de-MySQL/assets/js/three-hero.js',
+  '/Guia-de-MySQL/assets/js/three-charts.js',
+  '/Guia-de-MySQL/assets/js/babylon-er.js',
   '/Guia-de-MySQL/assets/search-index.json',
   '/Guia-de-MySQL/assets/favicon.svg',
   '/Guia-de-MySQL/assets/og-image.svg',

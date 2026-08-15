@@ -86,6 +86,11 @@
   margin-bottom: 0.75rem;
 }
 
+.card-icon i {
+  display: inline-block;
+  transform-origin: center;
+}
+
 .card h3 {
   margin-top: 0;
   font-size: 1.15rem;

@@ -51,6 +51,17 @@
   <link href="../../assets/css/layout.css" rel="stylesheet">
   <link href="../../assets/css/components.css" rel="stylesheet">
   <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <link href="../../assets/css/3d.css" rel="stylesheet">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
   <script>
     (function() {
       var theme = localStorage.getItem('mysql-guide-theme');
@@ -134,6 +145,9 @@ GROUP BY categoria;</code></pre>
           </table>
         </div>
 
+        <p>Visualización 3D del resultado: <strong>arrastra</strong> para rotar la gráfica, usa la <strong>rueda del mouse</strong> para acercar o alejar.</p>
+        <div class="chart-3d anime-reveal" data-chart3d='{"title":"Unidades vendidas por categoría (SUM + GROUP BY)","bars":[{"label":"Electrónica","value":20},{"label":"Papelería","value":70},{"label":"Muebles","value":5}]}'></div>
+
         <h2>AVG</h2>
         <p>Calcula el promedio de los valores de una columna numérica. MySQL devuelve un decimal con la mayor precisión posible.</p>
         <div class="code-block">
@@ -188,6 +202,9 @@ FROM ventas;</code></pre>
   <script defer src="../../assets/js/copy-code.js"></script>
   <script defer src="../../assets/js/search.js"></script>
   <script defer src="../../assets/js/main.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <script defer src="../../assets/js/anime-init.js"></script>
+  <script type="module" src="../../assets/js/three-charts.js"></script>
 
   <script>
 if ('serviceWorker' in navigator) {

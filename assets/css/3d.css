@@ -1,0 +1,206 @@
+/* === HERO 3D (Three.js) === */
+.hero > .hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+body.webgl-active .hero-decor {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+/* === GRÁFICAS 3D DE CONSULTAS (Three.js) === */
+.chart-3d {
+  position: relative;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-secondary);
+  margin: 1rem 0 1.5rem;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
+.chart-3d-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+}
+
+.chart-3d-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+.chart-3d-canvas-wrap canvas:active {
+  cursor: grabbing;
+}
+
+.chart-3d-caption {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-primary);
+}
+
+.chart-3d-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.chart-3d-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chart-3d-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.chart-3d-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.chart-3d-msg {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.chart-3d-loading .chart-3d-msg {
+  font-style: italic;
+}
+
+/* === DIAGRAMA ER 3D (Babylon.js) === */
+.er-3d {
+  position: relative;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-secondary);
+  margin: 1.5rem 0;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
+.er-3d canvas {
+  display: block;
+  width: 100%;
+  height: 420px;
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+}
+
+.er-3d canvas:active {
+  cursor: grabbing;
+}
+
+.er-3d-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding: 0.6rem 1rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-primary);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.er-3d-toolbar .hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+}
+
+.er-3d-toolbar .hint i {
+  color: var(--accent);
+}
+
+.er-3d-msg {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* === ANIMACIONES anime.js === */
+.js-anime .anime-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.js-anime .anime-reveal.anime-done {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* === CONTADORES === */
+.stats-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 2.5rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.stat-item {
+  text-align: center;
+  min-width: 110px;
+}
+
+.stat-num {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1.1;
+}
+
+.stat-label {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* === REDUCED MOTION === */
+@media (prefers-reduced-motion: reduce) {
+  .js-anime .anime-reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .hero-canvas,
+  .chart-3d-canvas-wrap canvas,
+  .er-3d canvas {
+    animation: none !important;
+  }
+}

@@ -51,6 +51,17 @@
   <link href="../../assets/css/layout.css" rel="stylesheet">
   <link href="../../assets/css/components.css" rel="stylesheet">
   <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <link href="../../assets/css/3d.css" rel="stylesheet">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
   <script>
     (function() {
       var theme = localStorage.getItem('mysql-guide-theme');
@@ -116,6 +127,9 @@ INSERT INTO empleados VALUES
             </tbody>
           </table>
         </div>
+
+        <p>Visualización 3D de los salarios: <strong>arrastra</strong> para rotar la gráfica, usa la <strong>rueda del mouse</strong> para acercar o alejar.</p>
+        <div class="chart-3d anime-reveal" data-chart3d='{"title":"Salario por empleado","bars":[{"label":"Ana López","value":45000},{"label":"Carlos Ruiz","value":52000},{"label":"María García","value":48000},{"label":"José Pérez","value":55000},{"label":"Laura Díaz","value":41000},{"label":"Pedro Sánchez","value":39000}]}'></div>
 
         <h2>Seleccionar todas las columnas con *</h2>
         <p>El asterisco <code>*</code> es un comodín que representa todas las columnas de la tabla. Aunque es práctico para explorar datos rápidamente, no se recomienda en producción porque puede devolver columnas innecesarias y afectar el rendimiento. Su uso está orientado principalmente a consultas ad-hoc durante el desarrollo.</p>
@@ -229,6 +243,9 @@ INSERT INTO empleados VALUES
   <script defer src="../../assets/js/copy-code.js"></script>
   <script defer src="../../assets/js/search.js"></script>
   <script defer src="../../assets/js/main.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <script defer src="../../assets/js/anime-init.js"></script>
+  <script type="module" src="../../assets/js/three-charts.js"></script>
 
   <script>
 if ('serviceWorker' in navigator) {

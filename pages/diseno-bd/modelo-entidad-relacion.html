@@ -51,6 +51,7 @@
   <link href="../../assets/css/layout.css" rel="stylesheet">
   <link href="../../assets/css/components.css" rel="stylesheet">
   <link href="../../assets/css/responsive.css" rel="stylesheet">
+  <link href="../../assets/css/3d.css" rel="stylesheet">
   <script>
     (function() {
       var theme = localStorage.getItem('mysql-guide-theme');
@@ -138,6 +139,19 @@ erDiagram
     LIBRO ||--o{ PRESTAMO : incluye
 </div>
 
+        <h2>Explora el modelo en 3D</h2>
+        <p>Este diagrama 3D interactivo muestra las entidades <code>AUTOR</code>, <code>LIBRO</code>, <code>SOCIO</code> y <code>PRESTAMO</code> con sus relaciones. <strong>Arrastra</strong> para rotar la escena, usa la <strong>rueda del mouse</strong> para acercar y alejar, y el <strong>botón derecho</strong> para desplazarte.</p>
+        <div class="er-3d anime-reveal" id="er-3d">
+          <canvas id="er-canvas" aria-label="Diagrama entidad-relación interactivo en 3D. Arrastra para rotar, usa la rueda del mouse para acercar o alejar."></canvas>
+          <div class="er-3d-toolbar">
+            <span class="hint"><i class="bi bi-arrows-move"></i> Arrastra para rotar</span>
+            <span class="hint"><i class="bi bi-zoom-in"></i> Rueda para zoom</span>
+            <span class="hint"><i class="bi bi-mouse"></i> Botón derecho para mover</span>
+            <span class="hint"><i class="bi bi-box"></i> Cajas = entidades · líneas = relaciones</span>
+          </div>
+          <p class="er-3d-msg" id="er-3d-msg" style="display:none;"></p>
+        </div>
+
         <div class="code-block">
           <div class="code-label">SQL</div>
           <pre><code class="language-sql">CREATE DATABASE biblioteca;
@@ -200,6 +214,10 @@ CREATE TABLE prestamo (
   <script defer src="../../assets/js/copy-code.js"></script>
   <script defer src="../../assets/js/search.js"></script>
   <script defer src="../../assets/js/main.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+  <script defer src="../../assets/js/anime-init.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/babylonjs@9.21.2/babylon.js"></script>
+  <script defer src="../../assets/js/babylon-er.js"></script>
 
   <script>
 if ('serviceWorker' in navigator) {
